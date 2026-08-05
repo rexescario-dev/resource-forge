@@ -20,6 +20,14 @@ This design covers only the maintainable architecture and project foundation. No
 
 > Build the repository shape first, the contracts second, and the implementations third.
 
+## Architecture principles
+
+- Resource-first, transport-agnostic.
+- Core defines contracts, not implementations.
+- Integrations depend only on core.
+- Framework support is additive, never foundational.
+- Repository structure precedes framework features.
+
 ## Relationship to ContextForge
 
 Resource Forge lives as a **sibling repository** to ContextForge:
@@ -110,13 +118,16 @@ Reserved names (not created yet): `@resource-forge/types`, `contracts`, `testing
 
 ### Allowed dependency graph
 
+`nest`, `graphql`, `prisma`, and `cli` may depend on `core`. `core` depends on none of them.
+
 ```text
-core
- ├── nest
- ├── graphql
- ├── prisma
- └── cli
+              @resource-forge/core
+               ▲      ▲      ▲      ▲
+               │      │      │      │
+            nest   graphql prisma   cli
 ```
+
+Arrows point toward the dependency (importer → imported).
 
 ### Forbidden edges
 
@@ -165,8 +176,8 @@ Each package:
 
 - Builds successfully.
 - Exports a placeholder entry point with a TODO for its future responsibility.
-- Ships a README covering purpose, responsibilities, current status (`placeholder`), future scope, and dependency rules.
-- Uses `version: 0.0.0` and is publishable in principle (`private: false`).
+- Ships a README using a consistent template: Purpose, Responsibilities, Current status, Dependency rules, Future scope.
+- Uses `version: 0.0.0` and is configured to be publishable (`private: false`), although no publishing workflow is included in this scaffold.
 - Depends on `@resource-forge/core` via `workspace:*` where applicable (except `core` itself).
 - Has **no** runtime dependencies on NestJS, Prisma, or GraphQL libraries.
 
@@ -227,7 +238,7 @@ No badges. No implementation examples. No real installation cookbook beyond plac
 | M1 | Repository & workspace foundation |
 | M2 | Core contracts |
 | M3 | Resource model |
-| M4 | Framework integrations (Nest, GraphQL, Prisma) |
+| M4 | Initial transport and persistence integrations (NestJS, GraphQL, Prisma) |
 | M5 | CLI and end-to-end examples |
 
 ## License
@@ -256,3 +267,4 @@ Copyright (c) 2026 Resource Forge Contributors
 4. Package dependency graph matches the allowed/forbidden rules above.
 5. Documentation states intent without promising unimplemented features.
 6. No NestJS, Prisma, or GraphQL runtime dependencies are present.
+7. Every package builds independently within the workspace.
