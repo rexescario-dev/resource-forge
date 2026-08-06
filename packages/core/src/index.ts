@@ -19,3 +19,18 @@ export {
   resourceIdentitiesEqual,
   validateResourceIdentity,
 } from './identity/index.js';
+
+export type {
+  JsonValue,
+  JsonValueValidationError,
+  MetadataEntry,
+  MetadataKey,
+  MetadataKeyKind,
+  MetadataKeyValidationError,
+} from './metadata/index.js';
+export {
+  createMetadataKey,
+  metadataKeysEqual,
+  validateJsonValue,
+  validateMetadataKey,
+} from './metadata/index.js';
