@@ -109,46 +109,71 @@ Exact TypeScript names and module paths are **open until §5 export boundary is 
 
 ## 5. Export boundary
 
-Define the public contract surface intentionally before coding.
+**Status:** Partially accepted (cross-cutting locks). Concrete symbols deferred per slice.
 
-### 5.1 Intended public surface (categories)
+Define the public contract surface intentionally before coding. Review scope follows approach **C**: lock categories, package/module ownership intent, and error/outcome philosophy globally; defer TypeScript names and per-slice export lists to each slice’s task breakdown.
 
-Initial exports should expose only:
+### 5.1 Public contract categories — Accepted
 
-- identity concepts
-- metadata concepts
-- registry concepts
-- extension / composition concepts
+`@resource-forge/core` may expose only these semantic categories:
 
-### 5.2 Must not export (initially)
+- identity
+- metadata
+- registry
+- extension / composition
 
-- internal helpers
-- validation internals not needed by consumers
+Must **not** export:
+
 - adapters
-- runtime implementations (plugin loaders, scanners)
-- anything from `nest` / `graphql` / `prisma` / `cli`
+- runtime loaders
+- discovery
+- persistence
+- framework integrations (`nest` / `graphql` / `prisma` / `cli`)
+- internal helpers not needed by consumers
 
-### 5.3 Proposed module layout (for review; not frozen)
+### 5.2 Module ownership intent — Accepted (layout is not a public contract)
 
-| Path | Responsibility |
+Internal organization direction:
+
+```text
+packages/core/src/
+  identity/
+  metadata/
+  registry/
+  extension/
+  index.ts   # public re-exports only
+```
+
+Co-located Vitest tests under each area. Exact file names inside those directories remain an implementation detail.
+
+An in-memory registry is allowed **only** as a conforming implementation of RFC-003 semantics for tests and local use. It must not add persistence, networking, discovery, caching layers, synchronization, or indexing.
+
+### 5.3 Error / outcome modeling — Accepted (philosophy only)
+
+Use **explicit result types** for semantic operations where failure is an expected contract outcome. Reserve thrown exceptions for programmer misuse or broken invariants (not for RFC-defined outcomes).
+
+RFCs describe outcomes such as:
+
+```text
+register → success | duplicate registration | validation failure | identity mismatch | …
+lookup   → Hit | Miss
+compose  → ResourceMetadata | composition failure
+```
+
+These are part of the contract, not exceptional control flow. Result-oriented modeling keeps those outcomes visible.
+
+Exact TypeScript names (`Result`, `Success`/`Failure`, etc.) are **not** frozen here. Semantic failure classes from the RFCs must remain distinguishable regardless of naming.
+
+### 5.4 Deferred to per-slice review
+
+| Slice | Decide with task breakdown |
 | --- | --- |
-| `packages/core/src/identity/` | RFC-001 types and operations |
-| `packages/core/src/metadata/` | RFC-002 types and operations |
-| `packages/core/src/registry/` | RFC-003 registry contract + in-memory reference impl if needed for tests |
-| `packages/core/src/extension/` | RFC-004 producer + composition |
-| `packages/core/src/index.ts` | Public re-exports only |
-| `packages/core/src/**/*.test.ts` | Co-located Vitest tests proving RFC invariants |
+| M2.1 Identity | type name, construction, validation exposure, parse/format exposure |
+| M2.2 Metadata | metadata/entry/key/value symbols, equality helpers |
+| M2.3 Registry | registry contract shape, lookup/mutation outcome representation |
+| M2.4 Composition | contribution representation, composition entry point, failure variants |
 
-An in-memory registry is allowed **only** as a conforming implementation of RFC-003 semantics for tests and local use. It must not add persistence, networking, or discovery.
-
-### 5.4 Export review gate
-
-Before Task M2.1 code lands, agree:
-
-1. public export list (symbols);
-2. error / result modeling style (throw vs result types) — implementation decision, must not change RFC outcomes;
-3. whether parse/format for identity are public in v0;
-4. whether composition entry points are functions, a small facade, or both — names only, semantics from RFC-004.
+No full-package public symbol list is frozen before M2.1.
 
 ---
 
@@ -274,11 +299,11 @@ Only decisions not covered by RFCs belong here. No semantic decisions.
 
 | Decision | Options / note | Status |
 | --- | --- | --- |
-| Error modeling | thrown errors vs discriminated results | Open — pick at export review; outcomes must match RFC failure classes |
+| Error modeling | explicit results for semantic outcomes; throws for misuse only | **Accepted** (§5.3) — names deferred |
 | Registry reference impl | in-memory Map keyed by identity | Likely yes for tests; not a persistence layer |
-| Public parse/format for identity | expose in v0 vs validate+construct only | Open |
-| Composition public shape | function(s) vs small facade | Open — semantics fixed by RFC-004 §5 |
-| Module file names | as in §5.3 or flatter `src/*.ts` | Open — keep public surface stable either way |
+| Public parse/format for identity | expose in v0 vs construct+validate only | Open — decide in M2.1 task breakdown |
+| Composition public shape | function(s) vs small facade | Open — decide in M2.4 task breakdown |
+| Module file names | under §5.2 directories | Open — not a public contract |
 | Branding / opaque types | nominal vs structural TypeScript types | Open — must not change RFC equality |
 | Placeholder exports | keep `PACKAGE_NAME` / `PACKAGE_VERSION` | Keep for continuity unless export review removes them |
 
@@ -292,12 +317,17 @@ Build tooling (Vitest, tsc, turbo) already exists from M1 — no change required
 
 - [x] this plan is reviewed and Accepted;
 
+Cross-cutting export locks (§5.1–§5.3):
+
+- [x] public categories accepted;
+- [x] module ownership intent accepted;
+- [x] error/outcome philosophy accepted;
+
 M2 coding begins only after:
 
-- [ ] export boundary (§5) is accepted;
-- [ ] contract inventory (§4) is accepted as the semantic checklist;
-- [ ] open decisions in §8 that affect public surface are resolved;
-- [ ] implementation tasks for **M2.1** are written (bite-sized TDD) or explicitly authorized to be derived in-session from §6–§7.
+- [ ] M2.1 export decisions (§5.4) accepted with the M2.1 task breakdown;
+- [ ] contract inventory (§4) treated as the semantic checklist;
+- [ ] implementation tasks for **M2.1** are written (bite-sized TDD) and accepted.
 
 ### 9.2 M2 milestone (implementation gate)
 
@@ -353,10 +383,13 @@ RFCs:
 Plan:
   M2 implementation plan ✅ Accepted
 
+Export boundary:
+  categories / module intent / result philosophy ✅
+  per-slice symbols ⏳ (M2.1 next)
+
 Next:
-  Export boundary review ⏳
-  M2.1 task breakdown ⏳
+  M2.1 export decisions + task breakdown ⏳
 
 Code:
-  @resource-forge/core 🔒 locked until export boundary + M2.1 tasks are accepted
+  @resource-forge/core 🔒 locked until M2.1 tasks are accepted
 ```

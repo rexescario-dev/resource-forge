@@ -65,7 +65,7 @@ Do **not** start coding until the plan is Accepted.
 
 Plan: [`docs/superpowers/plans/2026-08-06-m2-implementation-plan.md`](superpowers/plans/2026-08-06-m2-implementation-plan.md) (Accepted).
 
-Next before code: accept §5 export boundary, then write the M2.1 task breakdown. Suggested slices:
+Cross-cutting export locks accepted. Next before code: M2.1 export decisions + task breakdown. Suggested slices:
 
 1. **M2.1** Identity primitives (RFC-001)
 2. **M2.2** Metadata model (RFC-002)
