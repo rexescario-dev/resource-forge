@@ -61,17 +61,11 @@ On acceptance of each RFC: set **Status: Accepted** in the spec, update [specs i
 
 ## 4. After RFC-002–004 acceptance — freeze M2 contract surface
 
-Do **not** start coding. Write an implementation plan first (suggested location: `docs/superpowers/plans/`, not under packages).
+Do **not** start coding until the plan is Accepted.
 
-Plan should cover:
+Plan: [`docs/superpowers/plans/2026-08-06-m2-implementation-plan.md`](superpowers/plans/2026-08-06-m2-implementation-plan.md) (Draft).
 
-- package ownership (`@resource-forge/core`)
-- public exports and dependency boundaries
-- type / contract inventory mapped from RFC-001–004
-- test obligations
-- migration path from RFC text → code
-
-Suggested implementation slices (plan only until written and agreed):
+It covers package ownership, export boundary, contract inventory, RFC→slice mapping, and test obligations. Suggested slices:
 
 1. **M2.1** Identity primitives (RFC-001)
 2. **M2.2** Metadata model (RFC-002)
