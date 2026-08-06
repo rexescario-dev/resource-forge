@@ -460,7 +460,7 @@ EOF
 - Modify: `packages/core/src/registry/index.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -532,13 +532,13 @@ describe('createInMemoryResourceRegistry — register', () => {
 });
 ```
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
 ```bash
 pnpm --filter @resource-forge/core test -- src/registry/in-memory.test.ts
 ```
 
-- [ ] **Step 3: Minimal `createInMemoryResourceRegistry` with `register` + `lookup`**
+- [x] **Step 3: Minimal `createInMemoryResourceRegistry` with `register` + `lookup`**
 
 Implement in `packages/core/src/registry/in-memory.ts`:
 
@@ -567,7 +567,7 @@ Export factory from barrel + `packages/core/src/index.ts`:
 export { createInMemoryResourceRegistry } from './registry/index.js';
 ```
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git add packages/core/src/registry packages/core/src/index.ts
@@ -586,7 +586,7 @@ EOF
 - Modify: `packages/core/src/registry/in-memory.ts`
 - Modify: `packages/core/src/registry/in-memory.test.ts`
 
-- [ ] **Step 1: Append failing tests**
+- [x] **Step 1: Append failing tests**
 
 ```ts
 describe('createInMemoryResourceRegistry — replace / unregister', () => {
@@ -647,14 +647,14 @@ describe('createInMemoryResourceRegistry — replace / unregister', () => {
 });
 ```
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
-- [ ] **Step 3: Implement `replace` and `unregister`**
+- [x] **Step 3: Implement `replace` and `unregister`**
 
 - `replace`: shared preconditions → require key present → `map.set` with supplied metadata → `ok(undefined)`
 - `unregister`: validate identity → require key present → `map.delete` → `ok(undefined)`
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -672,7 +672,7 @@ EOF
 - Modify: `packages/core/src/registry/in-memory.ts`
 - Modify: `packages/core/src/registry/in-memory.test.ts`
 
-- [ ] **Step 1: Append failing tests**
+- [x] **Step 1: Append failing tests**
 
 ```ts
 describe('createInMemoryResourceRegistry — lookup / enumerate', () => {
@@ -725,9 +725,9 @@ describe('createInMemoryResourceRegistry — lookup / enumerate', () => {
 
 Import `ResourceIdentity` type in the test file if needed.
 
-- [ ] **Step 2: Run — expect FAIL** (enumerate still stubbed)
+- [x] **Step 2: Run — expect FAIL** (enumerate still stubbed)
 
-- [ ] **Step 3: Implement `enumerate`**
+- [x] **Step 3: Implement `enumerate`**
 
 ```ts
 enumerate(): ReadonlyArray<ResourceIdentity> {
@@ -737,7 +737,7 @@ enumerate(): ReadonlyArray<ResourceIdentity> {
 
 Ensure `lookup` validates identity first and returns `miss` on failure (no `Result`).
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -755,7 +755,7 @@ EOF
 - Modify: `packages/core/src/registry/in-memory.ts` (if gaps remain)
 - Modify: `packages/core/src/registry/in-memory.test.ts`
 
-- [ ] **Step 1: Append failing tests**
+- [x] **Step 1: Append failing tests**
 
 ```ts
 describe('createInMemoryResourceRegistry — validation', () => {
@@ -861,9 +861,9 @@ describe('createInMemoryResourceRegistry — validation', () => {
 
 Note on validation order: for `register(identity, mismatchedMetadata)`, if both sides are structurally valid, failure is `identity_mismatch` (not metadata invalid). For forged invalid metadata values, prefer asserting `code` only when nested causes may vary. When both inputs are invalid, the result MUST be `invalid_identity`.
 
-- [ ] **Step 2: Run — expect FAIL** if validation not yet complete
+- [x] **Step 2: Run — expect FAIL** if validation not yet complete
 
-- [ ] **Step 3: Ensure shared precondition helper**
+- [x] **Step 3: Ensure shared precondition helper**
 
 Suggested private helper inside `in-memory.ts`:
 
@@ -919,7 +919,7 @@ function prepareAssociation(
 this.store.set(toKey(identity), metadata);
 ```
 
-- [ ] **Step 4: Full registry tests PASS; commit**
+- [x] **Step 4: Full registry tests PASS; commit**
 
 ```bash
 pnpm --filter @resource-forge/core test -- src/registry
@@ -941,7 +941,7 @@ EOF
 - Modify: `packages/core/src/index.test.ts`
 - Modify: `packages/core/README.md`
 
-- [ ] **Step 1: Smoke-test register → lookup → enumerate → unregister**
+- [x] **Step 1: Smoke-test register → lookup → enumerate → unregister**
 
 Append to `packages/core/src/index.test.ts`:
 
@@ -969,14 +969,14 @@ it('exposes in-memory ResourceRegistry from the package entry', () => {
 });
 ```
 
-- [ ] **Step 2: README** — mark Registry as implemented; list public symbols; note:
+- [x] **Step 2: README** — mark Registry as implemented; list public symbols; note:
 
   - association-only (no composition)
   - concrete Map impl not exported
   - enumerate snapshot / order non-normative
   - lookup miss ≠ error
 
-- [ ] **Step 3: Full core gate**
+- [x] **Step 3: Full core gate**
 
 ```bash
 pnpm --filter @resource-forge/core lint
@@ -987,7 +987,7 @@ pnpm --filter @resource-forge/core build
 
 Expected: all green (prior M2.1/M2.2 tests still pass).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -1025,6 +1025,6 @@ M2.1 Identity                 ✅
 M2.2 Metadata                 ✅
 M2.3 export decisions         ✅
 M2.3 task breakdown           ✅ Accepted
-M2.3 code                     ⏳ Task 1 next
+M2.3 code                     ✅ Complete
 M2.4 Composition              ⏳
 ```

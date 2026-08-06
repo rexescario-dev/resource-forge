@@ -92,7 +92,17 @@ describe('registry types', () => {
     void _l;
     void _e;
 
-    type _ReplaceErr = ReplaceError;
-    type _UnregisterErr = UnregisterError;
+    type ReplaceReturn = ReturnType<ResourceRegistry['replace']>;
+    type UnregisterReturn = ReturnType<ResourceRegistry['unregister']>;
+    const _replace: ReplaceReturn = {
+      ok: false,
+      error: { code: 'not_registered', identity } satisfies ReplaceError,
+    };
+    const _unregister: UnregisterReturn = {
+      ok: false,
+      error: { code: 'not_registered', identity } satisfies UnregisterError,
+    };
+    void _replace;
+    void _unregister;
   });
 });

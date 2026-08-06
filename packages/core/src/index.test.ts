@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PACKAGE_NAME,
   PACKAGE_VERSION,
+  createInMemoryResourceRegistry,
   createMetadataKey,
   createResourceIdentity,
   createResourceMetadata,
@@ -50,5 +51,25 @@ describe('@resource-forge/core', () => {
     }
 
     expect(resourceMetadataEqual(metadata.value, metadata.value)).toBe(true);
+  });
+
+  it('exposes in-memory ResourceRegistry from the package entry', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+    const metadata = createResourceMetadata(identity.value, []);
+    expect(metadata.ok).toBe(true);
+    if (!metadata.ok) {
+      return;
+    }
+
+    const registry = createInMemoryResourceRegistry();
+    expect(registry.register(identity.value, metadata.value).ok).toBe(true);
+    expect(registry.lookup(identity.value).status).toBe('hit');
+    expect(registry.enumerate()).toHaveLength(1);
+    expect(registry.unregister(identity.value).ok).toBe(true);
+    expect(registry.lookup(identity.value)).toEqual({ status: 'miss' });
   });
 });
