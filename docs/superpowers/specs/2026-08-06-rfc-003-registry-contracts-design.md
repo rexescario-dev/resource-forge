@@ -1,7 +1,7 @@
 # RFC-003: Registry Contracts
 
 **Date:** 2026-08-06  
-**Status:** Draft  
+**Status:** Accepted  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Depends on:** RFC-001 (Resource Identity), RFC-002 (Metadata Model)  
 **Blocks:** RFC-004 (Extension Model), M2 implementation
@@ -26,7 +26,7 @@ This RFC does not define:
 
 | Term | Meaning |
 | --- | --- |
-| Resource Registry | The authority for current identity → metadata associations |
+| Resource Registry | The authority for current identity → metadata associations within its scope |
 | Registered identity | An identity that currently has an association in the registry |
 | Current snapshot | The single immutable `ResourceMetadata` currently associated with a registered identity |
 | Hit / Miss | The two possible outcomes of lookup: the associated metadata or the absence of a registered identity |
@@ -189,7 +189,7 @@ The registry is intentionally small. It maintains current associations; it does 
 - **Distinct register / replace / unregister** make caller intent explicit; re-registration is not a silent overwrite or no-op.
 - **Dual-argument identity match** catches wiring bugs without allowing the registry to rewrite metadata.
 - **Lookup Hit/Miss** separates observation from mutation failures.
-- **Enumeration without metadata search** satisfies resource discovery without introducing indexes or query languages.
+- **Enumeration without metadata search** satisfies local inspection of registered identities without introducing discovery protocols.
 - **RFC-001 defines identity validity, RFC-002 defines metadata validity, RFC-003 defines association validity, and RFC-004 defines metadata production.**
 
 ## 7. Relationship to subsequent RFCs

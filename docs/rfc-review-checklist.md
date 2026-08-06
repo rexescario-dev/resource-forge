@@ -8,8 +8,8 @@ Use this checklist to accept RFC-002–004 before any M2 implementation. Do not 
 | --- | --- | --- |
 | [RFC-001](superpowers/specs/2026-08-06-rfc-001-resource-identity-design.md) | Resource identity | Accepted |
 | [RFC-002](superpowers/specs/2026-08-06-rfc-002-metadata-model-design.md) | Metadata model | Accepted |
-| [RFC-003](superpowers/specs/2026-08-06-rfc-003-registry-contracts-design.md) | Registry contracts | Draft — review next |
-| [RFC-004](superpowers/specs/2026-08-06-rfc-004-extension-model-design.md) | Extension model | Draft |
+| [RFC-003](superpowers/specs/2026-08-06-rfc-003-registry-contracts-design.md) | Registry contracts | Accepted |
+| [RFC-004](superpowers/specs/2026-08-06-rfc-004-extension-model-design.md) | Extension model | Draft — review next |
 
 Review in order: **002 → 003 → 004**. Treat earlier accepted RFCs as frozen; record cross-RFC gaps as review comments rather than silent edits.
 
@@ -35,11 +35,11 @@ On acceptance of each RFC: set **Status: Accepted** in the spec, update [specs i
 
 **Goal:** lock registry responsibility.
 
-- [ ] Does the registry only associate identity → completed immutable metadata snapshots?
-- [ ] Are register / replace / unregister / lookup / enumerate semantics clear (including Hit/Miss)?
-- [ ] Is snapshot replacement current-state-only (no retained history)?
-- [ ] Is the registry explicitly prevented from constructing, merging, or interpreting extension metadata?
-- [ ] Does it remain free of discovery protocols, search indexes, and programming-interface prescriptions?
+- [x] Does the registry only associate identity → completed immutable metadata snapshots?
+- [x] Are register / replace / unregister / lookup / enumerate semantics clear (including Hit/Miss)?
+- [x] Is snapshot replacement current-state-only (no retained history)?
+- [x] Is the registry explicitly prevented from constructing, merging, or interpreting extension metadata?
+- [x] Does it remain free of discovery protocols, search indexes, and programming-interface prescriptions?
 
 **Accept when:** association ownership is unambiguous and production stays outside the registry (RFC-004).
 
