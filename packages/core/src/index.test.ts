@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PACKAGE_NAME,
   PACKAGE_VERSION,
+  composeResourceMetadata,
   createInMemoryResourceRegistry,
   createMetadataKey,
   createResourceIdentity,
@@ -71,5 +72,30 @@ describe('@resource-forge/core', () => {
     expect(registry.enumerate()).toHaveLength(1);
     expect(registry.unregister(identity.value).ok).toBe(true);
     expect(registry.lookup(identity.value)).toEqual({ status: 'miss' });
+  });
+
+  it('exposes composeResourceMetadata from the package entry', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const composed = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'graphql',
+            entries: [{ name: 'typeName', value: 'Customer' }],
+          },
+        ],
+      },
+    ]);
+    expect(composed.ok).toBe(true);
+    if (!composed.ok) {
+      return;
+    }
+    expect(resourceMetadataEqual(composed.value, composed.value)).toBe(true);
   });
 });

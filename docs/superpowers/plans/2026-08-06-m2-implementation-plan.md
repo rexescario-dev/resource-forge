@@ -385,7 +385,7 @@ Plan:
 
 Export boundary:
   categories / module intent / result philosophy ✅
-  per-slice symbols ⏳ (M2.1 next)
+  per-slice symbols ✅ (M2.1–M2.4 locked in task plans)
 
 M2.1:
   code ✅ complete
@@ -393,5 +393,15 @@ M2.1:
 M2.2:
   export decisions ✅
   task breakdown ✅ `2026-08-06-m2-2-metadata-model.md`
-  code ✅ M2.2 complete; M2.3 next
+  code ✅ complete
+
+M2.3:
+  export decisions ✅
+  task breakdown ✅ `2026-08-06-m2-3-registry-contracts.md`
+  code ✅ complete
+
+M2.4:
+  export decisions ✅
+  task breakdown ✅ `2026-08-07-m2-4-extension-composition.md`
+  code ✅ complete (M2 milestone contract layer)
 ```
