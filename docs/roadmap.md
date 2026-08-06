@@ -17,12 +17,12 @@ Before implementing M2, architecture decisions are written as small RFCs under [
 
 Planned RFCs for the M2 gate:
 
-| RFC | Topic |
-| --- | --- |
-| RFC-001 | Resource identity |
-| RFC-002 | Metadata model |
-| RFC-003 | Registry contracts |
-| RFC-004 | Extension model |
+| RFC | Topic | Status |
+| --- | --- | --- |
+| RFC-001 | Resource identity | Accepted |
+| RFC-002 | Metadata model | Planned |
+| RFC-003 | Registry contracts | Planned |
+| RFC-004 | Extension model | Planned |
 
 See [RFC process](rfc-process.md).
 

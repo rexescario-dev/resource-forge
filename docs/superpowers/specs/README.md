@@ -7,7 +7,7 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md) and
 | Spec | Status |
 | --- | --- |
 | [Initial scaffold](2026-08-06-resource-forge-initial-scaffold-design.md) | Accepted (M1) |
-| RFC-001 — Resource identity | Planned |
+| [RFC-001 — Resource identity](2026-08-06-rfc-001-resource-identity-design.md) | Accepted |
 | RFC-002 — Metadata model | Planned |
 | RFC-003 — Registry contracts | Planned |
 | RFC-004 — Extension model | Planned |
