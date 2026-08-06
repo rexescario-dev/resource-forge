@@ -196,14 +196,9 @@ ResourceMetadata (RFC-002)
 Registry register/replace (RFC-003)
 ```
 
-## 5. Normative operations
+## 5. Composition capability
 
-These operations describe the minimum semantic capabilities required of conforming implementations (including future `@resource-forge/core` contracts). They do not prescribe public APIs, function names, modules, exception types, or package structure.
-
-| Operation | Responsibility |
-| --- | --- |
-| **contribute** | For a given `ResourceIdentity`, obtain a producer’s contribution: zero or more namespace partitions |
-| **compose** | Combine a `ResourceIdentity` and a provided producer collection into one immutable `ResourceMetadata` or a composition failure, under the rules of this RFC |
+Conforming implementations MUST provide a way to obtain producer contributions and compose them according to this RFC. The public programming interface—including function names, modules, exception types, and package structure—is intentionally unspecified and deferred to M2.
 
 ## 6. Examples
 
