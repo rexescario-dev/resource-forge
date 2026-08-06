@@ -393,5 +393,5 @@ M2.1:
 M2.2:
   export decisions ✅
   task breakdown ✅ `2026-08-06-m2-2-metadata-model.md`
-  code 🔓 in progress
+  code ✅ M2.2 complete; M2.3 next
 ```

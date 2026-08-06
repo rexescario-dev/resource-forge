@@ -7,22 +7,26 @@ Core contracts for Resource Forge — vocabulary and invariants from accepted RF
 ## Responsibilities
 
 - Resource identity (M2.1)
-- Metadata model (planned M2.2)
+- Metadata model (M2.2)
 - Registry contracts (planned M2.3)
 - Extension / composition contracts (planned M2.4)
 
 ## Current status
 
-M2.1 identity primitives are implemented:
+### M2.1 Identity
 
-- `ResourceIdentity`
-- `ResourceIdentityKind`
-- `createResourceIdentity`
-- `validateResourceIdentity`
-- `resourceIdentitiesEqual`
+- `ResourceIdentity`, `ResourceIdentityKind`
+- `createResourceIdentity`, `validateResourceIdentity`, `resourceIdentitiesEqual`
+
+### M2.2 Metadata
+
+- `MetadataKey`, `MetadataKeyKind`, `MetadataEntry`, `ResourceMetadata`, `JsonValue`
+- `createMetadataKey`, `validateMetadataKey`, `metadataKeysEqual`
+- `validateJsonValue`
+- `createResourceMetadata`, `validateResourceMetadata`, `resourceMetadataEqual`
 - shared `Result` / `ok` / `err`
 
-Canonical string `parse` / `format` for `namespace/name` are **not** public.
+Not public: identity/key string parse-format encodings, entry mutation helpers (`withEntry` / `withoutEntry`).
 
 ## Dependency rules
 
@@ -33,4 +37,4 @@ Canonical string `parse` / `format` for `namespace/name` are **not** public.
 
 - Adapters, discovery, persistence, decorators
 - Resource schemas (fields, relations, operations)
-- Metadata, registry, and composition modules (later M2 slices)
+- Registry and composition modules (later M2 slices)

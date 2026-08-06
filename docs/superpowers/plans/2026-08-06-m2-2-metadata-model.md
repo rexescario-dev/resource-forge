@@ -189,13 +189,13 @@ Reuse `packages/core/src/result.ts` and identity APIs from M2.1.
 - Create: `packages/core/src/metadata/json-value.ts`
 - Create: `packages/core/src/metadata/json-value.test.ts`
 
-- [ ] **Step 1: Write failing tests** — accept null/bool/number/string/array/plain object; reject `undefined`, function, bigint; nested object/array paths reported
+- [x] **Step 1: Write failing tests** — accept null/bool/number/string/array/plain object; reject `undefined`, function, bigint; nested object/array paths reported
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
-- [ ] **Step 3: Implement `validateJsonValue`**
+- [x] **Step 3: Implement `validateJsonValue`**
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git commit -m "feat(core): validate JsonValue for metadata entries"
@@ -212,7 +212,7 @@ git commit -m "feat(core): validate JsonValue for metadata entries"
 - Create: `packages/core/src/metadata/index.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
   - valid extension keys: `graphql`/`typeName`, `openapi`/`operationId`
   - invalid name casing / separators
@@ -221,11 +221,11 @@ git commit -m "feat(core): validate JsonValue for metadata entries"
   - equality case-sensitive; no normalization
   - default kind is extension
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
-- [ ] **Step 3: Implement create/validate/equal** (rules derived from RFC-002; RFC-002 remains authoritative)
+- [x] **Step 3: Implement create/validate/equal** (rules derived from RFC-002; RFC-002 remains authoritative)
 
-- [ ] **Step 4: Export; tests PASS; commit**
+- [x] **Step 4: Export; tests PASS; commit**
 
 ```bash
 git commit -m "feat(core): add MetadataKey create/validate/equal"
@@ -243,7 +243,7 @@ git commit -m "feat(core): add MetadataKey create/validate/equal"
 - Create: `packages/core/src/metadata/create.test.ts`
 - Modify barrels / package index
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
   - empty entries success
   - mixed `rf` + extension entries success when keys valid
@@ -253,11 +253,11 @@ git commit -m "feat(core): add MetadataKey create/validate/equal"
   - forged `{namespace:'rf',...}` key accepted when structurally grammar-valid (trust model: no provenance tracking)
   - identity remains the explicit input identity (not derived from entries)
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
-- [ ] **Step 3: Implement validate + create wrapper**
+- [x] **Step 3: Implement validate + create wrapper**
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git commit -m "feat(core): create and validate ResourceMetadata snapshots"
@@ -271,14 +271,14 @@ git commit -m "feat(core): create and validate ResourceMetadata snapshots"
 - Create: `packages/core/src/metadata/equal.ts`
 - Create: `packages/core/src/metadata/equal.test.ts`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
   - equal when same identity + same entries different order
   - unequal when identity differs
   - unequal when value differs
   - missing key ≠ null value
 
-- [ ] **Step 2–4: Implement; PASS; commit**
+- [x] **Step 2–4: Implement; PASS; commit**
 
 ```bash
 git commit -m "feat(core): add resourceMetadataEqual"
@@ -292,11 +292,11 @@ git commit -m "feat(core): add resourceMetadataEqual"
 - Modify: `packages/core/src/index.test.ts`
 - Modify: `packages/core/README.md`
 
-- [ ] **Step 1: Smoke-test** create identity → create metadata key → create metadata → equal
+- [x] **Step 1: Smoke-test** create identity → create metadata key → create metadata → equal
 
-- [ ] **Step 2: README** — document M2.2 exports; note no mutation helpers / no key encodings
+- [x] **Step 2: README** — document M2.2 exports; note no mutation helpers / no key encodings
 
-- [ ] **Step 3: Full core gate**
+- [x] **Step 3: Full core gate**
 
 ```bash
 pnpm --filter @resource-forge/core lint
@@ -305,7 +305,7 @@ pnpm --filter @resource-forge/core test
 pnpm --filter @resource-forge/core build
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git commit -m "docs(core): document M2.2 metadata exports"
@@ -337,5 +337,5 @@ git commit -m "docs(core): document M2.2 metadata exports"
 M2.1 Identity                 ✅
 M2.2 export decisions         ✅
 M2.2 task breakdown           ✅ Accepted
-M2.2 code                     🔓 Task 1 next
+M2.2 code                     ✅ Complete
 ```

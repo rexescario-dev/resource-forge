@@ -34,6 +34,7 @@ export {
   createMetadataKey,
   createResourceMetadata,
   metadataKeysEqual,
+  resourceMetadataEqual,
   validateJsonValue,
   validateMetadataKey,
   validateResourceMetadata,

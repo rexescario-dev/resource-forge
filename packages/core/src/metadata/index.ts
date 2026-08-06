@@ -9,6 +9,7 @@ export type {
   ResourceMetadata,
 } from './types.js';
 export { createResourceMetadata } from './create.js';
+export { resourceMetadataEqual } from './equal.js';
 export { validateJsonValue } from './json-value.js';
 export {
   createMetadataKey,
