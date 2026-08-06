@@ -7,8 +7,8 @@ Use this checklist to accept RFC-002–004 before any M2 implementation. Do not 
 | RFC | Topic | Status |
 | --- | --- | --- |
 | [RFC-001](superpowers/specs/2026-08-06-rfc-001-resource-identity-design.md) | Resource identity | Accepted |
-| [RFC-002](superpowers/specs/2026-08-06-rfc-002-metadata-model-design.md) | Metadata model | Draft — review next |
-| [RFC-003](superpowers/specs/2026-08-06-rfc-003-registry-contracts-design.md) | Registry contracts | Draft |
+| [RFC-002](superpowers/specs/2026-08-06-rfc-002-metadata-model-design.md) | Metadata model | Accepted |
+| [RFC-003](superpowers/specs/2026-08-06-rfc-003-registry-contracts-design.md) | Registry contracts | Draft — review next |
 | [RFC-004](superpowers/specs/2026-08-06-rfc-004-extension-model-design.md) | Extension model | Draft |
 
 Review in order: **002 → 003 → 004**. Treat earlier accepted RFCs as frozen; record cross-RFC gaps as review comments rather than silent edits.
@@ -21,11 +21,11 @@ On acceptance of each RFC: set **Status: Accepted** in the spec, update [specs i
 
 **Goal:** lock the metadata foundation.
 
-- [ ] Is `ResourceMetadata` the correct immutable boundary?
-- [ ] Are entry / `MetadataKey` / `JsonValue` rules complete enough to implement validate/equal?
-- [ ] Is ownership clear (`rf` framework-owned vs non-`rf` producer-owned)?
-- [ ] Are equality and validity consistent with RFC-001 identity (identity explicit, not derived from entries)?
-- [ ] Are there any hidden extension, registry, transport, or persistence assumptions leaking into the model?
+- [x] Is `ResourceMetadata` the correct immutable boundary?
+- [x] Are entry / `MetadataKey` / `JsonValue` rules complete enough to implement validate/equal?
+- [x] Is ownership clear (`rf` framework-owned vs non-`rf` producer-owned)?
+- [x] Are equality and validity consistent with RFC-001 identity (identity explicit, not derived from entries)?
+- [x] Are there any hidden extension, registry, transport, or persistence assumptions leaking into the model?
 
 **Accept when:** boundaries are crisp and no further design questions block M2 metadata contracts.
 

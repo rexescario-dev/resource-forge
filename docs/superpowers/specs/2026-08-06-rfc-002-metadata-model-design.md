@@ -1,7 +1,7 @@
 # RFC-002: Metadata Model
 
 **Date:** 2026-08-06  
-**Status:** Draft  
+**Status:** Accepted  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Depends on:** RFC-001 (Resource Identity)  
 **Blocks:** RFC-003 (Registry Contracts), RFC-004 (Extension Model), M2 implementation

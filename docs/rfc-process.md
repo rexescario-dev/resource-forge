@@ -38,7 +38,7 @@ Do not implement core contracts until these are accepted:
 | RFC | Topic | Status |
 | --- | --- | --- |
 | RFC-001 | Resource identity | Accepted |
-| RFC-002 | Metadata model | Draft |
+| RFC-002 | Metadata model | Accepted |
 | RFC-003 | Registry contracts | Draft |
 | RFC-004 | Extension model | Draft |
 
