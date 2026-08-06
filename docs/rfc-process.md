@@ -40,8 +40,8 @@ Do not implement core contracts until these are accepted:
 | RFC-001 | Resource identity | Accepted |
 | RFC-002 | Metadata model | Accepted |
 | RFC-003 | Registry contracts | Accepted |
-| RFC-004 | Extension model | Draft |
+| RFC-004 | Extension model | Accepted |
 
-Next step is **review and acceptance**, not implementation. Use the [RFC review & acceptance checklist](rfc-review-checklist.md) (order: RFC-002 → RFC-003 → RFC-004). After acceptance, write an M2 implementation plan before coding.
+RFC-001–004 are accepted. Next step is an **M2 implementation plan** (not code). Use the [RFC review & acceptance checklist](rfc-review-checklist.md) for post-acceptance planning gates.
 
 M3+ work may introduce additional RFCs as needed.

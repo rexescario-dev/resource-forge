@@ -5,8 +5,8 @@ Resource Forge grows by design before implementation. After the repository found
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M1 | Repository & workspace foundation | Done |
-| — | Core architecture RFCs (gate before M2) | Next |
-| M2 | Core contracts (vocabulary, not behavior) | Planned |
+| — | Core architecture RFCs (gate before M2) | Done |
+| M2 | Core contracts (vocabulary, not behavior) | Planned (plan next) |
 | M3 | Resource model | Planned |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
@@ -22,7 +22,7 @@ Planned RFCs for the M2 gate:
 | RFC-001 | Resource identity | Accepted |
 | RFC-002 | Metadata model | Accepted |
 | RFC-003 | Registry contracts | Accepted |
-| RFC-004 | Extension model | Draft |
+| RFC-004 | Extension model | Accepted |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 

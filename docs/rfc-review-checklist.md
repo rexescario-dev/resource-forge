@@ -9,7 +9,7 @@ Use this checklist to accept RFC-002–004 before any M2 implementation. Do not 
 | [RFC-001](superpowers/specs/2026-08-06-rfc-001-resource-identity-design.md) | Resource identity | Accepted |
 | [RFC-002](superpowers/specs/2026-08-06-rfc-002-metadata-model-design.md) | Metadata model | Accepted |
 | [RFC-003](superpowers/specs/2026-08-06-rfc-003-registry-contracts-design.md) | Registry contracts | Accepted |
-| [RFC-004](superpowers/specs/2026-08-06-rfc-004-extension-model-design.md) | Extension model | Draft — review next |
+| [RFC-004](superpowers/specs/2026-08-06-rfc-004-extension-model-design.md) | Extension model | Accepted |
 
 Review in order: **002 → 003 → 004**. Treat earlier accepted RFCs as frozen; record cross-RFC gaps as review comments rather than silent edits.
 
@@ -49,11 +49,11 @@ On acceptance of each RFC: set **Status: Accepted** in the spec, update [specs i
 
 **Goal:** lock extension and composition boundaries.
 
-- [ ] Are producers responsible for contributing metadata (namespace partitions)?
-- [ ] Is composition a semantic capability only (no prescribed public API / operation names)?
-- [ ] Can multiple producers contribute without the registry becoming an orchestrator?
-- [ ] Are exclusive namespace ownership, empty contribution, unordered producers, and pure composition unambiguous?
-- [ ] Is the composition boundary sufficient for future authoring styles and adapters without redesigning 001–003?
+- [x] Are producers responsible for contributing metadata (namespace partitions)?
+- [x] Is composition a semantic capability only (no prescribed public API / operation names)?
+- [x] Can multiple producers contribute without the registry becoming an orchestrator?
+- [x] Are exclusive namespace ownership, empty contribution, unordered producers, and pure composition unambiguous?
+- [x] Is the composition boundary sufficient for future authoring styles and adapters without redesigning 001–003?
 
 **Accept when:** production/composition is fully specified and discovery, DI, transports, and persistence remain out of scope.
 
@@ -94,6 +94,6 @@ ResourceMetadata (RFC-002)
 Registry register/replace (RFC-003)
 ```
 
-- [ ] No RFC redefines another’s responsibility
-- [ ] NestJS, GraphQL, Prisma, decorators, and persistence are not first-class in any gate RFC
-- [ ] M2 remains vocabulary/contracts only (no runtime scanning or adapters)
+- [x] No RFC redefines another’s responsibility
+- [x] NestJS, GraphQL, Prisma, decorators, and persistence are not first-class in any gate RFC
+- [x] M2 remains vocabulary/contracts only (no runtime scanning or adapters)

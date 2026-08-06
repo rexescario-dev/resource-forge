@@ -1,7 +1,7 @@
 # RFC-004: Extension Model
 
 **Date:** 2026-08-06  
-**Status:** Draft  
+**Status:** Accepted  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Depends on:** RFC-001 (Resource Identity), RFC-002 (Metadata Model), RFC-003 (Registry Contracts)  
 **Blocks:** M2 implementation
