@@ -133,14 +133,14 @@ Core does not introduce runtime-specific value types (for example framework clas
 
 1. **Unordered** — Ordering has no semantic meaning and MUST NOT affect equality.
 2. **Unique keys** — Duplicate `MetadataKey`s are not permitted within a single `ResourceMetadata` value.
-3. **Unknown namespaces preserved** — Consumers that do not understand a namespace MUST preserve those entries without modification or reinterpretation.
+3. **Unknown namespaces preserved** — Consumers that do not understand a namespace MUST preserve those entries without modification or reinterpretation. Consumers MAY ignore namespaces they do not understand, but MUST preserve them when producing a derived `ResourceMetadata` value.
 4. **Ownership of interpretation** — Core assigns semantics only to metadata defined by the reserved `rf` namespace. Entries in all other namespaces are owned by their defining extension or producer. Core MUST NOT interpret extension-owned metadata beyond the structural rules of this RFC.
 
 Invalid inputs are errors. Implementations MUST NOT silently drop, merge, normalize, or reinterpret conflicting or invalid metadata entries.
 
 ## 4. Normative operations
 
-These are semantic contracts for future implementations (including `@resource-forge/core`). This RFC does not define concrete APIs, function names, or modules.
+These operations describe the minimum semantic capabilities required of conforming implementations (including future `@resource-forge/core` contracts). They do not prescribe public APIs, function names, modules, or package structure.
 
 | Operation | Responsibility |
 | --- | --- |
@@ -153,7 +153,7 @@ Construction of a new snapshot from a previous one (add/remove/replace entry) is
 
 These statements constrain future RFCs and packages. They do not define registry or adapter behavior in this RFC.
 
-- Registries associate metadata with resources by `ResourceIdentity` (RFC-001). They MUST treat `ResourceMetadata` as immutable snapshots.
+- Future registries associate metadata with resources by `ResourceIdentity` (RFC-001). They MUST treat `ResourceMetadata` as immutable snapshots.
 - Adapters and transports MAY read metadata entries. They MUST NOT redefine identity from metadata, and MUST NOT strip unknown namespaces.
 - Future RFCs MAY define concrete `rf` keys. Such keys MUST use the reserved `rf` namespace and MUST NOT change identity semantics.
 - Opaque or surrogate storage identifiers MAY exist for optimization. They MUST NOT replace `ResourceIdentity` or redefine `MetadataKey`.
