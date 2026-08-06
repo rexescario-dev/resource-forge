@@ -21,7 +21,7 @@ Planned RFCs for the M2 gate:
 | --- | --- | --- |
 | RFC-001 | Resource identity | Accepted |
 | RFC-002 | Metadata model | Draft |
-| RFC-003 | Registry contracts | Planned |
+| RFC-003 | Registry contracts | Draft |
 | RFC-004 | Extension model | Planned |
 
 See [RFC process](rfc-process.md).
