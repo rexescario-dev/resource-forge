@@ -39,3 +39,12 @@ export {
   validateMetadataKey,
   validateResourceMetadata,
 } from './metadata/index.js';
+
+export type {
+  LookupResult,
+  RegisterError,
+  RegistryMutationError,
+  ReplaceError,
+  ResourceRegistry,
+  UnregisterError,
+} from './registry/index.js';
