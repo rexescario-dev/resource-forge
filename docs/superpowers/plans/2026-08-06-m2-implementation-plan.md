@@ -168,7 +168,7 @@ Exact TypeScript names (`Result`, `Success`/`Failure`, etc.) are **not** frozen 
 
 | Slice | Decide with task breakdown |
 | --- | --- |
-| M2.1 Identity | type name, construction, validation exposure, parse/format exposure |
+| M2.1 Identity | construct+validate+equal locked; concrete symbols in [M2.1 task plan](2026-08-06-m2-1-identity-primitives.md) |
 | M2.2 Metadata | metadata/entry/key/value symbols, equality helpers |
 | M2.3 Registry | registry contract shape, lookup/mutation outcome representation |
 | M2.4 Composition | contribution representation, composition entry point, failure variants |
@@ -301,7 +301,7 @@ Only decisions not covered by RFCs belong here. No semantic decisions.
 | --- | --- | --- |
 | Error modeling | explicit results for semantic outcomes; throws for misuse only | **Accepted** (§5.3) — names deferred |
 | Registry reference impl | in-memory Map keyed by identity | Likely yes for tests; not a persistence layer |
-| Public parse/format for identity | expose in v0 vs construct+validate only | Open — decide in M2.1 task breakdown |
+| Public parse/format for identity | construct+validate public; parse/format deferred | **Accepted** — see M2.1 task plan |
 | Composition public shape | function(s) vs small facade | Open — decide in M2.4 task breakdown |
 | Module file names | under §5.2 directories | Open — not a public contract |
 | Branding / opaque types | nominal vs structural TypeScript types | Open — must not change RFC equality |
@@ -387,9 +387,10 @@ Export boundary:
   categories / module intent / result philosophy ✅
   per-slice symbols ⏳ (M2.1 next)
 
-Next:
-  M2.1 export decisions + task breakdown ⏳
+M2.1:
+  construct+validate+equal ✅
+  task breakdown ⏳ Draft — `2026-08-06-m2-1-identity-primitives.md`
 
 Code:
-  @resource-forge/core 🔒 locked until M2.1 tasks are accepted
+  @resource-forge/core 🔒 locked until M2.1 task plan is Accepted
 ```

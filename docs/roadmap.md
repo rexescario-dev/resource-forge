@@ -6,7 +6,7 @@ Resource Forge grows by design before implementation. After the repository found
 | --- | --- | --- |
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
-| M2 | Core contracts (vocabulary, not behavior) | Planned — [implementation plan](superpowers/plans/2026-08-06-m2-implementation-plan.md) (Accepted); M2.1 task breakdown next |
+| M2 | Core contracts (vocabulary, not behavior) | Planned — [M2 plan](superpowers/plans/2026-08-06-m2-implementation-plan.md) Accepted; [M2.1 tasks](superpowers/plans/2026-08-06-m2-1-identity-primitives.md) Draft |
 | M3 | Resource model | Planned |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
