@@ -14,4 +14,8 @@ export type {
   ResourceIdentity,
   ResourceIdentityKind,
 } from './identity/index.js';
-export { validateResourceIdentity } from './identity/index.js';
+export {
+  createResourceIdentity,
+  resourceIdentitiesEqual,
+  validateResourceIdentity,
+} from './identity/index.js';
