@@ -6,15 +6,6 @@
 **Depends on:** RFC-001 (Resource Identity), RFC-002 (Metadata Model)  
 **Blocks:** RFC-004 (Extension Model), M2 implementation
 
-## Terminology
-
-| Term | Meaning |
-| --- | --- |
-| Resource Registry | The authority for current identity → metadata associations |
-| Registered identity | An identity that currently has an association in the registry |
-| Current snapshot | The single immutable `ResourceMetadata` currently associated with a registered identity |
-| Hit / Miss | The two possible outcomes of lookup: the associated metadata or the absence of a registered identity |
-
 ## 1. Scope
 
 **RFC-003 defines the semantic responsibilities of a Resource Registry:** maintaining the current association between a `ResourceIdentity` (RFC-001) and an immutable `ResourceMetadata` snapshot (RFC-002), and answering queries about that association. It does not prescribe APIs, storage, discovery protocols, indexing, providers, concurrency, networking, or implementation details.
@@ -31,11 +22,20 @@ This RFC does not define:
 - metadata production or extension contribution (RFC-004);
 - registry implementations or programming interfaces.
 
+## Terminology
+
+| Term | Meaning |
+| --- | --- |
+| Resource Registry | The authority for current identity → metadata associations |
+| Registered identity | An identity that currently has an association in the registry |
+| Current snapshot | The single immutable `ResourceMetadata` currently associated with a registered identity |
+| Hit / Miss | The two possible outcomes of lookup: the associated metadata or the absence of a registered identity |
+
 ## 2. Ownership and association model
 
 ### 2.1 What the registry owns
 
-- The current set of registered `ResourceIdentity` values.
+- The current identity → metadata associations.
 - For each registered identity, exactly one current immutable `ResourceMetadata` snapshot.
 - Enforcement of the association invariants and mutation preconditions defined by this RFC.
 
@@ -54,7 +54,7 @@ ResourceIdentity  →  current ResourceMetadata snapshot
 
 - At most one current snapshot per identity.
 - The registry is current-state only: replacing or unregistering a snapshot leaves no observable history.
-- The registry never derives identity from metadata entries, never rewrites `metadata.identity`, and never merges or partially updates snapshots.
+- The registry never derives identity from metadata, never rewrites `metadata.identity`, and never merges or partially updates snapshots.
 - For every registered association `(identity, metadata)`, `identity` SHALL equal `metadata.identity` under RFC-001 equality.
 
 ### 2.4 State model
@@ -83,7 +83,7 @@ Unregistered
 
 ## 3. Operations and invariants
 
-These operations describe the minimum semantic capabilities required of conforming implementations (including future `@resource-forge/core` contracts). They do not prescribe public APIs, function names, modules, exception types, or package structure.
+These operations describe the minimum semantic capabilities required of conforming implementations (including the future contracts defined by `@resource-forge/core`). They do not prescribe public APIs, function names, modules, exception types, or package structure.
 
 ### 3.1 Shared mutation preconditions
 
@@ -102,7 +102,7 @@ Ill-formed inputs and identity mismatch are errors. The registry MUST NOT repair
 | **register** `(identity, metadata)` | Mutation | Identity **not** registered; shared preconditions (§3.1) | Identity becomes registered with `metadata` as current snapshot |
 | **replace** `(identity, metadata)` | Mutation | Identity **is** registered; shared preconditions (§3.1) | Current snapshot becomes `metadata`; no history retained |
 | **unregister** `(identity)` | Mutation | Identity **is** registered | Association removed; identity unregistered; no history retained |
-| **lookup** `(identity)` | Query | — | **Hit**(current snapshot) or **Miss** |
+| **lookup** `(identity)` | Query | — | Hit(current snapshot) or Miss |
 | **enumerate** | Query | — | The set of currently registered identities; no ordering, filtering, or metadata-based querying is implied |
 
 ### 3.3 Semantic outcomes
@@ -113,9 +113,9 @@ Ill-formed inputs and identity mismatch are errors. The registry MUST NOT repair
 | `replace` / `unregister` when not registered | Not registered |
 | Invalid identity or metadata | Validation failure |
 | `identity ≠ metadata.identity` | Identity mismatch |
-| `lookup` when not registered | **Miss** |
+| `lookup` when not registered | Miss |
 
-`lookup` is a pure query. Absence is a successful observation (**Miss**), not a mutation failure.
+`lookup` is a pure query. Absence is a successful observation (Miss), not a mutation failure.
 
 ### 3.4 Invariants
 
@@ -190,7 +190,7 @@ The registry is intentionally small. It maintains current associations; it does 
 - **Dual-argument identity match** catches wiring bugs without allowing the registry to rewrite metadata.
 - **Lookup Hit/Miss** separates observation from mutation failures.
 - **Enumeration without metadata search** satisfies resource discovery without introducing indexes or query languages.
-- **Structural validity belongs to RFC-001 and RFC-002; association validity belongs to RFC-003; metadata production belongs to RFC-004.**
+- **RFC-001 defines identity validity, RFC-002 defines metadata validity, RFC-003 defines association validity, and RFC-004 defines metadata production.**
 
 ## 7. Relationship to subsequent RFCs
 
@@ -211,5 +211,5 @@ This RFC is accepted when:
 2. Conceptual operations and semantic outcomes are fully specified without prescribing APIs or implementations.
 3. Invariants guarantee identity/metadata agreement, whole-snapshot mutation, and current-state-only behavior.
 4. Lookup distinguishes Hit from Miss without manufacturing metadata.
-5. History, multi-profile catalogs, metadata search, providers, storage, and programming interfaces remain clearly out of scope.
+5. Historical metadata, multi-profile catalogs, metadata search, providers, storage, and programming interfaces remain clearly out of scope.
 6. No normative requirements depend on implementation language, storage mechanism, or runtime.
