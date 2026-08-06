@@ -63,9 +63,9 @@ On acceptance of each RFC: set **Status: Accepted** in the spec, update [specs i
 
 Do **not** start coding until the plan is Accepted.
 
-Plan: [`docs/superpowers/plans/2026-08-06-m2-implementation-plan.md`](superpowers/plans/2026-08-06-m2-implementation-plan.md) (Draft).
+Plan: [`docs/superpowers/plans/2026-08-06-m2-implementation-plan.md`](superpowers/plans/2026-08-06-m2-implementation-plan.md) (Accepted).
 
-It covers package ownership, export boundary, contract inventory, RFC→slice mapping, and test obligations. Suggested slices:
+Next before code: accept §5 export boundary, then write the M2.1 task breakdown. Suggested slices:
 
 1. **M2.1** Identity primitives (RFC-001)
 2. **M2.2** Metadata model (RFC-002)

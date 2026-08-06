@@ -42,6 +42,6 @@ Do not implement core contracts until these are accepted:
 | RFC-003 | Registry contracts | Accepted |
 | RFC-004 | Extension model | Accepted |
 
-RFC-001–004 are accepted. Next step is an **M2 implementation plan** (not code). Use the [RFC review & acceptance checklist](rfc-review-checklist.md) for post-acceptance planning gates.
+RFC-001–004 and the [M2 implementation plan](superpowers/plans/2026-08-06-m2-implementation-plan.md) are accepted. Next: **export boundary review**, then M2.1 task breakdown — still no core contract code until those gates pass. See the [RFC review checklist](rfc-review-checklist.md).
 
 M3+ work may introduce additional RFCs as needed.

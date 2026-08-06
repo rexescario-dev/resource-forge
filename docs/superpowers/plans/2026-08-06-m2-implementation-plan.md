@@ -1,8 +1,8 @@
 # M2 Implementation Plan
 
-> **For agentic workers:** Do **not** implement code from this document until Status is Accepted and the contract inventory / export boundary below are reviewed. After acceptance, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` to implement bite-sized TDD tasks derived from §6 slices. This plan intentionally omits TypeScript signatures so the public surface is agreed before code freezes it.
+> **For agentic workers:** Plan Status is Accepted. Do **not** implement code until the §5 export boundary is accepted and M2.1 bite-sized TDD tasks exist. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. This plan intentionally omits TypeScript signatures so the public surface is agreed before code freezes it.
 
-**Status:** Draft  
+**Status:** Accepted  
 **Depends on:** RFC-001–004 (Accepted)  
 **Package:** `@resource-forge/core`  
 **Scope:** Contract implementation only (vocabulary + invariants; not behavior of adapters or hosts)
@@ -109,7 +109,7 @@ Exact TypeScript names and module paths are **open until §5 export boundary is 
 
 ## 5. Export boundary
 
-Define the public API intentionally before coding.
+Define the public contract surface intentionally before coding.
 
 ### 5.1 Intended public surface (categories)
 
@@ -211,7 +211,7 @@ Implement in order. Each slice must be testable alone. Do not start a later slic
 
 - producer contribution model (namespace partitions);
 - exclusive namespace ownership;
-- framework vs extension producer kind for `rf`;
+- framework/core vs extension producer role for `rf`;
 - pure composition → one `ResourceMetadata` or failure;
 - empty contribution and empty producer set success paths;
 - order independence.
@@ -290,10 +290,11 @@ Build tooling (Vitest, tsc, turbo) already exists from M1 — no change required
 
 ### 9.1 This plan (planning gate)
 
+- [x] this plan is reviewed and Accepted;
+
 M2 coding begins only after:
 
-- [ ] this plan is reviewed;
-- [ ] export boundary (§5) is agreed;
+- [ ] export boundary (§5) is accepted;
 - [ ] contract inventory (§4) is accepted as the semantic checklist;
 - [ ] open decisions in §8 that affect public surface are resolved;
 - [ ] implementation tasks for **M2.1** are written (bite-sized TDD) or explicitly authorized to be derived in-session from §6–§7.
@@ -303,7 +304,7 @@ M2 coding begins only after:
 M2 is complete when:
 
 - [ ] M2.1–M2.4 invariants in §7 have green tests in `@resource-forge/core`;
-- [ ] public exports match the agreed §5 surface;
+- [ ] public exports match the accepted §5 contract surface;
 - [ ] no NestJS / GraphQL / Prisma / decorator / discovery code landed in core;
 - [ ] placeholder packages outside core remain feature-free;
 - [ ] docs status: roadmap M2 updated to Done (or equivalent) only after the above.
@@ -350,8 +351,12 @@ RFCs:
   004 ✅ Accepted
 
 Plan:
-  M2 implementation plan ⏳ Draft (this document)
+  M2 implementation plan ✅ Accepted
+
+Next:
+  Export boundary review ⏳
+  M2.1 task breakdown ⏳
 
 Code:
-  @resource-forge/core 🔒 locked until this plan is Accepted
+  @resource-forge/core 🔒 locked until export boundary + M2.1 tasks are accepted
 ```
