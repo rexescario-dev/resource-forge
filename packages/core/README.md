@@ -2,25 +2,35 @@
 
 ## Purpose
 
-Framework abstractions for Resource Forge.
+Core contracts for Resource Forge — vocabulary and invariants from accepted RFCs.
 
 ## Responsibilities
 
-- Resource contracts
-- Metadata model
-- Registry interfaces
-- Extension points
-- Internal utilities
+- Resource identity (M2.1)
+- Metadata model (planned M2.2)
+- Registry contracts (planned M2.3)
+- Extension / composition contracts (planned M2.4)
 
 ## Current status
 
-Placeholder. No framework features are implemented yet.
+M2.1 identity primitives are implemented:
+
+- `ResourceIdentity`
+- `ResourceIdentityKind`
+- `createResourceIdentity`
+- `validateResourceIdentity`
+- `resourceIdentitiesEqual`
+- shared `Result` / `ok` / `err`
+
+Canonical string `parse` / `format` for `namespace/name` are **not** public.
 
 ## Dependency rules
 
 - Must not depend on NestJS, Prisma, or GraphQL
 - All other `@resource-forge/*` packages may depend on this package
 
-## Future scope
+## Non-goals (current)
 
-Define the resource-first contracts that transports and persistence adapters implement against.
+- Adapters, discovery, persistence, decorators
+- Resource schemas (fields, relations, operations)
+- Metadata, registry, and composition modules (later M2 slices)

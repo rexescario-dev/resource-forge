@@ -101,7 +101,7 @@ true iff `a.namespace === b.namespace && a.name === b.name` (no trimming/casefol
 - Create: `packages/core/src/result.test.ts`
 - Modify: `packages/core/src/index.ts` (export `Result`, `Ok`, `Err`, `ok`, `err`)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -118,12 +118,12 @@ describe('Result', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `pnpm --filter @resource-forge/core test -- src/result.test.ts`  
 Expected: FAIL (module not found)
 
-- [ ] **Step 3: Minimal implementation**
+- [x] **Step 3: Minimal implementation**
 
 ```ts
 export type Ok<T> = { readonly ok: true; readonly value: T };
@@ -139,11 +139,11 @@ export function err<E>(error: E): Err<E> {
 }
 ```
 
-- [ ] **Step 4: Export from package entry and re-run tests**
+- [x] **Step 4: Export from package entry and re-run tests**
 
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/core/src/result.ts packages/core/src/result.test.ts packages/core/src/index.ts
@@ -161,7 +161,7 @@ git commit -m "feat(core): add Result helpers for semantic outcomes"
 - Create: `packages/core/src/identity/index.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Write failing validation tests (grammar + reserved namespace)**
+- [x] **Step 1: Write failing validation tests (grammar + reserved namespace)**
 
 Cover at least:
 
@@ -211,9 +211,9 @@ describe('validateResourceIdentity', () => {
 
 Add further cases from RFC-001 §8.2 as separate `it` blocks in the same file.
 
-- [ ] **Step 2: Run tests — expect FAIL**
+- [x] **Step 2: Run tests — expect FAIL**
 
-- [ ] **Step 3: Implement types + validate**
+- [x] **Step 3: Implement types + validate**
 
 ```ts
 // types.ts (illustrative)
@@ -237,9 +237,9 @@ Validation rules (derived from RFC-001; RFC-001 remains authoritative):
 - if `kind === 'user'` and `namespace === 'rf'` → `reserved_namespace`
 - return `ok({ namespace, name })` with the **exact** input strings on success (no cloning mutations beyond readonly object)
 
-- [ ] **Step 4: Export via `identity/index.ts` and package `index.ts`; tests PASS**
+- [x] **Step 4: Export via `identity/index.ts` and package `index.ts`; tests PASS**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git commit -m "feat(core): validate ResourceIdentity per RFC-001"
@@ -255,7 +255,7 @@ git commit -m "feat(core): validate ResourceIdentity per RFC-001"
 - Modify: `packages/core/src/identity/index.ts`
 - Modify: `packages/core/src/index.ts`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -277,9 +277,9 @@ describe('createResourceIdentity', () => {
 });
 ```
 
-- [ ] **Step 2: Run — expect FAIL**
+- [x] **Step 2: Run — expect FAIL**
 
-- [ ] **Step 3: Implement as validate wrapper**
+- [x] **Step 3: Implement as validate wrapper**
 
 ```ts
 export function createResourceIdentity(
@@ -294,7 +294,7 @@ export function createResourceIdentity(
 }
 ```
 
-- [ ] **Step 4: Tests PASS; commit**
+- [x] **Step 4: Tests PASS; commit**
 
 ```bash
 git commit -m "feat(core): add createResourceIdentity"
@@ -309,7 +309,7 @@ git commit -m "feat(core): add createResourceIdentity"
 - Create: `packages/core/src/identity/equal.test.ts`
 - Modify barrels / package index
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -336,7 +336,7 @@ describe('resourceIdentitiesEqual', () => {
 });
 ```
 
-- [ ] **Step 2–4: Implement `a.namespace === b.namespace && a.name === b.name`; PASS; commit**
+- [x] **Step 2–4: Implement `a.namespace === b.namespace && a.name === b.name`; PASS; commit**
 
 ```bash
 git commit -m "feat(core): add resourceIdentitiesEqual"
@@ -350,11 +350,11 @@ git commit -m "feat(core): add resourceIdentitiesEqual"
 - Modify: `packages/core/src/index.test.ts`
 - Modify: `packages/core/README.md`
 
-- [ ] **Step 1: Extend package smoke test** to import public identity symbols from `./index.js` and assert create+equal round-trip for `crm`/`Customer`
+- [x] **Step 1: Extend package smoke test** to import public identity symbols from `./index.js` and assert create+equal round-trip for `crm`/`Customer`
 
-- [ ] **Step 2: Update README** Current status → M2.1 identity contracts; list public identity exports; restate non-goals (no parse/format, no adapters)
+- [x] **Step 2: Update README** Current status → M2.1 identity contracts; list public identity exports; restate non-goals (no parse/format, no adapters)
 
-- [ ] **Step 3: Run full core quality gate**
+- [x] **Step 3: Run full core quality gate**
 
 ```bash
 pnpm --filter @resource-forge/core lint
@@ -365,7 +365,7 @@ pnpm --filter @resource-forge/core build
 
 Expected: all pass
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git commit -m "docs(core): document M2.1 identity exports"
@@ -399,5 +399,5 @@ M2 plan                         ✅
 Export categories / results     ✅
 M2.1 construct+validate lock    ✅
 M2.1 task breakdown             ✅ Accepted
-M2.1 code                       🔓 Task 1 next
+M2.1 code                       ✅ Complete
 ```

@@ -390,5 +390,5 @@ Export boundary:
 M2.1:
   construct+validate+equal ✅
   task breakdown ✅ `2026-08-06-m2-1-identity-primitives.md`
-  code 🔓 in progress
+  code ✅ M2.1 complete; M2.2 next
 ```
