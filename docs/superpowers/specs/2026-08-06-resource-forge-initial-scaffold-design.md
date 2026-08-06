@@ -233,13 +233,16 @@ No badges. No implementation examples. No real installation cookbook beyond plac
 
 ### Roadmap milestones
 
+Normative detail lives in [`docs/roadmap.md`](../../roadmap.md). Summary:
+
 | Milestone | Focus |
 | --- | --- |
 | M1 | Repository & workspace foundation |
-| M2 | Core contracts |
+| — | Core architecture RFCs (gate before M2) |
+| M2 | Core contracts (vocabulary, not behavior) |
 | M3 | Resource model |
-| M4 | Initial transport and persistence integrations (NestJS, GraphQL, Prisma) |
-| M5 | CLI and end-to-end examples |
+| M4 | Integrations (Nest → GraphQL → Prisma) |
+| M5 | CLI & end-to-end examples |
 
 ## License
 

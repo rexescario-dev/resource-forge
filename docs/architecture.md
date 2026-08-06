@@ -1,5 +1,7 @@
 # Architecture
 
+Architecture decisions are captured as RFCs before implementation. See [rfc-process.md](rfc-process.md) and [roadmap.md](roadmap.md).
+
 Resource Forge organizes work around a logical pipeline:
 
 ```text

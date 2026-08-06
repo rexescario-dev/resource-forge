@@ -1,6 +1,6 @@
 # Resource Forge
 
-**Status:** Early scaffold. Repository structure and package boundaries are established. Framework integrations and runtime functionality will be introduced incrementally.
+**Status:** M1 complete (repository foundation). Next: architecture RFCs for core contracts (M2), then implementation.
 
 ## Vision
 
@@ -43,13 +43,14 @@ See [docs/architecture.md](docs/architecture.md).
 
 ## Roadmap summary
 
-1. Repository & workspace foundation
-2. Core contracts
-3. Resource model
-4. Initial transport and persistence integrations (NestJS, GraphQL, Prisma)
-5. CLI and end-to-end examples
+1. **M1** — Repository & workspace foundation *(done)*
+2. **RFCs** — Resource identity, metadata, registry, extension model *(next)*
+3. **M2** — Core contracts (vocabulary, not behavior)
+4. **M3** — Resource model (transport-agnostic)
+5. **M4** — Integrations: Nest → GraphQL → Prisma
+6. **M5** — CLI & end-to-end examples
 
-Details: [docs/roadmap.md](docs/roadmap.md).
+Details: [docs/roadmap.md](docs/roadmap.md). RFCs: [docs/rfc-process.md](docs/rfc-process.md).
 
 ## Development
 
