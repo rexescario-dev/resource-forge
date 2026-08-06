@@ -1,3 +1,4 @@
+export { composeResourceMetadata } from './compose.js';
 export type {
   CompositionError,
   Contribution,

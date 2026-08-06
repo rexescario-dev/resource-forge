@@ -58,3 +58,4 @@ export type {
   NamespacePartition,
   ProducerKind,
 } from './extension/index.js';
+export { composeResourceMetadata } from './extension/index.js';
