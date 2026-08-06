@@ -110,4 +110,163 @@ describe('composeResourceMetadata', () => {
     }
     expect(resourceMetadataEqual(withEmpty.value, without.value)).toBe(true);
   });
+
+  it('rejects invalid producer kind', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'other' as unknown as 'extension',
+        partitions: [],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error).toEqual({
+      code: 'invalid_contribution',
+      contributionIndex: 0,
+      cause: { code: 'invalid_kind', kind: 'other' },
+    });
+  });
+
+  it('rejects duplicate partition namespaces inside one contribution', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          { namespace: 'graphql', entries: [] },
+          { namespace: 'graphql', entries: [] },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.code).toBe('invalid_contribution');
+    if (result.error.code !== 'invalid_contribution') {
+      return;
+    }
+    expect(result.error.contributionIndex).toBe(0);
+    expect(result.error.cause).toEqual({
+      code: 'duplicate_partition_namespace',
+      namespace: 'graphql',
+      partitionIndices: [0, 1],
+    });
+  });
+
+  it('rejects duplicate entry names inside one partition', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'graphql',
+            entries: [
+              { name: 'typeName', value: 'A' },
+              { name: 'typeName', value: 'B' },
+            ],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.code).toBe('invalid_contribution');
+    if (result.error.code !== 'invalid_contribution') {
+      return;
+    }
+    expect(result.error.partitionIndex).toBe(0);
+    expect(result.error.cause).toEqual({
+      code: 'duplicate_entry_name',
+      name: 'typeName',
+      entryIndices: [0, 1],
+    });
+  });
+
+  it('surfaces invalid json values as invalid_contribution', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'graphql',
+            entries: [
+              {
+                name: 'typeName',
+                value: undefined as unknown as string,
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.code).toBe('invalid_contribution');
+    if (result.error.code !== 'invalid_contribution') {
+      return;
+    }
+    expect(result.error.cause.code).toBe('invalid_json_value');
+  });
+
+  it('wraps MetadataKeyValidationError under invalid_key', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'GraphQL',
+            entries: [{ name: 'typeName', value: 'Customer' }],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.code).toBe('invalid_contribution');
+    if (result.error.code !== 'invalid_contribution') {
+      return;
+    }
+    expect(result.error.cause).toEqual({
+      code: 'invalid_key',
+      cause: { code: 'invalid_namespace', namespace: 'GraphQL' },
+    });
+  });
 });
