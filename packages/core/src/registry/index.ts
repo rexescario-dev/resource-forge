@@ -6,3 +6,4 @@ export type {
   ResourceRegistry,
   UnregisterError,
 } from './types.js';
+export { createInMemoryResourceRegistry } from './in-memory.js';

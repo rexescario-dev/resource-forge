@@ -48,3 +48,4 @@ export type {
   ResourceRegistry,
   UnregisterError,
 } from './registry/index.js';
+export { createInMemoryResourceRegistry } from './registry/index.js';
