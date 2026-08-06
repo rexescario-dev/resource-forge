@@ -24,7 +24,7 @@ Planned RFCs for the M2 gate:
 | RFC-003 | Registry contracts | Draft |
 | RFC-004 | Extension model | Draft |
 
-See [RFC process](rfc-process.md).
+See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
 ---
 

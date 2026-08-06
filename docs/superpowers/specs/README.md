@@ -1,6 +1,6 @@
 # Architecture specs (RFCs)
 
-Design documents for Resource Forge. See [RFC process](../../rfc-process.md) and [roadmap](../../roadmap.md).
+Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [roadmap](../../roadmap.md), and the [RFC review checklist](../../rfc-review-checklist.md) for M2 gate acceptance.
 
 ## Index
 

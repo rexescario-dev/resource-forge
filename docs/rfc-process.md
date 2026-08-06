@@ -35,11 +35,13 @@ Small RFCs are preferred over large omnibus documents.
 
 Do not implement core contracts until these are accepted:
 
-| RFC | Topic |
-| --- | --- |
-| RFC-001 | Resource identity |
-| RFC-002 | Metadata model |
-| RFC-003 | Registry contracts |
-| RFC-004 | Extension model |
+| RFC | Topic | Status |
+| --- | --- | --- |
+| RFC-001 | Resource identity | Accepted |
+| RFC-002 | Metadata model | Draft |
+| RFC-003 | Registry contracts | Draft |
+| RFC-004 | Extension model | Draft |
+
+Next step is **review and acceptance**, not implementation. Use the [RFC review & acceptance checklist](rfc-review-checklist.md) (order: RFC-002 → RFC-003 → RFC-004). After acceptance, write an M2 implementation plan before coding.
 
 M3+ work may introduce additional RFCs as needed.
