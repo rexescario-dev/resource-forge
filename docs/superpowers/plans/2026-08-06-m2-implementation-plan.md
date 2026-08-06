@@ -169,7 +169,7 @@ Exact TypeScript names (`Result`, `Success`/`Failure`, etc.) are **not** frozen 
 | Slice | Decide with task breakdown |
 | --- | --- |
 | M2.1 Identity | construct+validate+equal locked; concrete symbols in [M2.1 task plan](2026-08-06-m2-1-identity-primitives.md) |
-| M2.2 Metadata | metadata/entry/key/value symbols, equality helpers |
+| M2.2 Metadata | create/validate/equal + entry pairs + key kind; see [M2.2 task plan](2026-08-06-m2-2-metadata-model.md) |
 | M2.3 Registry | registry contract shape, lookup/mutation outcome representation |
 | M2.4 Composition | contribution representation, composition entry point, failure variants |
 
@@ -388,7 +388,10 @@ Export boundary:
   per-slice symbols ⏳ (M2.1 next)
 
 M2.1:
-  construct+validate+equal ✅
-  task breakdown ✅ `2026-08-06-m2-1-identity-primitives.md`
-  code ✅ M2.1 complete; M2.2 next
+  code ✅ complete
+
+M2.2:
+  export decisions ✅
+  task breakdown ⏳ Draft — `2026-08-06-m2-2-metadata-model.md`
+  code 🔒
 ```
