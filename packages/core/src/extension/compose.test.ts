@@ -3,6 +3,7 @@ import { createResourceIdentity } from '../identity/create.js';
 import { resourceMetadataEqual } from '../metadata/equal.js';
 import { createMetadataKey } from '../metadata/key.js';
 import { composeResourceMetadata } from './compose.js';
+import type { Contribution } from './types.js';
 
 describe('composeResourceMetadata', () => {
   it('composes empty contributions into empty-entry metadata', () => {
@@ -373,5 +374,40 @@ describe('composeResourceMetadata', () => {
       namespace: 'rf',
       contributionIndices: [0, 1],
     });
+  });
+
+  it('is independent of contribution order for successful composition', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const a: Contribution = {
+      kind: 'framework',
+      partitions: [
+        {
+          namespace: 'rf',
+          entries: [{ name: 'description', value: 'CRM customer' }],
+        },
+      ],
+    };
+    const b: Contribution = {
+      kind: 'extension',
+      partitions: [
+        {
+          namespace: 'graphql',
+          entries: [{ name: 'typeName', value: 'Customer' }],
+        },
+      ],
+    };
+
+    const ab = composeResourceMetadata(identity.value, [a, b]);
+    const ba = composeResourceMetadata(identity.value, [b, a]);
+    expect(ab.ok && ba.ok).toBe(true);
+    if (!ab.ok || !ba.ok) {
+      return;
+    }
+    expect(resourceMetadataEqual(ab.value, ba.value)).toBe(true);
   });
 });
