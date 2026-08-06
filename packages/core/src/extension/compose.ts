@@ -237,6 +237,30 @@ export function composeResourceMetadata(
     }
   }
 
+  for (
+    let contributionIndex = 0;
+    contributionIndex < contributions.length;
+    contributionIndex += 1
+  ) {
+    const contribution = contributions[contributionIndex]!;
+    if (contribution.kind !== 'extension') {
+      continue;
+    }
+    for (
+      let partitionIndex = 0;
+      partitionIndex < contribution.partitions.length;
+      partitionIndex += 1
+    ) {
+      if (contribution.partitions[partitionIndex]!.namespace === 'rf') {
+        return err({
+          code: 'reserved_namespace_violation',
+          contributionIndex,
+          partitionIndex,
+        });
+      }
+    }
+  }
+
   const entries = assembleEntries(contributions);
   const metadata = createResourceMetadata(validatedIdentity.value, entries);
   if (!metadata.ok) {

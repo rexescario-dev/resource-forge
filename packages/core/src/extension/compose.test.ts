@@ -269,4 +269,33 @@ describe('composeResourceMetadata', () => {
       cause: { code: 'invalid_namespace', namespace: 'GraphQL' },
     });
   });
+
+  it('rejects extension contributions that include rf', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'rf',
+            entries: [{ name: 'description', value: 'nope' }],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error).toEqual({
+      code: 'reserved_namespace_violation',
+      contributionIndex: 0,
+      partitionIndex: 0,
+    });
+  });
 });
