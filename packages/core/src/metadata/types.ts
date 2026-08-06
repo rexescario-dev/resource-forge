@@ -1,3 +1,8 @@
+import type {
+  IdentityValidationError,
+  ResourceIdentity,
+} from '../identity/types.js';
+
 export type JsonValue =
   | null
   | boolean
@@ -27,3 +32,29 @@ export type MetadataEntry = {
   readonly key: MetadataKey;
   readonly value: JsonValue;
 };
+
+export type ResourceMetadata = {
+  readonly identity: ResourceIdentity;
+  readonly entries: ReadonlyArray<MetadataEntry>;
+};
+
+export type MetadataValidationError =
+  | {
+      readonly code: 'invalid_identity';
+      readonly cause: IdentityValidationError;
+    }
+  | {
+      readonly code: 'invalid_key';
+      readonly index: number;
+      readonly cause: MetadataKeyValidationError;
+    }
+  | {
+      readonly code: 'invalid_value';
+      readonly index: number;
+      readonly cause: JsonValueValidationError;
+    }
+  | {
+      readonly code: 'duplicate_key';
+      readonly index: number;
+      readonly key: MetadataKey;
+    };

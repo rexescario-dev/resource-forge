@@ -27,10 +27,14 @@ export type {
   MetadataKey,
   MetadataKeyKind,
   MetadataKeyValidationError,
+  MetadataValidationError,
+  ResourceMetadata,
 } from './metadata/index.js';
 export {
   createMetadataKey,
+  createResourceMetadata,
   metadataKeysEqual,
   validateJsonValue,
   validateMetadataKey,
+  validateResourceMetadata,
 } from './metadata/index.js';
