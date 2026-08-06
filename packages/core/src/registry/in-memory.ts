@@ -80,12 +80,44 @@ function createRegistry(): ResourceRegistry {
     },
 
     replace(identity, metadata): Result<void, ReplaceError> {
-      void metadata;
-      return err({ code: 'not_registered', identity });
+      const prepared = prepareAssociation(identity, metadata);
+      if (!prepared.ok) {
+        return prepared;
+      }
+
+      const key = toKey(prepared.value.identity);
+      if (!store.has(key)) {
+        return err({
+          code: 'not_registered',
+          identity: prepared.value.identity,
+        });
+      }
+
+      // Retain caller-supplied immutable snapshot instance.
+      store.set(key, metadata);
+      return ok(undefined);
     },
 
     unregister(identity): Result<void, UnregisterError> {
-      return err({ code: 'not_registered', identity });
+      const identityKind =
+        identity.namespace === 'rf' ? 'framework' : 'user';
+      const validated = validateResourceIdentity(identity, {
+        kind: identityKind,
+      });
+      if (!validated.ok) {
+        return err({ code: 'invalid_identity', cause: validated.error });
+      }
+
+      const key = toKey(validated.value);
+      if (!store.has(key)) {
+        return err({
+          code: 'not_registered',
+          identity: validated.value,
+        });
+      }
+
+      store.delete(key);
+      return ok(undefined);
     },
 
     lookup(identity): LookupResult {
@@ -106,7 +138,7 @@ function createRegistry(): ResourceRegistry {
     },
 
     enumerate(): ReadonlyArray<ResourceIdentity> {
-      return [];
+      return Array.from(store.values(), (metadata) => metadata.identity);
     },
   };
 }
