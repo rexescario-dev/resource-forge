@@ -10,4 +10,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md) and
 | [RFC-001 — Resource identity](2026-08-06-rfc-001-resource-identity-design.md) | Accepted |
 | [RFC-002 — Metadata model](2026-08-06-rfc-002-metadata-model-design.md) | Draft |
 | [RFC-003 — Registry contracts](2026-08-06-rfc-003-registry-contracts-design.md) | Draft |
-| RFC-004 — Extension model | Planned |
+| [RFC-004 — Extension model](2026-08-06-rfc-004-extension-model-design.md) | Draft |
