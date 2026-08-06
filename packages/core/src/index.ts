@@ -49,3 +49,12 @@ export type {
   UnregisterError,
 } from './registry/index.js';
 export { createInMemoryResourceRegistry } from './registry/index.js';
+
+export type {
+  CompositionError,
+  Contribution,
+  ContributionEntry,
+  ContributionValidationError,
+  NamespacePartition,
+  ProducerKind,
+} from './extension/index.js';
