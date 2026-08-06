@@ -1,8 +1,8 @@
 # M2.2 Metadata Model — Implementation Tasks
 
-> **For agentic workers:** Do **not** write code until this document’s Status is Accepted. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-002. Reuse M2.1 `Result` helpers — do not invent a parallel outcome model.
+> **For agentic workers:** Status is Accepted. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-002. Reuse M2.1 `Result` helpers — do not invent a parallel outcome model.
 
-**Status:** Draft  
+**Status:** Accepted  
 **Parent plan:** `docs/superpowers/plans/2026-08-06-m2-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-002 Metadata Model (Accepted); depends on RFC-001 / M2.1  
 **Package:** `@resource-forge/core`  
@@ -29,7 +29,7 @@
 
 ---
 
-## Proposed M2.2 public contract surface (for acceptance)
+## M2.2 public contract surface
 
 | Symbol | Kind | Role |
 | --- | --- | --- |
@@ -107,9 +107,23 @@ Construction / validation steps:
 2. For each entry, re-validate `key` with kind inferred as `key.namespace === 'rf' ? 'framework' : 'extension'`.
 3. Validate each `value` as `JsonValue`.
 4. Reject duplicate keys via `metadataKeysEqual` (`duplicate_key`).
-5. On success, return immutable snapshot: `identity` + `entries` as a readonly array (input order may be preserved; equality ignores order).
+5. On success, return a readonly snapshot (`identity` + `entries` as a readonly array). Input order may be preserved; equality ignores order. Whether runtime `Object.freeze` is used is an implementation detail — the public API must not expose a mutation surface.
 
 `validateResourceMetadata` accepts a candidate `{ identity, entries }` and returns the same `Result` shape.
+
+**Trust model for `rf` during snapshot validate/create:** `validateResourceMetadata` / `createResourceMetadata` validate **structural** invariants only. Because `MetadataKey` does not store ownership kind, ownership cannot be proven after construction. Revalidation uses the same namespace-derived trust model as forged values:
+
+```text
+createMetadataKey("rf", "description")
+  → requires { kind: "framework" }
+
+createResourceMetadata(identity, [
+  { key: { namespace: "rf", name: "description" }, value: "x" }
+])
+  → accepted if key grammar is valid
+```
+
+The normal constructors prevent accidental misuse; they do not provide runtime provenance tracking.
 
 ### Equality
 
@@ -122,7 +136,7 @@ true iff:
 1. `resourceIdentitiesEqual(a.identity, b.identity)`; and
 2. the same set of keys (via `metadataKeysEqual`) map to deeply equal `JsonValue`s.
 
-Entry order irrelevant. Missing key ≠ key with `null` value.
+Entry order irrelevant. Missing key ≠ key with `null` value. For object `JsonValue`s, **property key ordering is ignored** (do not use `JSON.stringify` equality).
 
 ---
 
@@ -236,7 +250,7 @@ git commit -m "feat(core): add MetadataKey create/validate/equal"
   - duplicate key failure
   - invalid identity failure
   - invalid key / invalid value failures with index
-  - extension-forged path: key `{namespace:'rf',...}` accepted only when structurally framework-valid (document trust model)
+  - forged `{namespace:'rf',...}` key accepted when structurally grammar-valid (trust model: no provenance tracking)
   - identity remains the explicit input identity (not derived from entries)
 
 - [ ] **Step 2: Run — expect FAIL**
@@ -301,14 +315,12 @@ git commit -m "docs(core): document M2.2 metadata exports"
 
 ## Acceptance criteria (this task plan)
 
-This M2.2 task breakdown is Accepted when:
-
-1. Public symbols in the table are agreed (or revised here).
-2. `MetadataKeyKind` is validation context only (not stored on `MetadataKey`).
-3. Entries are ordered pairs; equality is order-independent.
-4. create/validate return `Result<…>` with validated values.
-5. No mutation helpers, key encodings, registry, or composition in this slice.
-6. Tasks stay small enough for TDD without new architecture.
+- [x] Public symbols in the table are agreed.
+- [x] `MetadataKeyKind` is validation context only (not stored on `MetadataKey`).
+- [x] Entries are ordered pairs; equality is order-independent (object key order ignored).
+- [x] Snapshot validate uses structural/`rf` trust model (no provenance).
+- [x] create/validate return `Result<…>` with validated values.
+- [x] No mutation helpers, key encodings, registry, or composition in this slice.
 
 ## M2.2 implementation complete when
 
@@ -323,7 +335,7 @@ This M2.2 task breakdown is Accepted when:
 
 ```text
 M2.1 Identity                 ✅
-M2.2 export decisions         ✅ (create/entries/key kind)
-M2.2 task breakdown           ⏳ Draft (this document)
-M2.2 code                     🔒
+M2.2 export decisions         ✅
+M2.2 task breakdown           ✅ Accepted
+M2.2 code                     🔓 Task 1 next
 ```
