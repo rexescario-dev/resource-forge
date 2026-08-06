@@ -389,8 +389,6 @@ Export boundary:
 
 M2.1:
   construct+validate+equal ✅
-  task breakdown ⏳ Draft — `2026-08-06-m2-1-identity-primitives.md`
-
-Code:
-  @resource-forge/core 🔒 locked until M2.1 task plan is Accepted
+  task breakdown ✅ `2026-08-06-m2-1-identity-primitives.md`
+  code 🔓 in progress
 ```

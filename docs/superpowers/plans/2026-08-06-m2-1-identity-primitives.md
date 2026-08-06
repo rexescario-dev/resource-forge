@@ -1,8 +1,8 @@
 # M2.1 Identity Primitives — Implementation Tasks
 
-> **For agentic workers:** Do **not** write code until this document’s Status is Accepted. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** Status is Accepted. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Steps use checkbox (`- [ ]`) syntax for tracking. Follow TDD; do not invent semantics beyond RFC-001.
 
-**Status:** Draft  
+**Status:** Accepted  
 **Parent plan:** `docs/superpowers/plans/2026-08-06-m2-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-001 Resource Identity (Accepted)  
 **Package:** `@resource-forge/core`  
@@ -16,16 +16,14 @@
 
 ---
 
-## Proposed M2.1 public contract surface (for acceptance)
-
-These names are proposed for M2.1 only. Accept or revise before coding.
+## M2.1 public contract surface
 
 | Symbol | Kind | Role |
 | --- | --- | --- |
 | `ResourceIdentity` | type | Readonly structured `{ namespace, name }` |
 | `ResourceIdentityKind` | type | `'user' \| 'framework'` — validation context |
 | `createResourceIdentity` | function | Construct validated identity; default kind `'user'` |
-| `validateResourceIdentity` | function | Validate a candidate `{ namespace, name }` under a kind |
+| `validateResourceIdentity` | function | Validate a candidate `{ namespace, name }` under a kind; returns a validated `ResourceIdentity` on success |
 | `resourceIdentitiesEqual` | function | RFC-001 equality (exact string match, case-sensitive) |
 | `IdentityValidationError` | type | Discriminated failure reason for create/validate |
 | `Ok` / `Err` / `Result` | types + helpers | Minimal shared result envelope for semantic outcomes |
@@ -51,7 +49,13 @@ type IdentityValidationError =
   | { readonly code: 'reserved_namespace'; readonly namespace: string };
 ```
 
-`createResourceIdentity` and `validateResourceIdentity` return `Result<ResourceIdentity, IdentityValidationError>` and `Result<true, IdentityValidationError>` respectively (or validate returns `Result<ResourceIdentity, …>` by returning the same object when valid — prefer **`Result<ResourceIdentity, IdentityValidationError>` for both** when the input is a candidate pair, and create is sugar that builds then validates).
+Both `createResourceIdentity` and `validateResourceIdentity` return:
+
+```text
+Result<ResourceIdentity, IdentityValidationError>
+```
+
+Validation returns a **validated identity value**, not a boolean. `createResourceIdentity` is sugar that builds a candidate pair and validates it.
 
 **Locked behavior for create:**
 
@@ -226,7 +230,7 @@ export type IdentityValidationError =
   | { readonly code: 'reserved_namespace'; readonly namespace: string };
 ```
 
-Validation rules (normative from RFC-001):
+Validation rules (derived from RFC-001; RFC-001 remains authoritative):
 
 - `Namespace ::= ^[a-z][a-z0-9-]*$`
 - `Name ::= ^[A-Z][A-Za-z0-9]*$`
@@ -371,13 +375,12 @@ git commit -m "docs(core): document M2.1 identity exports"
 
 ## Acceptance criteria (this task plan)
 
-This M2.1 task breakdown is Accepted when:
-
-1. Public symbols in the table above are agreed (or explicitly revised in this doc).
-2. parse/format remain non-public.
-3. Result philosophy matches the parent plan (§5.3).
-4. Tasks are small enough to execute with TDD without inventing new semantics.
-5. Out of scope remains: metadata, registry, composition, adapters, discovery.
+- [x] Public symbols in the table above are agreed.
+- [x] `validateResourceIdentity` returns `Result<ResourceIdentity, IdentityValidationError>` (validated value, not boolean).
+- [x] parse/format remain non-public.
+- [x] Result philosophy matches the parent plan (§5.3).
+- [x] Tasks are small enough to execute with TDD without inventing new semantics.
+- [x] Out of scope remains: metadata, registry, composition, adapters, discovery.
 
 ## M2.1 implementation complete when
 
@@ -394,7 +397,7 @@ This M2.1 task breakdown is Accepted when:
 ```text
 M2 plan                         ✅
 Export categories / results     ✅
-M2.1 construct+validate lock    ✅ (pending commit with parent plan note)
-M2.1 task breakdown             ⏳ Draft (this document)
-M2.1 code                       🔒
+M2.1 construct+validate lock    ✅
+M2.1 task breakdown             ✅ Accepted
+M2.1 code                       🔓 Task 1 next
 ```
