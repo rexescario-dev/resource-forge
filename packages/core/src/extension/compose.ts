@@ -261,6 +261,37 @@ export function composeResourceMetadata(
     }
   }
 
+  const ownersByNamespace = new Map<string, number[]>();
+  for (
+    let contributionIndex = 0;
+    contributionIndex < contributions.length;
+    contributionIndex += 1
+  ) {
+    const contribution = contributions[contributionIndex]!;
+    for (
+      let partitionIndex = 0;
+      partitionIndex < contribution.partitions.length;
+      partitionIndex += 1
+    ) {
+      const namespace = contribution.partitions[partitionIndex]!.namespace;
+      const owners = ownersByNamespace.get(namespace);
+      if (owners === undefined) {
+        ownersByNamespace.set(namespace, [contributionIndex]);
+        continue;
+      }
+      if (owners[0] !== contributionIndex) {
+        const contributionIndices = [...owners, contributionIndex].sort(
+          (a, b) => a - b,
+        );
+        return err({
+          code: 'duplicate_namespace',
+          namespace,
+          contributionIndices,
+        });
+      }
+    }
+  }
+
   const entries = assembleEntries(contributions);
   const metadata = createResourceMetadata(validatedIdentity.value, entries);
   if (!metadata.ok) {

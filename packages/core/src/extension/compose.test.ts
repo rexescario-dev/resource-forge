@@ -298,4 +298,80 @@ describe('composeResourceMetadata', () => {
       partitionIndex: 0,
     });
   });
+
+  it('rejects cross-contribution duplicate namespaces', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'graphql',
+            entries: [{ name: 'typeName', value: 'Customer' }],
+          },
+        ],
+      },
+      {
+        kind: 'extension',
+        partitions: [
+          {
+            namespace: 'graphql',
+            entries: [{ name: 'typeName', value: 'CrmCustomer' }],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error).toEqual({
+      code: 'duplicate_namespace',
+      namespace: 'graphql',
+      contributionIndices: [0, 1],
+    });
+  });
+
+  it('rejects two framework contributions both owning rf as duplicate_namespace', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) {
+      return;
+    }
+
+    const result = composeResourceMetadata(identity.value, [
+      {
+        kind: 'framework',
+        partitions: [
+          {
+            namespace: 'rf',
+            entries: [{ name: 'description', value: 'a' }],
+          },
+        ],
+      },
+      {
+        kind: 'framework',
+        partitions: [
+          {
+            namespace: 'rf',
+            entries: [{ name: 'description', value: 'b' }],
+          },
+        ],
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error).toEqual({
+      code: 'duplicate_namespace',
+      namespace: 'rf',
+      contributionIndices: [0, 1],
+    });
+  });
 });
