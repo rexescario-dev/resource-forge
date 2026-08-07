@@ -69,6 +69,7 @@ export type {
 } from './resource/index.js';
 export {
   createEmptyResourceSchema,
+  createResource,
   emptyAnnotations,
   validateResource,
 } from './resource/index.js';
