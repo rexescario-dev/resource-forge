@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | Planned |
+| M3 | Resource model | In progress — RFC-005 Accepted; implementation plan next |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -23,6 +23,13 @@ Planned RFCs for the M2 gate:
 | RFC-002 | Metadata model | Accepted |
 | RFC-003 | Registry contracts | Accepted |
 | RFC-004 | Extension model | Accepted |
+
+M3 gate RFCs:
+
+| RFC | Topic | Status |
+| --- | --- | --- |
+| RFC-005 | Resource model | Accepted |
+| RFC-006+ | Annotations; Resource Fields / Relations / Operations | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
@@ -85,21 +92,17 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-Once contracts exist, define what a resource actually is — still transport-agnostic, still no code generation.
+**Status:** In progress — RFC-005 Accepted; no production Resource code until the M3 implementation plan and public export decisions are accepted.
 
-Possible concepts (to be decided in design, not assumed):
+RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. Annotation representation and schema member vocabulary remain later RFCs.
 
-- Resource
-- Field
-- Relation
-- Operation
-- Identifier
-- Collection
-- Capability
-- Policy (only if needed)
-- Metadata composition
+Suggested implementation slices (see M3 implementation plan):
 
-The output should be a model that GraphQL, REST, OpenAPI, gRPC, and other transports could theoretically consume.
+- **M3.1** — Resource / ResourceSchema contracts, minimal construction, validation
+- **M3.2** — `projectResourceMetadata` (RFC-005 floor only)
+- **M3.3+** — deferred until RFC-006 and Resource Fields / Relations / Operations RFCs
+
+Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
 ---
 

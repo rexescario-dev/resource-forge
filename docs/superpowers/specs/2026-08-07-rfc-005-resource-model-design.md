@@ -1,7 +1,7 @@
 # RFC-005: Resource Model
 
 **Date:** 2026-08-07  
-**Status:** Draft  
+**Status:** Accepted  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Depends on:** RFC-001 (Resource Identity), RFC-002 (Metadata Model), RFC-003 (Registry Contracts), RFC-004 (Extension Model — conceptual alignment only)  
 **Blocks:** M3 implementation; RFC-006 (Annotations) and subsequent Resource Fields / Relations / Operations RFCs build on this model
@@ -191,9 +191,10 @@ Resource {
 projectResourceMetadata(resource)
   → ResourceMetadata {
       identity: (crm, Customer),
-      ... metadata contents beyond identity are intentionally unspecified by this RFC
+      ...
     }
 
+Additional metadata contents are intentionally unspecified by this RFC.
 The snapshot MUST be RFC-002-valid.
 ```
 
