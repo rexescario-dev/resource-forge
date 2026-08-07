@@ -333,11 +333,11 @@ M2 coding begins only after:
 
 M2 is complete when:
 
-- [ ] M2.1–M2.4 invariants in §7 have green tests in `@resource-forge/core`;
-- [ ] public exports match the accepted §5 contract surface;
-- [ ] no NestJS / GraphQL / Prisma / decorator / discovery code landed in core;
-- [ ] placeholder packages outside core remain feature-free;
-- [ ] docs status: roadmap M2 updated to Done (or equivalent) only after the above.
+- [x] M2.1–M2.4 invariants in §7 have green tests in `@resource-forge/core`;
+- [x] public exports match the accepted §5 contract surface;
+- [x] no NestJS / GraphQL / Prisma / decorator / discovery code landed in core;
+- [x] placeholder packages outside core remain feature-free;
+- [x] docs status: roadmap M2 updated to Done (or equivalent) only after the above.
 
 ### 9.3 First code slice after acceptance
 

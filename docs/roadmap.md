@@ -6,8 +6,8 @@ Resource Forge grows by design before implementation. After the repository found
 | --- | --- | --- |
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
-| M2 | Core contracts (vocabulary, not behavior) | In progress — M2.1–M2.3 ✅; M2.4 composition next |
-| M3 | Resource model | Planned |
+| M2 | Core contracts (vocabulary, not behavior) | Done |
+| M3 | Resource model | In progress — M3.1 ✅; M3.2 projection next |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -24,6 +24,13 @@ Planned RFCs for the M2 gate:
 | RFC-003 | Registry contracts | Accepted |
 | RFC-004 | Extension model | Accepted |
 
+M3 gate RFCs:
+
+| RFC | Topic | Status |
+| --- | --- | --- |
+| RFC-005 | Resource model | Accepted |
+| RFC-006+ | Annotations; Resource Fields / Relations / Operations | Planned |
+
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
 ---
@@ -37,6 +44,8 @@ Monorepo layout, tooling, CI, placeholder packages, and documentation. No framew
 ---
 
 ## M2 — Core contracts
+
+**Status:** Done
 
 Establish the framework's **vocabulary**, not behavior. Deliverables live in `@resource-forge/core` as contracts and types — no runtime scanning or adapters.
 
@@ -83,21 +92,17 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-Once contracts exist, define what a resource actually is — still transport-agnostic, still no code generation.
+**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1 task plan](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) Draft. M3.1 Resource contracts complete. Next: M3.2 projection task plan.
 
-Possible concepts (to be decided in design, not assumed):
+RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. Annotation representation and schema member vocabulary remain later RFCs.
 
-- Resource
-- Field
-- Relation
-- Operation
-- Identifier
-- Collection
-- Capability
-- Policy (only if needed)
-- Metadata composition
+Suggested implementation slices (see M3 implementation plan):
 
-The output should be a model that GraphQL, REST, OpenAPI, gRPC, and other transports could theoretically consume.
+- **M3.1** — Resource / ResourceSchema contracts, minimal construction, validation
+- **M3.2** — `projectResourceMetadata` (RFC-005 floor only)
+- **M3.3+** — deferred until RFC-006 and Resource Fields / Relations / Operations RFCs
+
+Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
 ---
 
