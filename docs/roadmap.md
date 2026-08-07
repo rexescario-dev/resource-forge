@@ -6,7 +6,7 @@ Resource Forge grows by design before implementation. After the repository found
 | --- | --- | --- |
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
-| M2 | Core contracts (vocabulary, not behavior) | In progress — M2.1–M2.3 ✅; M2.4 composition next |
+| M2 | Core contracts (vocabulary, not behavior) | Done |
 | M3 | Resource model | Planned |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
@@ -37,6 +37,8 @@ Monorepo layout, tooling, CI, placeholder packages, and documentation. No framew
 ---
 
 ## M2 — Core contracts
+
+**Status:** Done
 
 Establish the framework's **vocabulary**, not behavior. Deliverables live in `@resource-forge/core` as contracts and types — no runtime scanning or adapters.
 
