@@ -1,8 +1,8 @@
 # M3 Implementation Plan
 
-> **For agentic workers:** Plan Status is **Draft**. Do **not** implement Resource production code until this plan is Accepted, the §5 export boundary for the active slice is accepted, and that slice’s bite-sized TDD task plan exists. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. This plan intentionally omits TypeScript signatures so the public surface is agreed before code freezes it.
+> **For agentic workers:** Plan Status is **Accepted**. Do **not** implement Resource production code until the §5 export boundary for the active slice is accepted and that slice’s bite-sized TDD task plan exists. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. This plan intentionally omits TypeScript signatures so the public surface is agreed before code freezes it.
 
-**Status:** Draft  
+**Status:** Accepted  
 **Depends on:** RFC-005 (Accepted); RFC-001–004 (Accepted, unchanged)  
 **Package:** `@resource-forge/core`  
 **Scope:** Resource authoritative contracts + RFC-005 projection floor only (not annotations vocabulary, not schema members, not adapters)
@@ -113,11 +113,11 @@ Exact TypeScript names and module paths are **open until §5 export boundary is 
 
 ## 5. Export boundary
 
-**Status:** Cross-cutting locks proposed with this plan; concrete symbols deferred per slice.
+**Status:** Cross-cutting locks Accepted (§5.1–§5.3). Concrete symbols deferred per slice.
 
 Define the public contract surface intentionally before coding. Same approach as M2: lock categories, module ownership intent, and error/outcome philosophy globally; defer TypeScript names and per-slice export lists to each slice’s task breakdown.
 
-### 5.1 Public contract categories — Proposed
+### 5.1 Public contract categories — Accepted
 
 `@resource-forge/core` may expose M2 categories plus:
 
@@ -134,7 +134,7 @@ Must **not** newly export:
 
 Existing M2 exports remain unless a later accepted decision revises them.
 
-### 5.2 Module ownership intent — Proposed (layout is not a public contract)
+### 5.2 Module ownership intent — Accepted (layout is not a public contract)
 
 Internal organization direction (additive):
 
@@ -150,15 +150,15 @@ packages/core/src/
 
 Co-located Vitest tests under `resource/`. Exact file names inside that directory remain an implementation detail.
 
-### 5.3 Error / outcome modeling — Inherit M2 (§5.3 Accepted)
+### 5.3 Error / outcome modeling — Accepted (inherit M2)
 
 Use **explicit result types** for semantic operations where failure is an expected contract outcome. Reserve thrown exceptions for programmer misuse or broken invariants.
 
 RFC-005 outcomes include:
 
 ```text
-construct / validate  → valid Resource | validation failure
-projectResourceMetadata → ResourceMetadata | failure (at least: invalid Resource)
+Construction and validation produce either a valid Resource or a validation failure.
+Projection produces either RFC-002-valid ResourceMetadata or a failure outcome when projection cannot proceed.
 ```
 
 Exact TypeScript error discriminant names are **not** frozen here. Reuse the existing `Result` helpers from M2 unless a slice export review justifies otherwise.
@@ -192,7 +192,7 @@ Implement in order. Each slice must be testable alone. Do not start a later slic
 
 **Depends on:** M2.1 identity.  
 
-**Must not:** project metadata; define annotation contents; define field/relation/operation members; touch registry or composition.
+**Must not:** implement `projectResourceMetadata` or any projection behavior beyond what is necessary to represent the Resource contract; define annotation contents; define field/relation/operation members; touch registry or composition.
 
 ### M3.2 Projection (RFC-005 floor)
 
@@ -258,10 +258,10 @@ Only decisions not covered by RFCs belong here. No semantic decisions.
 
 | Decision | Options / note | Status |
 | --- | --- | --- |
-| Error modeling | inherit M2 `Result` philosophy | **Proposed** — names deferred to slice plans |
+| Error modeling | inherit M2 `Result` philosophy | **Accepted** — names deferred to slice plans |
 | Empty annotations representation | sentinel empty value vs empty structural placeholder vs branded void | Open — M3.1 export review; must not freeze RFC-006 vocabulary |
 | Empty schema collections representation | opaque empty arrays vs branded empty collections | Open — M3.1; must not imply ordering/uniqueness rules |
-| Projection floor entries | empty `entries` vs unspecified non-empty framework markers | Open — M3.2; RFC-005 forbids inventing vocabulary; prefer empty entries unless export review proves otherwise |
+| Projection floor entries | No metadata vocabulary is introduced in this slice. If an empty `entries` representation satisfies RFC-002, it is the simplest implementation, but the export review remains authoritative. | Open — M3.2 |
 | Projection vs compose | may call `composeResourceMetadata` internally or not | Open — M3.2; not required by RFC-005 |
 | Module file names | under `resource/` | Open — not a public contract |
 | Branding / opaque types | nominal vs structural | Open — must not change RFC equality / validation semantics |
@@ -275,13 +275,13 @@ Build tooling already exists from M1/M2 — no change required for M3 unless gap
 
 ### 9.1 This plan (planning gate)
 
-- [ ] this plan is reviewed and Accepted;
+- [x] this plan is reviewed and Accepted;
 
 Cross-cutting export locks (§5.1–§5.3):
 
-- [ ] public categories accepted;
-- [ ] module ownership intent accepted;
-- [ ] error/outcome philosophy accepted (inherit M2 or explicitly revise);
+- [x] public categories accepted;
+- [x] module ownership intent accepted;
+- [x] error/outcome philosophy accepted (inherit M2);
 
 M3 coding begins only after:
 
@@ -295,6 +295,7 @@ RFC-005 floor implementation is complete when:
 
 - [ ] M3.1–M3.2 invariants in §7 have green tests in `@resource-forge/core`;
 - [ ] public exports match the accepted §5 contract surface for those slices;
+- [ ] projection remains one-way; no reverse projection introduced;
 - [ ] no NestJS / GraphQL / Prisma / decorator / discovery code landed in core;
 - [ ] placeholder packages outside core remain feature-free;
 - [ ] no annotation vocabulary or schema member types beyond empty collections;
@@ -328,6 +329,8 @@ Not:
 annotation DSL + field catalog + GraphQL mapping + registry of Resources + builders
 ```
 
+Do not treat projected `ResourceMetadata` as persistent Resource state.
+
 Those belong to RFC-006+, later M3 slices, M4, or later plans.
 
 ---
@@ -341,11 +344,11 @@ RFCs:
   006+ ⏳ Planned
 
 Plan:
-  M3 implementation plan ⏳ Draft (this document)
+  M3 implementation plan ✅ Accepted
 
 Export boundary:
-  categories / module intent / result philosophy ⏳ proposed in §5
-  per-slice symbols ⛔ after plan Accept + slice task plans
+  categories / module intent / result philosophy ✅ §5.1–§5.3
+  per-slice symbols ⛔ after slice task plans Accepted
 
 M3.1:
   export decisions ⛔
