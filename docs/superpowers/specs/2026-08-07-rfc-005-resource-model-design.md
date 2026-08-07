@@ -193,10 +193,9 @@ projectResourceMetadata(resource)
       identity: (crm, Customer),
       ...
     }
-
-Additional metadata contents are intentionally unspecified by this RFC.
-The snapshot MUST be RFC-002-valid.
 ```
+
+Additional metadata contents are intentionally unspecified by this RFC. The snapshot MUST be RFC-002-valid.
 
 ### 5.2 Identity agreement
 
