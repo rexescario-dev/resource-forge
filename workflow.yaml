@@ -1,0 +1,63 @@
+workflow:
+  version: "1"
+  profile: library
+  packages:
+    generic: 1.0.0
+    cursor: 0.1.0
+  assets:
+    - path: docs/workflows/README.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:5593edbc9d8abd15dc52c1751d835abaa1ff02ad83b2c7a8598c1a9c96ea2f7f
+    - path: docs/workflows/specs/agent-workflow-design.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:b47a0f0465a70f7f883f5eb9728655b99d775022a41fe342883847d08ec995f0
+    - path: docs/workflows/conventions/prompt-library.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:a4cea94b99725d2f37d6470394171c68ca58e89d8c3233d209dc38253ec3a477
+    - path: docs/workflows/prompts/specification.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:c0171774c06817ec1d62582e0c1081cbcba418cb223d3c1de05298727ffa6bd4
+    - path: docs/workflows/prompts/design-review.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:df24b0777626160fe01737c897a435e00cbffc413497ee3fde4c733f1cc145fc
+    - path: docs/workflows/prompts/implementation-planning.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:4c2993137f082adc0243958b832fc8496bc94781874b4d3ebdb9b3bf27a96157
+    - path: docs/workflows/prompts/plan-review.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:21f3cf043b698651a97935cb4282fe2a71d40c7977719db56fd6034b9345826a
+    - path: docs/workflows/prompts/implementation-execution.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:3d683c5e933f87d77e8ff7c44f4f62b949b97c01d9bf7dd892ae9462d49c39e7
+    - path: docs/workflows/prompts/code-review.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:9b96e349529dcb2272f118481471079bd2de7b09d8f449109b7480870bf3d632
+    - path: docs/workflows/prompts/refactoring.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:6c5ca785bf8cad5a80c53cd6ea70987ca10bd04add8eb89d3f2fb4b16bfc4bad
+    - path: docs/workflows/prompts/documentation-execution.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:1c53e95ba843932234df9ce6e22e5346322c24bdbb35e005ec7a949bc5742a20
+    - path: docs/workflows/prompts/workflow-validation.md
+      package: generic
+      version: 1.0.0
+      digest: sha256:303efbfb6c8b6dc8ea0443e1ad0a5139ce36e8ba5b71df4e11c37489aecced2b
+    - path: .cursor/rules/workflow.mdc
+      package: cursor
+      version: 0.1.0
+      digest: sha256:996f47877811841ab7d0a85828b9d090f3e6310b64fbba5a485f1cb828d4ef08
+  installation:
+    installedAt: 2026-08-07T16:42:26.689Z
+    toolVersion: 0.1.0
+    catalogId: context-forge-local
