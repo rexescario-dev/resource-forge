@@ -7,3 +7,4 @@ export type {
 } from './types.js';
 export { emptyAnnotations } from './empty-annotations.js';
 export { createEmptyResourceSchema } from './schema.js';
+export { validateResource } from './validate.js';
