@@ -1,8 +1,8 @@
 # M3.1 Resource Contracts — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft**. Do **not** implement production Resource code until this plan is Accepted. Then REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M2.1 `Result` and identity helpers — do not invent a parallel outcome model. Do **not** implement `projectResourceMetadata` in this slice.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M2.1 `Result` and identity helpers — do not invent a parallel outcome model. Do **not** implement `projectResourceMetadata` in this slice.
 
-**Status:** Draft  
+**Status:** Accepted  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-005 Resource Model (Accepted); depends on RFC-001 / M2.1  
 **Package:** `@resource-forge/core`  

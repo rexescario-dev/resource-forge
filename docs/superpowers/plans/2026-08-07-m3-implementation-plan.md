@@ -285,9 +285,9 @@ Cross-cutting export locks (§5.1–§5.3):
 
 M3 coding begins only after:
 
-- [ ] M3.1 export decisions (§5.4) accepted with the M3.1 task breakdown;
-- [ ] contract inventory (§4) treated as the semantic checklist;
-- [ ] implementation tasks for **M3.1** are written (bite-sized TDD) and accepted.
+- [x] M3.1 export decisions (§5.4) accepted with the M3.1 task breakdown;
+- [x] contract inventory (§4) treated as the semantic checklist;
+- [x] implementation tasks for **M3.1** are written (bite-sized TDD) and accepted.
 
 ### 9.2 M3.1–M3.2 slice gate (RFC-005 floor)
 
@@ -351,9 +351,9 @@ Export boundary:
   per-slice symbols ⛔ after slice task plans Accepted
 
 M3.1:
-  export decisions ⏳ Draft task plan `2026-08-07-m3-1-resource-contracts.md`
-  task breakdown ⏳ same Draft
-  code ⛔
+  export decisions ✅ Accepted task plan `2026-08-07-m3-1-resource-contracts.md`
+  task breakdown ✅ same
+  code ⏳ in progress
 
 M3.2:
   export decisions ⛔
