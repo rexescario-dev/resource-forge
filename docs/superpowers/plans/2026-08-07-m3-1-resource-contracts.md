@@ -587,7 +587,7 @@ git commit -m "feat(core): add createResource for minimal resources"
 **Files:**
 - Modify: `packages/core/src/index.test.ts` (or create `packages/core/src/resource/exports.test.ts`)
 
-- [ ] **Step 1: Write failing smoke test for public exports**
+- [x] **Step 1: Write failing smoke test for public exports**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -617,17 +617,17 @@ describe('M3.1 public exports', () => {
 });
 ```
 
-- [ ] **Step 2: Run full core suite**
+- [x] **Step 2: Run full core suite**
 
 Run: `pnpm --filter @resource-forge/core test`  
 Expected: PASS (including prior M2 tests)
 
-- [ ] **Step 3: Confirm non-goals**
+- [x] **Step 3: Confirm non-goals**
 
 - `projectResourceMetadata` is **not** exported
 - no Nest/GraphQL/Prisma imports under `packages/core/src/resource/`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/core/src/index.test.ts packages/core/src/resource
@@ -638,12 +638,12 @@ git commit -m "test(core): smoke M3.1 resource public exports"
 
 ## Completion criteria (M3.1)
 
-- [ ] Parent plan §7 Resource contracts checklist is green
-- [ ] Public exports match the locked surface above
-- [ ] No `projectResourceMetadata` in this slice
-- [ ] No annotation vocabulary beyond `EmptyAnnotations`
-- [ ] No field / relation / operation member types
-- [ ] Placeholder packages remain feature-free
+- [x] Parent plan §7 Resource contracts checklist is green
+- [x] Public exports match the locked surface above
+- [x] No `projectResourceMetadata` in this slice
+- [x] No annotation vocabulary beyond `EmptyAnnotations`
+- [x] No field / relation / operation member types
+- [x] Placeholder packages remain feature-free
 
 ---
 
