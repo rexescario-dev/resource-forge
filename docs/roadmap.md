@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — RFC-005 Accepted; M3 plan Draft |
+| M3 | Resource model | In progress — M3 plan Accepted; M3.1 task plan Draft |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -92,7 +92,7 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-**Status:** In progress — RFC-005 Accepted; [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) is Draft. No production Resource code until that plan and public export decisions are accepted.
+**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1 task plan](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) Draft. No production Resource code until M3.1 export decisions / task plan are Accepted.
 
 RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. Annotation representation and schema member vocabulary remain later RFCs.
 

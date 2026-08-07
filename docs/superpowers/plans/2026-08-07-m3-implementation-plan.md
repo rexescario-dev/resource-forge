@@ -351,8 +351,8 @@ Export boundary:
   per-slice symbols ⛔ after slice task plans Accepted
 
 M3.1:
-  export decisions ⛔
-  task breakdown ⛔
+  export decisions ⏳ Draft task plan `2026-08-07-m3-1-resource-contracts.md`
+  task breakdown ⏳ same Draft
   code ⛔
 
 M3.2:
