@@ -33,6 +33,9 @@ describe('validateResource', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.code).toBe('invalid_identity');
+      if (result.error.code === 'invalid_identity') {
+        expect(result.error.cause.code).toBe('invalid_namespace');
+      }
     }
   });
 
