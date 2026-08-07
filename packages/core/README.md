@@ -9,7 +9,7 @@ Core contracts for Resource Forge — vocabulary and invariants from accepted RF
 - Resource identity (M2.1)
 - Metadata model (M2.2)
 - Registry contracts (M2.3)
-- Extension / composition contracts (planned M2.4)
+- Extension / composition contracts (M2.4)
 
 ## Current status
 
@@ -42,6 +42,21 @@ Behavior notes:
 - `enumerate()` returns a snapshot array; order is non-normative
 - Concrete Map-backed class and internal key encoding are not exported
 
+### M2.4 Extension / Composition
+
+- `composeResourceMetadata(identity, contributions)` — pure free function
+- `Contribution`, `NamespacePartition`, `ContributionEntry`, `ProducerKind`
+- `CompositionError` + nested `ContributionValidationError`
+
+Behavior notes:
+
+- Contribution **data only** — no producer callables, discovery, or loading in core
+- Returns `Result<ResourceMetadata, CompositionError>`; does not mutate the registry
+- Callers may `register` / `replace` after successful composition (separate step)
+- Exclusive namespace ownership; only `kind: 'framework'` may contribute `rf`
+- Empty contributions / empty producer set succeed with empty-entry metadata
+- Contribution order affects diagnostic indices only; success payloads are order-independent under `resourceMetadataEqual`
+
 ## Dependency rules
 
 - Must not depend on NestJS, Prisma, or GraphQL
@@ -51,4 +66,4 @@ Behavior notes:
 
 - Adapters, discovery, persistence, decorators
 - Resource schemas (fields, relations, operations)
-- Composition / producer modules (M2.4)
+- Producer callables, compose-and-register helpers, concrete `rf` key catalog
