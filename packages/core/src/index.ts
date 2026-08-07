@@ -67,4 +67,4 @@ export type {
   ResourceSchema,
   ResourceValidationError,
 } from './resource/index.js';
-export { emptyAnnotations } from './resource/index.js';
+export { createEmptyResourceSchema, emptyAnnotations } from './resource/index.js';
