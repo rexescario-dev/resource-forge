@@ -59,3 +59,12 @@ export type {
   ProducerKind,
 } from './extension/index.js';
 export { composeResourceMetadata } from './extension/index.js';
+
+export type {
+  EmptyAnnotations,
+  EmptySchemaCollection,
+  Resource,
+  ResourceSchema,
+  ResourceValidationError,
+} from './resource/index.js';
+export { emptyAnnotations } from './resource/index.js';
