@@ -353,7 +353,7 @@ Export boundary:
 M3.1:
   export decisions ✅ Accepted task plan `2026-08-07-m3-1-resource-contracts.md`
   task breakdown ✅ same
-  code ⏳ in progress
+  code ✅ M3.1 complete (projection still M3.2)
 
 M3.2:
   export decisions ⛔
