@@ -1,7 +1,8 @@
 # RFC-012: Resource Operations
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; closed name-only `Operation = { name: OperationName }`; ordered unique `operations` sequence; empty valid; independent namespaces; no projection contribution; validate-before-snapshot; kind/IO/execution deferred; RFC-009 / RFC-010 / RFC-011 unchanged  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#36](https://github.com/rexescario-dev/resource-forge/issues/36)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model — `operations` slot), RFC-006 (Annotations — projection boundary), RFC-007 (Resource Fields — parallel floor; independent namespaces), RFC-008 (Resource Relations — parallel floor; independent namespaces), RFC-009 / RFC-010 / RFC-011 (Fields/Relations member contracts — relied upon unchanged)  
@@ -287,7 +288,7 @@ RFC-008  Resource Relations
         │
 RFC-009–011  Field types / Relation association / multiplicity
         │
-RFC-012  Resource Operations     ← this RFC (Draft)
+RFC-012  Resource Operations     ← this RFC (Accepted)
         │
 Later    Operation kind / signature / execution / optionality / vocabulary
 ```
