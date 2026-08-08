@@ -1,9 +1,9 @@
 # M3.6 Resource Field Types — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (awaiting M5 Plan Review). After Accept, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-009. Reuse M3.1–M3.5 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement nullability, constraints, defaults, enums, composites, named refs, additional scalars, value validation/coercion, field→metadata projection, association semantics, dual-shape compatibility, or public `validateFields` / `validateFieldType` APIs.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-009. Reuse M3.1–M3.5 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement nullability, constraints, defaults, enums, composites, named refs, additional scalars, value validation/coercion, field→metadata projection, association semantics, dual-shape compatibility, or public `validateFields` / `validateFieldType` APIs.
 
-**Status:** Draft  
-**M5:** Pending Plan Review  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers; tightened internal `validateFieldType` non-export wording + snapshot ownership assertions; validate-before-snapshot and no dual-shape locked; one PR with implementation for #23  
 **Tracking:** [#23](https://github.com/rexescario-dev/resource-forge/issues/23)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.6 was blocked on Resource Field Types RFC  
 **Source RFC:** RFC-009 Resource Field Types (**Accepted**) — amends Field member shape; partial supersession of RFC-007 §3.2  
@@ -68,7 +68,7 @@ These freeze the M3.6 implementation surface. They MUST NOT invent product seman
 | `relations` / `operations` | Unchanged from M3.5 (`ReadonlyArray<Relation>`; operations empty-only). |
 | Snapshot construction vs validation | **Separated, non-lossy.** Raw candidate validation (closed shape, names, uniqueness, type membership) happens **before** any snapshot that materializes `{ name, type }` only. `snapshotFields` accepts only already-validated `Field` members and freezes an ordered sequence; it MUST NOT discard, strip, normalize, or invent `type`. |
 | Non-empty Resource construction | **No public builder.** Public `createResource(identity)` remains empty schema collections + empty annotations. Tests use existing **internal** fixtures (`createResourceWithFieldsForTests` / `createResourceWithRelationsForTests`) that validate candidates before snapshotting. |
-| Internal helpers | `validateFieldName` / `validateFieldType` / `checkFields` / `snapshotFields` / `fieldsEqual` remain **internal or test-only**. Public validation remains `validateResource`. |
+| Internal helpers | Preserve the **existing** M3.4 mechanism: `validateFieldName` / `checkFields` / `snapshotFields` / `fieldsEqual` may remain **module-local exports** in `fields.ts` for same-package seams and tests, but MUST NOT be barrel-/package-exported. New `validateFieldType` is a **non-exported** helper inside `fields.ts` only (not module-exported, not barrel-exported). Public validation remains `validateResource`. |
 | Validation ownership | Part of `validateResource` via schema. No public `validateFields` / `validateFieldType` / `validateResourceSchema`. |
 | Schema error taxonomy | Field failures: `invalid_schema` **with** `cause: FieldValidationError` using `invalid_field_name` / `duplicate_field_name` / `invalid_field_member` / **`invalid_field_type`**. Relation failures unchanged. Non-member schema failures: `invalid_schema` without field/relation cause. |
 | Projection | After revalidation, still `createResourceMetadata(identity, [...annotations])` only. Fields MUST NOT contribute entries. |
@@ -260,7 +260,7 @@ For each task: write failing tests → implement → green → commit.
 7. Invalid vocabulary (`"String"`, `" string "`, `"str"`, `"integer"`, `"null"`, non-string) → `invalid_schema` / `invalid_field_type` with observed `type`
 8. Invalid `FieldName` / duplicate name still map to existing causes (with valid `type` present)
 9. Uniqueness by name only: two Fields same name different types cannot coexist → `duplicate_field_name`
-10. Snapshot-by-value / freeze: mutating caller-owned candidates MUST NOT change snapshotted Fields (after successful validate-then-snapshot)
+10. Snapshot ownership: mutating caller-owned candidate **array** and **member objects** MUST NOT change snapshotted Fields; assert `Object.isFrozen` on the fields array and each Field member (after successful validate-then-snapshot)
 11. Order-sensitive equality (internal/test): `[id:string, email:string] ≠ [email:string, id:string]`; same names/order but different types unequal
 12. Projection: non-empty typed fields + empty annotations → identity + **no** metadata entries from fields
 13. Projection: typed fields + annotations → annotation entries only
@@ -366,12 +366,13 @@ Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to typed 
 - Modify: `packages/core/src/resource/create-resource-with-relations.ts` (comments if needed)
 - Confirm: `packages/core/src/resource/validate.ts` continues to call `checkFields`
 
-- [ ] **Step 1: Internal `validateFieldType`**
+- [ ] **Step 1: Internal (non-exported) `validateFieldType`**
 
 ```ts
 const FIELD_TYPES = new Set(['string', 'number', 'boolean']);
 
-export function validateFieldType(
+/** Module-private — not exported from fields.ts; not barrel-exported. */
+function validateFieldType(
   type: unknown,
 ): Result<FieldType, { readonly code: 'invalid_field_type'; readonly type: unknown }> {
   if (typeof type !== 'string' || !FIELD_TYPES.has(type)) {
@@ -381,11 +382,11 @@ export function validateFieldType(
 }
 ```
 
-Exact membership only — no trim/lowercase.
+Exact membership only — no trim/lowercase. Do **not** add `export` on this helper.
 
 - [ ] **Step 2: Widen `checkFields`**
 
-For each candidate member:
+Keep the existing module-local `export function checkFields` (same-package / test import only). For each candidate member:
 
 1. plain object required → else `invalid_field_member`
 2. `Object.keys(member)` must be exactly the set `{ name, type }` (order irrelevant; length 2; both keys present) → else `invalid_field_member`
@@ -397,6 +398,8 @@ For each candidate member:
 MUST NOT strip extras or invent `type`.
 
 - [ ] **Step 3: Widen `snapshotFields` / `fieldsEqual`**
+
+Preserve existing module-local exports (not package barrels):
 
 ```ts
 export function snapshotFields(fields: readonly Field[]): ReadonlyArray<Field> {
@@ -415,6 +418,24 @@ export function fieldsEqual(left: readonly Field[], right: readonly Field[]): bo
   }
   return true;
 }
+```
+
+Snapshot ownership test (member + array); assert freezes:
+
+```ts
+const candidates = [{ name: 'id', type: 'string' as const }];
+const list: object[] = [candidates[0]!];
+const resource = createResourceWithFieldsForTests(identity, list);
+expect(resource.ok).toBe(true);
+if (!resource.ok) return;
+
+candidates[0]!.name = 'changed';
+list.push({ name: 'extra', type: 'number' });
+
+expect(resource.value.schema.fields.map((f) => f.name)).toEqual(['id']);
+expect(resource.value.schema.fields[0]?.type).toBe('string');
+expect(Object.isFrozen(resource.value.schema.fields)).toBe(true);
+expect(Object.isFrozen(resource.value.schema.fields[0])).toBe(true);
 ```
 
 - [ ] **Step 4: Update fixture comments** to say freeze `{ name, type }` (behavior already via `checkFields`/`snapshotFields`)
@@ -478,24 +499,76 @@ Retained RFC-007 collection rules (FieldName, order, uniqueness-by-name, empty, 
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-009 (+ retained RFC-007 collection rules)
-- [ ] Field is exactly `{ name, type }`; name-only rejected; no dual-shape
-- [ ] `FieldType` closed exact membership; dedicated `invalid_field_type`
-- [ ] Missing `type` / extras → `invalid_field_member`
-- [ ] Field equality includes `type`; uniqueness remains by name only
-- [ ] Snapshot construction separated from `validateResource`; candidates validated before `{ name, type }` materialization
-- [ ] `snapshotFields` never strips unknown properties or invents default `type`
-- [ ] Non-empty Resources via internal/test seams only (no public builder)
-- [ ] Field helpers internal; public validation remains `validateResource`
-- [ ] Projection non-participation required and tested
-- [ ] Nullability / constraints / enums / composites / value validation / field→metadata deferred
-- [ ] Relations / operations / annotations unchanged
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: Accepted plan + implementation in **one PR** for [#23](https://github.com/rexescario-dev/resource-forge/issues/23) (no plan-only merge)
+- [x] No new product semantics beyond RFC-009 (+ retained RFC-007 collection rules)
+- [x] Field is exactly `{ name, type }`; name-only rejected; no dual-shape
+- [x] `FieldType` closed exact membership; dedicated `invalid_field_type`
+- [x] Missing `type` / extras → `invalid_field_member`
+- [x] Field equality includes `type`; uniqueness remains by name only
+- [x] Snapshot construction separated from `validateResource`; candidates validated before `{ name, type }` materialization
+- [x] `snapshotFields` never strips unknown properties or invents default `type`
+- [x] Non-empty Resources via internal/test seams only (no public builder)
+- [x] Field helpers internal/test-only (existing module-local export mechanism); `validateFieldType` non-exported; public validation remains `validateResource`
+- [x] Projection non-participation required and tested
+- [x] Nullability / constraints / enums / composites / value validation / field→metadata deferred
+- [x] Relations / operations / annotations unchanged
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: Accepted plan + implementation in **one PR** for [#23](https://github.com/rexescario-dev/resource-forge/issues/23) (no plan-only merge)
+
+---
+
+## M5 review record
+
+```text
+Decision: Accepted
+Subject (plan): docs/superpowers/plans/2026-08-08-m3-6-field-types.md
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-009-resource-field-types-design.md
+Delivery goal: Breaking widen Field to exactly { name, type } with closed FieldType; validate-before-snapshot; no dual-shape; projection unchanged
+Review summary: No plan blockers. Pre-Accept wording tightened so validateFieldType is unambiguously non-exported; existing fields.ts module-local export mechanism preserved; snapshot ownership tests strengthened (member + array + Object.isFrozen).
+Findings: None (no plan blockers)
+Traceability: adequate (coverage + deferrals checked)
+Gate: Proceed to M6. No implementation activity before this Accept.
+Authority: Plan governs sequencing/execution; specification governs product semantics.
+```
+
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.6 Field Types |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/23 |
+| M4 | Plan **Accepted** (Draft reviewed) |
+| M5 | Review **Accepted** |
+| M6 | n/a (not started) |
+| M7 | n/a |
+| M8 | n/a |
+| M9 | n/a |
+| Branch | `feat/m3-6-field-types` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/24 |
+| Status | **Ready for M6** |
+
+### Shipped
+
+- Accepted M3.6 implementation plan for RFC-009 typed Fields
+- Internal-helper / public-API boundary clarified (`validateFieldType` non-exported)
+- Snapshot ownership verification strengthened in the plan
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | N/A (docs/plan only at M5) |
+| Typecheck | N/A |
+| Lint | N/A |
+| Build | N/A |
+| Package validation | N/A |
+
+### Next Gate
+
+**M6 — Implementation**
 
 ---
 
 ## Gate
 
-**M4 Draft complete.** Ready for **M5 Plan Review**. Do not implement until this plan is **Accepted**. Do not invent nullability, constraints, enums, composites, association semantics, dual-shape compatibility, or field→metadata projection.
+**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #23. Do not invent nullability, constraints, enums, composites, association semantics, dual-shape compatibility, or field→metadata projection. Keep Accepted plan + implementation on **one PR** (no plan-only merge).
