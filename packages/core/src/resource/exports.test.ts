@@ -92,3 +92,14 @@ describe('M3.5 / M3.7 / M3.8 public exports', () => {
     expect('createResourceWithRelationsForTests' in core).toBe(false);
   });
 });
+
+describe('M3.9 public exports', () => {
+  it('does not export operation validate helpers or EmptySchemaCollection', () => {
+    expect('validateOperations' in core).toBe(false);
+    expect('validateOperationName' in core).toBe(false);
+    expect('snapshotOperations' in core).toBe(false);
+    expect('operationsEqual' in core).toBe(false);
+    expect('createResourceWithOperationsForTests' in core).toBe(false);
+    expect('EmptySchemaCollection' in core).toBe(false);
+  });
+});

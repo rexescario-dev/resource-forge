@@ -387,7 +387,7 @@ describe('RFC-011 relation multiplicity', () => {
     );
   });
 
-  it('rejects non-empty operations without a relation cause', () => {
+  it('accepts name-only non-empty operations without a relation cause', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
@@ -397,7 +397,28 @@ describe('RFC-011 relation multiplicity', () => {
       schema: {
         fields: [],
         relations: [],
-        operations: [{ name: 'create' }] as unknown as [],
+        operations: [{ name: 'create' }],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.schema.operations.map((o) => o.name)).toEqual([
+      'create',
+    ]);
+  });
+
+  it('rejects invalid operation members without a relation cause', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const result = validateResource({
+      identity: identity.value,
+      schema: {
+        fields: [],
+        relations: [],
+        operations: [{ name: 'create', kind: 'command' } as never],
       },
       annotations: emptyAnnotations,
     });
@@ -405,7 +426,7 @@ describe('RFC-011 relation multiplicity', () => {
     if (!result.ok) {
       expect(result.error.code).toBe('invalid_schema');
       if (result.error.code === 'invalid_schema') {
-        expect(result.error.cause).toBeUndefined();
+        expect(result.error.cause?.code).toBe('invalid_operation_member');
       }
     }
   });

@@ -5,18 +5,14 @@ import {
 import { err, ok, type Result } from '../result.js';
 import { checkAnnotations } from './annotations.js';
 import { checkFields, snapshotFields } from './fields.js';
+import { checkOperations, snapshotOperations } from './operations.js';
 import { checkRelations, snapshotRelations } from './relations.js';
 import type {
   Annotations,
-  EmptySchemaCollection,
   Resource,
   ResourceSchema,
   ResourceValidationError,
 } from './types.js';
-
-function isEmptySchemaCollection(value: unknown): value is EmptySchemaCollection {
-  return Array.isArray(value) && value.length === 0;
-}
 
 export function validateResource(candidate: {
   identity: ResourceIdentity;
@@ -38,8 +34,7 @@ export function validateResource(candidate: {
   if (
     !Array.isArray(schema.fields) ||
     !Array.isArray(schema.relations) ||
-    !('operations' in schema) ||
-    !isEmptySchemaCollection(schema.operations)
+    !Array.isArray(schema.operations)
   ) {
     return err({ code: 'invalid_schema' });
   }
@@ -52,6 +47,12 @@ export function validateResource(candidate: {
   const relationsResult = checkRelations(schema.relations);
   if (!relationsResult.ok) {
     return err({ code: 'invalid_schema', cause: relationsResult.error });
+  }
+
+  // Delegate to the single Operation-validation implementation (RFC-012 / M3.9 plan).
+  const operationsResult = checkOperations(schema.operations);
+  if (!operationsResult.ok) {
+    return err({ code: 'invalid_schema', cause: operationsResult.error });
   }
 
   const annotationsResult = checkAnnotations(candidate.annotations);
@@ -68,7 +69,7 @@ export function validateResource(candidate: {
       // Freeze validated members so Resource ownership does not alias caller arrays/objects.
       fields: snapshotFields(fieldsResult.value),
       relations: snapshotRelations(relationsResult.value),
-      operations: schema.operations,
+      operations: snapshotOperations(operationsResult.value),
     },
     // Authoritative annotations snapshot already established at construction; do not re-snapshot here.
     annotations: candidate.annotations,

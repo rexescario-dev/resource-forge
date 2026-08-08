@@ -305,10 +305,10 @@ For each task: write failing tests → implement → green → commit.
 - Create: `packages/core/src/resource/operations.test.ts` (and/or extend `validate.test.ts`) with failing expectations
 - Update: tests that assumed non-empty operations always fail
 
-- [ ] **Step 1: Widen types** — `OperationName`, `Operation`, `OperationValidationError`; `ResourceSchema.operations: ReadonlyArray<Operation>`; `invalid_schema` optional `cause` as `FieldValidationError | RelationValidationError | OperationValidationError`; stop typing operations as `EmptySchemaCollection`
-- [ ] **Step 2: Write failing tests** for grammar, duplicates, closed member, order preservation, independent namespaces (field+relation+operation), export smoke (`validateOperations` absent), CRUD names as ordinary names
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new cases (and compile breaks where empty-only typing was assumed)
-- [ ] **Step 4: Commit** `test(core): add failing M3.9 operation contract tests`
+- [x] **Step 1: Widen types** — `OperationName`, `Operation`, `OperationValidationError`; `ResourceSchema.operations: ReadonlyArray<Operation>`; `invalid_schema` optional `cause` as `FieldValidationError | RelationValidationError | OperationValidationError`; stop typing operations as `EmptySchemaCollection`
+- [x] **Step 2: Write failing tests** for grammar, duplicates, closed member, order preservation, independent namespaces (field+relation+operation), export smoke (`validateOperations` absent), CRUD names as ordinary names
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new cases (and compile breaks where empty-only typing was assumed)
+- [x] **Step 4: Commit** `test(core): add failing M3.9 operation contract tests`
 
 ### Task 2: Snapshot construction + validation integration
 
@@ -319,11 +319,11 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/schema.ts` / `create-resource-with-fields.ts` / `create-resource-with-relations.ts` for empty `ReadonlyArray<Operation>`
 - Update: `fields.test.ts` / `relations.test.ts` non-empty-operations expectations
 
-- [ ] **Step 1: Internal helpers** — `validateOperationName` (`/^[a-z][a-zA-Z0-9]*$/`); **`checkOperations` as the single Operation-validation implementation** (closed shape + uniqueness); `snapshotOperations` accepts only already-validated Operation members and creates a new frozen ordered sequence — MUST NOT discard or normalize additional semantic properties. Raw candidate validation via `checkOperations` occurs before snapshotting.
-- [ ] **Step 2: Internal fixture** — `createResourceWithOperationsForTests` calls `checkOperations` before snapshot; optional fields/relations; then `validateResource`; not barrel-exported
-- [ ] **Step 3: `validateResource`** — **delegate** authoritative `operations` validation to `checkOperations` (MUST NOT duplicate the algorithm); retain field/relation checks; remove empty-only `isEmptySchemaCollection(schema.operations)` gate; empty operations still ok; wire `invalid_schema` + operation `cause`; snapshot operations like fields/relations
-- [ ] **Step 4: Green construction / snapshot / validate / order-sensitive equality / independent-namespace tests** — include proof that `{ name: 'create', kind: 'command' }` fails with `invalid_operation_member` (no silent strip-to-valid)
-- [ ] **Step 5: Commit** `feat(core): Resource operations sequence and validation (RFC-012)`
+- [x] **Step 1: Internal helpers** — `validateOperationName` (`/^[a-z][a-zA-Z0-9]*$/`); **`checkOperations` as the single Operation-validation implementation** (closed shape + uniqueness); `snapshotOperations` accepts only already-validated Operation members and creates a new frozen ordered sequence — MUST NOT discard or normalize additional semantic properties. Raw candidate validation via `checkOperations` occurs before snapshotting.
+- [x] **Step 2: Internal fixture** — `createResourceWithOperationsForTests` calls `checkOperations` before snapshot; optional fields/relations; then `validateResource`; not barrel-exported
+- [x] **Step 3: `validateResource`** — **delegate** authoritative `operations` validation to `checkOperations` (MUST NOT duplicate the algorithm); retain field/relation checks; remove empty-only `isEmptySchemaCollection(schema.operations)` gate; empty operations still ok; wire `invalid_schema` + operation `cause`; snapshot operations like fields/relations
+- [x] **Step 4: Green construction / snapshot / validate / order-sensitive equality / independent-namespace tests** — include proof that `{ name: 'create', kind: 'command' }` fails with `invalid_operation_member` (no silent strip-to-valid)
+- [x] **Step 5: Commit** `feat(core): Resource operations sequence and validation (RFC-012)`
 
 ### Task 3: Projection non-participation
 
@@ -331,10 +331,10 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.test.ts`
 - Modify: `packages/core/src/resource/project.ts` only if needed (body should remain annotation-only)
 
-- [ ] **Step 1: Failing tests** — non-empty operations + empty annotations ⇒ zero entries; operations + annotations ⇒ annotation entries only; invalid operations ⇒ `invalid_resource`; purity / order unchanged
-- [ ] **Step 2: Confirm implementation** — still `createResourceMetadata(identity, [...annotations])`; no operation mapping
-- [ ] **Step 3: Green tests**
-- [ ] **Step 4: Commit** `test(core): operations do not contribute to metadata projection`
+- [x] **Step 1: Failing tests** — non-empty operations + empty annotations ⇒ zero entries; operations + annotations ⇒ annotation entries only; invalid operations ⇒ `invalid_resource`; purity / order unchanged
+- [x] **Step 2: Confirm implementation** — still `createResourceMetadata(identity, [...annotations])`; no operation mapping
+- [x] **Step 3: Green tests**
+- [x] **Step 4: Commit** `test(core): operations do not contribute to metadata projection`
 
 ### Task 4: Exports, roadmap, slice closeout
 
@@ -343,10 +343,10 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `docs/roadmap.md` — mark M3.9 **implementation** complete only after M6 verification is green
 - Mark this plan Status **Accepted** tasks complete only after green (status flip is M5; checkboxes are M6)
 
-- [ ] **Step 1: Export smoke** — `Operation` / `OperationName` / `OperationValidationError` as locked; confirm no `validateOperations`; drop unused `EmptySchemaCollection` if applicable
-- [ ] **Step 2: Full `pnpm --filter @resource-forge/core test` green** (expect ≥ prior count; operations cases added)
-- [ ] **Step 3: Docs status updates only after verification**
-- [ ] **Step 4: Commit** `docs: record M3.9 operations slice complete`
+- [x] **Step 1: Export smoke** — `Operation` / `OperationName` / `OperationValidationError` as locked; confirm no `validateOperations`; drop unused `EmptySchemaCollection` if applicable
+- [x] **Step 2: Full `pnpm --filter @resource-forge/core test` green** (expect ≥ prior count; operations cases added)
+- [x] **Step 3: Docs status updates only after verification**
+- [x] **Step 4: Commit** `docs: record M3.9 operations slice complete`
 
 ---
 
@@ -404,3 +404,43 @@ For each task: write failing tests → implement → green → commit.
 ## Gate
 
 **M5 Accepted.** M6 implementation may begin under this plan and tracking issue #38. Do not invent kind/IO/execution semantics, Field/Relation reopen, or a public operations builder. `checkOperations` remains the single Operation-validation implementation.
+
+---
+
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.9 Resource Operations |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/38 |
+| M4 | Plan **Accepted** |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | Pending |
+| M8 | Pending |
+| M9 | Pending |
+| Branch | `feat/m3-9-operations` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/39 |
+| Status | **Ready for M7** |
+
+### Shipped
+
+- Widened `ResourceSchema.operations` to ordered `ReadonlyArray<Operation>` (`Operation = { name }`)
+- `checkOperations` as single Operation-validation implementation; reused by fixture + `validateResource`
+- Validate-before-snapshot; closed member (no strip of `kind`); empty valid; independent namespaces
+- No Operation → metadata contribution; invalid ops still fail projection gate
+- Removed `EmptySchemaCollection`; no public `validateOperations`
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | **Passed** (159 in `@resource-forge/core`) |
+| Typecheck | **Passed** |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
+
+### Next Gate
+
+**M7 — Code Review**
