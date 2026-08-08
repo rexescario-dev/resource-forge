@@ -672,3 +672,40 @@ describe('RFC-019 checkConstraintValues — cross-member kinds', () => {
     expect(result.error.code).toBe('range_constraint_violated');
   });
 });
+
+describe('RFC-020 checkConstraintValues — skip unique', () => {
+  it('skips unique without occupancy and still evaluates later kinds', () => {
+    const resource = resourceWithConstraints(
+      [
+        { name: 'emailUnique', kind: 'unique', field: 'code' },
+        { name: 'totalMax', kind: 'range', field: 'total', max: 10 },
+      ],
+      [totalField, codeField],
+    );
+
+    expect(
+      checkConstraintValues(
+        resource,
+        mapOf([
+          ['code', 'abc'],
+          ['total', 5],
+        ]),
+      ),
+    ).toEqual({ ok: true, value: undefined });
+
+    const rangeFail = checkConstraintValues(
+      resource,
+      mapOf([
+        ['code', 'abc'],
+        ['total', 11],
+      ]),
+    );
+    expect(rangeFail.ok).toBe(false);
+    if (!rangeFail.ok) {
+      expect(rangeFail.error).toMatchObject({
+        code: 'range_constraint_violated',
+        constraintName: 'totalMax',
+      });
+    }
+  });
+});

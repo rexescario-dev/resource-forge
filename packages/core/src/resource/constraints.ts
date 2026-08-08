@@ -17,6 +17,7 @@ const CONSTRAINT_KINDS: ReadonlySet<ConstraintKind> = new Set([
   'enum',
   'distinct',
   'equal',
+  'unique',
 ]);
 
 /** Internal: sole normative ConstraintName grammar (RFC-016). */
@@ -63,6 +64,7 @@ function resolveConstraintFields(
   index: number,
   rawFields: unknown,
   fieldsByName: ReadonlyMap<string, Field>,
+  requireHomogeneous: boolean,
 ): Result<FieldName[], ConstraintValidationError> {
   if (!Array.isArray(rawFields)) {
     return err({ code: 'invalid_constraint_fields', index });
@@ -99,10 +101,12 @@ function resolveConstraintFields(
       });
     }
 
-    if (expectedType === undefined) {
-      expectedType = field.type;
-    } else if (field.type !== expectedType) {
-      return err({ code: 'heterogeneous_constraint_field_types', index });
+    if (requireHomogeneous) {
+      if (expectedType === undefined) {
+        expectedType = field.type;
+      } else if (field.type !== expectedType) {
+        return err({ code: 'heterogeneous_constraint_field_types', index });
+      }
     }
 
     names.push(nameResult.value);
@@ -259,10 +263,22 @@ export function checkConstraints(
     }
 
     const isCrossMember = rawKind === 'distinct' || rawKind === 'equal';
+    const isUnique = rawKind === 'unique';
     const hasField = Object.prototype.hasOwnProperty.call(member, 'field');
     const hasFields = Object.prototype.hasOwnProperty.call(member, 'fields');
 
-    if (isCrossMember) {
+    if (isUnique) {
+      if (hasField === hasFields) {
+        return err({ code: 'invalid_constraint_targeting_shape', index });
+      }
+      if (hasField) {
+        if (!setsEqual(keys, ['name', 'kind', 'field'])) {
+          return err({ code: 'invalid_constraint_member', index });
+        }
+      } else if (!setsEqual(keys, ['name', 'kind', 'fields'])) {
+        return err({ code: 'invalid_constraint_member', index });
+      }
+    } else if (isCrossMember) {
       if (hasField) {
         return err({ code: 'invalid_constraint_targeting_shape', index });
       }
@@ -333,11 +349,49 @@ export function checkConstraints(
       });
     }
 
+    if (isUnique) {
+      if (hasField) {
+        const fieldResult = resolveTargetField(
+          index,
+          member.field,
+          fieldsByName,
+        );
+        if (!fieldResult.ok) {
+          return fieldResult;
+        }
+        seen.add(nameResult.value);
+        accepted.push({
+          name: nameResult.value,
+          kind: 'unique',
+          field: fieldResult.value.name,
+        });
+        continue;
+      }
+
+      const fieldsResult = resolveConstraintFields(
+        index,
+        member.fields,
+        fieldsByName,
+        false,
+      );
+      if (!fieldsResult.ok) {
+        return fieldsResult;
+      }
+      seen.add(nameResult.value);
+      accepted.push({
+        name: nameResult.value,
+        kind: 'unique',
+        fields: fieldsResult.value,
+      });
+      continue;
+    }
+
     if (isCrossMember) {
       const fieldsResult = resolveConstraintFields(
         index,
         member.fields,
         fieldsByName,
+        true,
       );
       if (!fieldsResult.ok) {
         return fieldsResult;
@@ -512,6 +566,21 @@ function snapshotConstraint(constraint: Constraint): Constraint {
     });
   }
 
+  if (constraint.kind === 'unique') {
+    if ('fields' in constraint) {
+      return Object.freeze({
+        name: constraint.name,
+        kind: 'unique' as const,
+        fields: Object.freeze([...constraint.fields]),
+      });
+    }
+    return Object.freeze({
+      name: constraint.name,
+      kind: 'unique' as const,
+      field: constraint.field,
+    });
+  }
+
   return Object.freeze({
     name: constraint.name,
     kind: constraint.kind,
@@ -555,6 +624,16 @@ function constraintEqual(left: Constraint, right: Constraint): boolean {
 
   if (left.kind === 'equal' && right.kind === 'equal') {
     return fieldNamesEqual(left.fields, right.fields);
+  }
+
+  if (left.kind === 'unique' && right.kind === 'unique') {
+    if ('fields' in left && 'fields' in right) {
+      return fieldNamesEqual(left.fields, right.fields);
+    }
+    if ('field' in left && 'field' in right) {
+      return left.field === right.field;
+    }
+    return false;
   }
 
   if (left.kind === 'range' && right.kind === 'range') {

@@ -866,4 +866,129 @@ describe('RFC-019 cross-member constraint kinds (declaration)', () => {
       ]),
     ).toBe(false);
   });
+
+  it('accepts single-field and heterogeneous composite unique', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        { name: 'emailUnique', kind: 'unique', field: 'primaryEmail' },
+        {
+          name: 'tenantSeq',
+          kind: 'unique',
+          fields: ['primaryEmail', 'total'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, total],
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+    expect(resource.value.schema.constraints).toEqual([
+      { name: 'emailUnique', kind: 'unique', field: 'primaryEmail' },
+      {
+        name: 'tenantSeq',
+        kind: 'unique',
+        fields: ['primaryEmail', 'total'],
+      },
+    ]);
+  });
+
+  it('rejects unique targeting-shape violations and length < 2', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const both = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'both',
+          kind: 'unique',
+          field: 'primaryEmail',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(both.ok).toBe(false);
+    if (!both.ok) {
+      expect(both.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_targeting_shape', index: 0 },
+      });
+    }
+
+    const neither = createResourceWithConstraintsForTests(
+      identity.value,
+      [{ name: 'neither', kind: 'unique' }],
+      emptyAnnotations,
+      [emailA],
+    );
+    expect(neither.ok).toBe(false);
+    if (!neither.ok) {
+      expect(neither.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_targeting_shape', index: 0 },
+      });
+    }
+
+    const short = createResourceWithConstraintsForTests(
+      identity.value,
+      [{ name: 'short', kind: 'unique', fields: ['primaryEmail'] }],
+      emptyAnnotations,
+      [emailA],
+    );
+    expect(short.ok).toBe(false);
+    if (!short.ok) {
+      expect(short.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_fields', index: 0 },
+      });
+    }
+  });
+
+  it('keeps distinct homogeneous while unique allows heterogeneous', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const distinctMixed = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'mixed',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'total'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, total],
+    );
+    expect(distinctMixed.ok).toBe(false);
+    if (!distinctMixed.ok) {
+      expect(distinctMixed.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'heterogeneous_constraint_field_types', index: 0 },
+      });
+    }
+
+    const uniqueMixed = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'mixedUnique',
+          kind: 'unique',
+          fields: ['primaryEmail', 'total'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, total],
+    );
+    expect(uniqueMixed.ok).toBe(true);
+  });
 });

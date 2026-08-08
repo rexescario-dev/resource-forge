@@ -151,15 +151,16 @@ export type OperationValidationError =
 /** Constraint identity string conforming to RFC-016 grammar. */
 export type ConstraintName = string;
 
-/** Closed exclusive constraint kind vocabulary (RFC-017 / RFC-019). */
+/** Closed exclusive constraint kind vocabulary (RFC-017 / RFC-019 / RFC-020). */
 export type ConstraintKind =
   | 'range'
   | 'pattern'
   | 'enum'
   | 'distinct'
-  | 'equal';
+  | 'equal'
+  | 'unique';
 
-/** Kind-discriminated closed Constraint member (RFC-017 / RFC-019). */
+/** Kind-discriminated closed Constraint member (RFC-017 / RFC-019 / RFC-020). */
 export type Constraint =
   | {
       readonly name: ConstraintName;
@@ -188,6 +189,16 @@ export type Constraint =
   | {
       readonly name: ConstraintName;
       readonly kind: 'equal';
+      readonly fields: ReadonlyArray<FieldName>;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'unique';
+      readonly field: FieldName;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'unique';
       readonly fields: ReadonlyArray<FieldName>;
     };
 
@@ -310,7 +321,47 @@ export type ConstraintEnforcementError =
       readonly index: number;
       readonly constraintName: ConstraintName;
       readonly field: FieldName;
+    }
+  | {
+      readonly code: 'unique_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
     };
+
+/** Invalid invocation / host-contract failure for population checks (RFC-020). */
+export type MissingOccupancyError = {
+  readonly code: 'missing_occupancy_surface';
+  readonly index: number;
+  readonly constraintName: ConstraintName;
+};
+
+/**
+ * Population check errors (RFC-020).
+ * `missing_occupancy_surface` MUST NOT appear on ConstraintEnforcementError.
+ */
+export type PopulationUniquenessError =
+  | ConstraintEnforcementError
+  | MissingOccupancyError;
+
+/** Uniqueness key extracted for population checks (RFC-020). */
+export type UniquenessKey =
+  | Exclude<FieldRuntimeValue, null>
+  | ReadonlyArray<Exclude<FieldRuntimeValue, null>>;
+
+/** Host occupancy answer for one unique Constraint (RFC-020). */
+export type OccupancySurface = {
+  readonly isOccupied: (key: UniquenessKey) => boolean;
+};
+
+/**
+ * Maps each evaluated unique Constraint to its occupancy surface.
+ * `index` is the zero-based position in ResourceSchema.constraints.
+ */
+export type OccupancyProvider = (
+  constraint: Extract<Constraint, { kind: 'unique' }>,
+  index: number,
+) => OccupancySurface | undefined;
 
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;
