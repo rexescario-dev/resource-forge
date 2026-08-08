@@ -125,8 +125,8 @@ target: ResourceIdentity {
 
 Target validation reuses RFC-001’s existing identity grammar and equality semantics. This RFC MUST NOT redefine namespace/name grammars, identity equality, or reserved-namespace policy.
 
-**Design Review question — validation context (`user` / `framework`):**  
-RFC-001 states that identity validation MAY depend on context (for example, framework-defined versus user-defined resources), and the existing identity validator distinguishes `user` vs `framework` contexts for reserved-`rf` handling. RFC-010 does **not** establish a new default or a Relation-specific reservation rule. Design Review MUST decide whether Relation `target` validation should invoke RFC-001’s existing identity validation under the `user` context, the `framework` context, or another explicitly identified existing RFC-001 validation context appropriate for declared association targets. Any chosen context MUST be an application of RFC-001’s existing validation context mechanism, not a new Relation-local policy.
+**Design Review decision — RFC-001 validation context for Relation targets:**  
+RFC-001 states that identity validation MAY depend on the context in which an identity is being created (for example, framework-defined versus user-defined resources), including reserved-`rf` handling. **Design Review MUST select one of the validation contexts already defined by RFC-001 for Relation `target` validation. RFC-010 MUST NOT introduce a new validation context** and MUST NOT invent a Relation-local reservation policy. Until Design Review records that selection in the Accepted RFC, implementers have no normative answer for which RFC-001 context applies to `target`; that selection is an M3 decision for this document, not an open implementation choice.
 
 ### 4.4 Self-target
 
@@ -257,7 +257,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 1. The closed Relation shape is unambiguously exactly `{ name, target }` with `target: ResourceIdentity`; missing `target` and extras are invalid.
 2. `target` is unambiguously declarative-only (no registry/existence/cross-Resource/registration-order/runtime load requirements).
 3. Target representation is structured RFC-001 identity (no string parse; no opaque ref grammar); RFC-001 rules are reused, not redefined.
-4. The RFC-001 validation-context question (`user` / `framework` / other existing context for Relation targets) is resolved by Design Review without inventing a Relation-local reservation policy.
+4. Design Review has selected one RFC-001-defined validation context for Relation `target`s; RFC-010 introduces no new validation context and no Relation-local reservation policy; the chosen context is recorded in the Accepted document.
 5. Supersession of RFC-008 §3.2 (and related Relation equality / closed-member text) is explicit; collection ownership remains with RFC-008.
 6. Relation value equality (`name` **and** `target`) and uniqueness-by-name coexistence rules are unambiguous.
 7. Conceptual failure causes distinguish Invalid relation member vs Invalid relation target vs name/duplicate causes; no silent repair; no required public validate API.
@@ -289,7 +289,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 | Cardinality in this floor | Deferred | Distinct dimension (*how many*); keep M3 focused |
 | Target representation | Structured `ResourceIdentity` | Reuse RFC-001; no parse/opaque grammar |
 | Target semantics | Declarative only | Declaration ≠ resolution; no registry in validateResource |
-| `rf` / kind | Design Review via RFC-001 validation context | Reuse existing mechanism; do not invent Relation-local default |
+| `rf` / validation context | M3 selects one RFC-001-defined context | No new context; no Relation-local reservation policy |
 | Self-target | Allowed (default) | No graph analysis in this floor |
 | Relation shape | Exactly `{ name, target }` | Closed member; breaking widen |
 | Compatibility | Breaking; no dual-shape | Honest migration |
@@ -303,16 +303,18 @@ This RFC may move from Draft to Accepted when Design Review finds:
 
 ## 14. Worked examples (conceptual)
 
+Conceptual `ResourceIdentity` values use the structured pair form `{ namespace, name }` (RFC-001). The informative canonical text `namespace/name` is not a Relation `target` representation.
+
 ```text
 Resource {
-  identity: (crm, Order)
+  identity: { namespace: crm, name: Order }
   schema: {
     fields: [
       { name: total, type: number }          # RFC-009
     ]
     relations: [
-      { name: customer, target: (crm, Customer) }
-      { name: lineItems, target: (crm, LineItem) }
+      { name: customer, target: { namespace: crm, name: Customer } }
+      { name: lineItems, target: { namespace: crm, name: LineItem } }
     ]
     operations: ∅
   }
@@ -324,19 +326,30 @@ Resource {
 # projectResourceMetadata → no Relation contribution (unchanged)
 
 # Self-target allowed by default:
-#   { name: parent, target: (crm, Order) } on Resource (crm, Order)
+#   { name: parent, target: { namespace: crm, name: Order } }
+#   on Resource identity { namespace: crm, name: Order }
 
 # Same target, different names — valid:
-#   [ { name: author, target: (crm, User) }, { name: editor, target: (crm, User) } ]
+#   [
+#     { name: author, target: { namespace: crm, name: User } },
+#     { name: editor, target: { namespace: crm, name: User } }
+#   ]
 
-# [ { name: customer } ]                         → invalid (missing target; Invalid relation member)
-# [ { name: customer, target: (crm, Customer), cardinality: "many" } ]
-#                                                 → invalid (extra member; Invalid relation member)
-# [ { name: customer, target: "crm/Customer" } ] → invalid (not structured ResourceIdentity)
-# [ { name: customer, target: (CRM, Customer) } ] → invalid (Invalid relation target; namespace grammar)
-# [ { name: Customer, target: (crm, Customer) } ] → invalid (Invalid relation name)
-# [ { name: a, target: (crm, A) }, { name: a, target: (crm, B) } ]
-#                                                 → invalid (Duplicate relation name)
+# [ { name: customer } ]
+#   → invalid (missing target; Invalid relation member)
+# [ { name: customer, target: { namespace: crm, name: Customer }, cardinality: "many" } ]
+#   → invalid (extra member; Invalid relation member)
+# [ { name: customer, target: "crm/Customer" } ]
+#   → invalid (not structured ResourceIdentity)
+# [ { name: customer, target: { namespace: CRM, name: Customer } } ]
+#   → invalid (Invalid relation target; namespace grammar)
+# [ { name: Customer, target: { namespace: crm, name: Customer } } ]
+#   → invalid (Invalid relation name)
+# [
+#   { name: a, target: { namespace: crm, name: A } },
+#   { name: a, target: { namespace: crm, name: B } }
+# ]
+#   → invalid (Duplicate relation name)
 ```
 
 ## 15. Implementation gate (non-normative)
