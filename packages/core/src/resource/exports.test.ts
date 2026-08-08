@@ -164,3 +164,22 @@ describe('M3.14 public exports', () => {
     expect('createResourceWithConstraintsForTests' in core).toBe(false);
   });
 });
+
+describe('M3.15 public exports', () => {
+  it('exposes checkConstraintValues and enforcement types without declaration helpers', () => {
+    expect(typeof core.checkConstraintValues).toBe('function');
+    expect('validateConstraints' in core).toBe(false);
+    expect('createResourceWithConstraintsForTests' in core).toBe(false);
+
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResource(identity.value);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const enforced = core.checkConstraintValues(resource.value, new Map());
+    expect(enforced).toEqual({ ok: true, value: undefined });
+  });
+});

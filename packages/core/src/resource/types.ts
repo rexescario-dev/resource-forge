@@ -222,6 +222,55 @@ export type ConstraintValidationError =
   | { readonly code: 'invalid_pattern'; readonly index: number }
   | { readonly code: 'invalid_enum_values'; readonly index: number };
 
+/** Runtime field value in a field-value map (RFC-018). */
+export type FieldRuntimeValue = string | number | boolean | null;
+
+/** Runtime constraint enforcement failure (RFC-018); distinct from declaration errors. */
+export type ConstraintEnforcementError =
+  | {
+      readonly code: 'missing_required_field_value';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'null_field_value';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'field_value_type_mismatch';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+      readonly expected: FieldType;
+    }
+  | {
+      readonly code: 'range_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'pattern_compilation_failure';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'pattern_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'enum_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    };
+
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;
   readonly relations: ReadonlyArray<Relation>;
