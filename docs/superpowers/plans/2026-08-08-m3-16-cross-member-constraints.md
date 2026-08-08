@@ -1,8 +1,9 @@
 # M3.16 Intra-Instance Cross-Member Constraints — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft**. After M5 Accept, use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-019. Reuse M3.1–M3.15 Resource / schema / field / constraint declaration and `checkConstraintValues` surfaces. Do **not** implement population uniqueness, sets of instances, stores, queries, indexes, persistence, Relation targeting, Field-local constraint slots, operator/`spec` bags, collect-all errors, or a second runtime check API. Do **not** reopen RFC-017 member-local `range` / `pattern` / `enum` shapes or RFC-018 member-local evaluation contracts beyond additive kinds.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-019. Reuse M3.1–M3.15 Resource / schema / field / constraint declaration and `checkConstraintValues` surfaces. Do **not** implement population uniqueness, sets of instances, stores, queries, indexes, persistence, Relation targeting, Field-local constraint slots, operator/`spec` bags, collect-all errors, or a second runtime check API. Do **not** reopen RFC-017 member-local `range` / `pattern` / `enum` shapes or RFC-018 member-local evaluation contracts beyond additive kinds. Kind-violation diagnostics MUST use `field = fields[0]` exactly as the planning lock (do not invent a “more precise” violating field).
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers. Closed `distinct`/`equal`; `field` vs `fields` targeting; declaration resolve/homogeneity; immutable `fields` snapshot; gate-order + immediate skip; no coercion; `===` not `Object.is`; kind-violation `fields[0]` diagnostic lock; fail-fast retained; RFC-017/018 regression; population uniqueness / second runtime surface excluded; fixture locality retained. M6 authorized; task checkboxes remain open until execution.  
 **Tracking:** [#72](https://github.com/rexescario-dev/resource-forge/issues/72)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-019 Intra-Instance Cross-Member Constraints (**Accepted**) — extends RFC-017 vocabulary and RFC-018 evaluation for multi-field kinds  
@@ -51,9 +52,9 @@ Where this plan and an Accepted specification disagree, the specification wins a
 ```text
 RFC-019 Accepted (#70)
        ↓
-M3.16 plan Draft (this document) (#72)
+M3.16 plan Accepted (this document) (#72)
        ↓
-M5 Plan Review → Accepted (or Return → revise)
+M5 Plan Review → Accepted
        ↓
 M6 implementation (complete task checkboxes during execution)
        ↓
@@ -253,15 +254,15 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 | --- | --- |
 | Slice | M3.16 Intra-Instance Cross-Member Constraints |
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/72 |
-| M4 | Plan **Draft** (awaiting M5) |
-| M5 | — |
+| M4 | Plan **Accepted** |
+| M5 | Review **Accepted** |
 | M6 | — |
 | M7 | — |
 | M8 | — |
 | M9 | — |
-| Branch | — |
-| PR | — |
-| Status | **Ready for M5** |
+| Branch | `docs/rfc-019-uniqueness-cross-member` (delivery may continue under #72) |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/71 (RFC Accept docs; delivery PR for #72 follows packaging) |
+| Status | **Ready for M6** |
 
 ### Shipped
 
@@ -271,12 +272,12 @@ _(filled at M6+)_
 
 | Check | Result |
 | --- | --- |
-| Tests | — |
-| Typecheck | — |
+| Tests | N/A (plan Accept) |
+| Typecheck | N/A |
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
 
 ### Next Gate
 
-**M5 Plan Review**
+**M6 Implementation** — task checkboxes remain open until execution.
