@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1–M3.6 ✅; next still blocked on Operations / association / vocabulary RFCs for other slices |
+| M3 | Resource model | In progress — M3.1–M3.6 ✅; RFC-010 Accepted; M3.7 association plan Draft (#28); other slices still blocked on Operations / cardinality / vocabulary RFCs as needed |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -33,7 +33,8 @@ M3 gate RFCs:
 | RFC-007 | Resource Fields (member + ordered `fields` sequence) | Accepted — [#13](https://github.com/rexescario-dev/resource-forge/issues/13) |
 | RFC-008 | Resource Relations (member + ordered `relations` sequence) | Accepted — [#17](https://github.com/rexescario-dev/resource-forge/issues/17) |
 | RFC-009 | Resource Field Types (required `{ name, type }`; closed `FieldType`) | Accepted — [#21](https://github.com/rexescario-dev/resource-forge/issues/21) |
-| RFC-010+ | Nullability / constraints; Operations; association semantics; annotation vocabulary; richer projection | Planned |
+| RFC-010 | Relation Association Semantics (required `{ name, target }`) | Accepted — [#26](https://github.com/rexescario-dev/resource-forge/issues/26) |
+| Later | Nullability / constraints; Operations; cardinality; annotation vocabulary; richer projection | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
@@ -96,9 +97,9 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) ✅; [M3.2](superpowers/plans/2026-08-08-m3-2-projection.md) ✅; [RFC-006](superpowers/specs/2026-08-08-rfc-006-annotations-design.md) Accepted; [M3.3 annotations](superpowers/plans/2026-08-08-m3-3-annotations.md) ✅ ([#10](https://github.com/rexescario-dev/resource-forge/issues/10)); [RFC-007](superpowers/specs/2026-08-08-rfc-007-resource-fields-design.md) Accepted; [M3.4 fields](superpowers/plans/2026-08-08-m3-4-fields.md) ✅ ([#15](https://github.com/rexescario-dev/resource-forge/issues/15)); [RFC-008](superpowers/specs/2026-08-08-rfc-008-resource-relations-design.md) Accepted ([#17](https://github.com/rexescario-dev/resource-forge/issues/17)); [M3.5 relations](superpowers/plans/2026-08-08-m3-5-relations.md) ✅ ([#19](https://github.com/rexescario-dev/resource-forge/issues/19)); [RFC-009](superpowers/specs/2026-08-08-rfc-009-resource-field-types-design.md) Accepted ([#21](https://github.com/rexescario-dev/resource-forge/issues/21)); [M3.6 Field Types](superpowers/plans/2026-08-08-m3-6-field-types.md) ✅ ([#23](https://github.com/rexescario-dev/resource-forge/issues/23)). Other slices still blocked on Operations / association / vocabulary RFCs as needed.
+**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) ✅; [M3.2](superpowers/plans/2026-08-08-m3-2-projection.md) ✅; [RFC-006](superpowers/specs/2026-08-08-rfc-006-annotations-design.md) Accepted; [M3.3 annotations](superpowers/plans/2026-08-08-m3-3-annotations.md) ✅ ([#10](https://github.com/rexescario-dev/resource-forge/issues/10)); [RFC-007](superpowers/specs/2026-08-08-rfc-007-resource-fields-design.md) Accepted; [M3.4 fields](superpowers/plans/2026-08-08-m3-4-fields.md) ✅ ([#15](https://github.com/rexescario-dev/resource-forge/issues/15)); [RFC-008](superpowers/specs/2026-08-08-rfc-008-resource-relations-design.md) Accepted ([#17](https://github.com/rexescario-dev/resource-forge/issues/17)); [M3.5 relations](superpowers/plans/2026-08-08-m3-5-relations.md) ✅ ([#19](https://github.com/rexescario-dev/resource-forge/issues/19)); [RFC-009](superpowers/specs/2026-08-08-rfc-009-resource-field-types-design.md) Accepted ([#21](https://github.com/rexescario-dev/resource-forge/issues/21)); [M3.6 Field Types](superpowers/plans/2026-08-08-m3-6-field-types.md) ✅ ([#23](https://github.com/rexescario-dev/resource-forge/issues/23)); [RFC-010](superpowers/specs/2026-08-08-rfc-010-relation-association-semantics-design.md) Accepted ([#26](https://github.com/rexescario-dev/resource-forge/issues/26)); [M3.7 relation association](superpowers/plans/2026-08-08-m3-7-relation-association.md) Draft ([#28](https://github.com/rexescario-dev/resource-forge/issues/28)). Other slices still blocked on Operations / cardinality / vocabulary RFCs as needed.
 
-RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. RFC-006 defines the annotation container, validation, and direct projection participation. RFC-007 defines the ordered `fields` sequence and `FieldName` (Field shape amended by RFC-009). RFC-008 defines name-only Relation members and the ordered `relations` sequence. RFC-009 requires closed typed Fields `{ name, type }` with `FieldType` ∈ {string, number, boolean}. Named annotation vocabulary, association semantics, nullability/constraints, and operations remain later RFCs.
+RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. RFC-006 defines the annotation container, validation, and direct projection participation. RFC-007 defines the ordered `fields` sequence and `FieldName` (Field shape amended by RFC-009). RFC-008 defines the ordered `relations` sequence and `RelationName` (Relation shape amended by RFC-010). RFC-009 requires closed typed Fields `{ name, type }` with `FieldType` ∈ {string, number, boolean}. RFC-010 requires closed associated Relations `{ name, target }` with declarative `ResourceIdentity` targets under RFC-001 `user` context. Named annotation vocabulary, cardinality, nullability/constraints, and operations remain later RFCs.
 
 Suggested implementation slices (see M3 implementation plan):
 
@@ -108,7 +109,8 @@ Suggested implementation slices (see M3 implementation plan):
 - **M3.4** — Fields per RFC-007 (member + ordered sequence + validation) ✅ — [#15](https://github.com/rexescario-dev/resource-forge/issues/15)
 - **M3.5** — Relations per RFC-008 (member + ordered sequence + validation) ✅ — [#19](https://github.com/rexescario-dev/resource-forge/issues/19)
 - **M3.6** — Field Types per RFC-009 (required `{ name, type }` + closed `FieldType`) ✅ — [#23](https://github.com/rexescario-dev/resource-forge/issues/23)
-- **M3.7+** — deferred until Operations / association / nullability-constraints / vocabulary RFCs as needed
+- **M3.7** — Relation Association per RFC-010 (required `{ name, target }`) — plan Draft [#28](https://github.com/rexescario-dev/resource-forge/issues/28)
+- **M3.8+** — deferred until Operations / cardinality / nullability-constraints / vocabulary RFCs as needed
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
