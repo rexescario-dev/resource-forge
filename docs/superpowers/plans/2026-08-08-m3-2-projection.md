@@ -1,8 +1,8 @@
 # M3.2 Projection — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** until M5 Accept. After Accept, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M3.1 `Resource` / `validateResource` and M2.2 `createResourceMetadata` — do not invent parallel metadata or outcome models. Do **not** implement annotation vocabulary or schema members.
+> **For agentic workers:** Status is **Draft — Ready for M5 Plan Review** until M5 Accept. After Accept, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M3.1 `Resource` / `validateResource` and M2.2 `createResourceMetadata` — do not invent parallel metadata or outcome models. Do **not** implement annotation vocabulary or schema members. Do **not** fabricate or mock an `invalid_metadata` scenario.
 
-**Status:** Draft  
+**Status:** Draft — Ready for M5 Plan Review  
 **Tracking:** [#6](https://github.com/rexescario-dev/resource-forge/issues/6)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-005 Resource Model (Accepted) §§3, 4.3; depends on RFC-001 / RFC-002 / M3.1  
@@ -34,10 +34,11 @@ Where this plan and an Accepted specification disagree, the specification wins a
 | Floor entries | empty `entries: []` only — no reserved keys / schema vocabulary |
 | Compose | **SHALL NOT** require `composeResourceMetadata`; implement via `createResourceMetadata` |
 | Validity gate | re-run `validateResource` before projecting |
-| Failure | invalid Resource → `invalid_resource`; defensive metadata failure → `invalid_metadata` |
+| Failure | invalid Resource → `invalid_resource`; `invalid_metadata` is defensive only (see Projection behavior) |
 | Mutation / registry | none — pure; no `register` / `replace` |
 | Reverse projection | deferred / out of scope |
 | Annotations / members | not in M3.2 |
+| `invalid_metadata` tests | **Do not** fabricate/mock a metadata failure; branch remains in the return contract for completeness |
 
 ---
 
@@ -89,9 +90,11 @@ projectResourceMetadata(resource: Resource): Result<ResourceMetadata, ResourcePr
 1. `validateResource(resource)`.
 2. On validation failure → `{ code: 'invalid_resource', cause }`.
 3. `createResourceMetadata(validated.identity, [])`.
-4. On metadata failure → `{ code: 'invalid_metadata', cause }` (defensive; empty entries + validated identity should succeed).
+4. On metadata failure → `{ code: 'invalid_metadata', cause }`.
 5. On success → RFC-002-valid `ResourceMetadata` whose identity equals the Resource identity under RFC-001 equality.
 6. MUST NOT mutate `resource`, MUST NOT call registry APIs, MUST NOT require `composeResourceMetadata`.
+
+**`invalid_metadata` expectation:** `invalid_metadata` is a defensive error branch required by the locked return contract. Under RFC-001/RFC-002 validity and the empty-entry floor, the branch is expected to be unreachable for a successfully validated Resource; M3.2 does not fabricate or mock a metadata failure to exercise it. Given a `validateResource`-successful Resource, `createResourceMetadata(validated.identity, [])` should succeed under the currently accepted RFC-002 contract.
 
 ---
 
@@ -152,10 +155,10 @@ projectResourceMetadata(resource: Resource): Result<ResourceMetadata, ResourcePr
 
 **Files:**
 - Modify: `packages/core/src/resource/types.ts`
+- Modify: `packages/core/src/resource/index.ts` — **export `ResourceProjectionError`**
 - Create: `packages/core/src/resource/project.test.ts`
-- Modify: `packages/core/src/resource/index.ts` (type re-export only if needed for tests via relative import)
 
-- [ ] **Step 1: Add `ResourceProjectionError` to types**
+- [ ] **Step 1: Add `ResourceProjectionError` to types and export from `resource/index.ts`**
 
 ```ts
 import type { MetadataValidationError } from '../metadata/types.js';
@@ -171,14 +174,16 @@ export type ResourceProjectionError =
     };
 ```
 
-Export the type from `resource/index.ts`.
+In `resource/index.ts`, re-export type `ResourceProjectionError` (function export waits for Task 2).
 
 - [ ] **Step 2: Write the failing tests**
+
+Do **not** add a test that fabricates or mocks `invalid_metadata`. Cover happy-path success (including RFC-002 validity of empty entries), purity, and `invalid_resource` only.
 
 ```ts
 import { describe, expect, it } from 'vitest';
 import { createResourceIdentity, resourceIdentitiesEqual } from '../identity/index.js';
-import { resourceMetadataEqual, validateResourceMetadata } from '../metadata/index.js';
+import { validateResourceMetadata } from '../metadata/index.js';
 import { createResource } from './create.js';
 import { emptyAnnotations } from './empty-annotations.js';
 import { createEmptyResourceSchema } from './schema.js';
@@ -250,8 +255,8 @@ git commit -m "test(core): add failing M3.2 projection floor tests"
 
 **Files:**
 - Create: `packages/core/src/resource/project.ts`
-- Modify: `packages/core/src/resource/index.ts`
-- Modify: `packages/core/src/index.ts`
+- Modify: `packages/core/src/resource/index.ts` — add **function** export only (`ResourceProjectionError` already exported in Task 1)
+- Modify: `packages/core/src/index.ts` — export type `ResourceProjectionError` + function `projectResourceMetadata`
 
 - [ ] **Step 1: Minimal implementation**
 
@@ -279,12 +284,10 @@ export function projectResourceMetadata(
 }
 ```
 
-- [ ] **Step 2: Export from barrels**
+- [ ] **Step 2: Export function from barrels**
 
-From `resource/index.ts` and `packages/core/src/index.ts`:
-
-- type `ResourceProjectionError`
-- function `projectResourceMetadata`
+- `resource/index.ts`: export `projectResourceMetadata` (type already exported in Task 1)
+- `packages/core/src/index.ts`: export type `ResourceProjectionError` + function `projectResourceMetadata`
 
 - [ ] **Step 3: Run projection tests — expect PASS**
 
@@ -303,8 +306,8 @@ git commit -m "feat(core): add projectResourceMetadata RFC-005 floor"
 
 **Files:**
 - Modify: `packages/core/src/index.test.ts`
-- Modify: `docs/roadmap.md` (M3 status line only — mark M3.2 complete after green tests)
-- Modify: `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (§11 status: M3.2 code complete)
+- Modify: `docs/roadmap.md` — mark M3.2 **implementation** complete only after M6 verification is green
+- Modify: `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` — §11 M3.2 code complete only after M6 verification is green
 
 - [ ] **Step 1: Extend public export smoke**
 
@@ -345,11 +348,14 @@ Expected: PASS (M2 + M3.1 + M3.2)
 - no field / relation / operation member types
 - no Nest/GraphQL/Prisma imports under `packages/core/src/resource/`
 - projection does not import registry modules
+- no fabricated `invalid_metadata` test
 
-- [ ] **Step 4: Update status docs**
+- [ ] **Step 4: Update status docs (implementation complete only)**
 
-- `docs/roadmap.md` — M3: M3.1 ✅; M3.2 ✅; next M3.3+ blocked on RFC-006+
-- Parent plan §11 — M3.2 export/task/code ✅
+Do this step **only after** Steps 2–3 are green (M6 verification). Plan Accept alone must not mark M3.2 code complete.
+
+- `docs/roadmap.md` — mark M3.2 implementation complete only after M6 verification is green; next M3.3+ blocked on RFC-006+
+- Parent plan §11 — M3.2 export/task/code ✅ only after M6 verification is green
 
 - [ ] **Step 5: Commit**
 
@@ -366,10 +372,11 @@ git commit -m "docs: record M3.2 projection floor complete"
 | --- | --- |
 | minimal Resource projects successfully | Task 1/2 happy-path test |
 | projected identity equals Resource identity | Task 1 identity agreement assertion |
-| projected snapshot is RFC-002-valid | `validateResourceMetadata` assertion |
+| projected snapshot is RFC-002-valid | `validateResourceMetadata` assertion (empty entries) |
 | projection does not mutate Resource | mutation test |
 | projection does not call register/replace | implementation constraint + no registry import |
 | invalid Resource failure distinguishable | `invalid_resource` test |
+| `invalid_metadata` | **Not exercised** — defensive branch only; do not fabricate |
 
 Full suite: `pnpm --filter @resource-forge/core test`.
 
@@ -406,8 +413,22 @@ Full suite: `pnpm --filter @resource-forge/core test`.
 
 ## Gate
 
-**Implementation plan drafted** — Ready for **Plan Review (M5)**. Do not implement until Status is **Accepted**.
+**Status: Draft — Ready for M5 Plan Review.** Do not implement until Status is **Accepted**.
+
+Lifecycle:
+
+```text
+Draft — Ready for M5 Plan Review
+  ↓
+M5 Plan Review → Accepted
+  ↓
+M6 TDD Implementation
+  ↓
+Tests + exports + verification green
+  ↓
+M3.2 Code Complete (roadmap / parent §11)
+```
 
 ## After Accept
 
-Coding begins only when this plan’s **Status** is **Accepted**. Prefer subagent-driven TDD per task. Prefer one PR for this tracking issue (#6) carrying Accept + M6.
+Coding begins only when this plan’s **Status** is **Accepted**. Prefer subagent-driven TDD per task. Prefer one PR for this tracking issue (#6) carrying Accept + M6. Do not mark roadmap/parent-plan M3.2 complete at Accept—only after M6 verification is green.
