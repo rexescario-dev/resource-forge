@@ -142,15 +142,21 @@ describe('M3.9 public exports', () => {
   });
 });
 
-describe('M3.13 public exports', () => {
-  it('exposes Constraint contracts without exporting constraint validate helpers', () => {
-    const constraint: Constraint = { name: 'nonNegativeTotal', kind: 'placeholder' };
-    const error: ConstraintValidationError = {
-      code: 'missing_constraint_kind',
-      index: 0,
+describe('M3.14 public exports', () => {
+  it('exposes ConstraintKind contracts without exporting constraint validate helpers', () => {
+    const constraint: Constraint = {
+      name: 'nonNegativeTotal',
+      kind: 'range',
+      field: 'total',
+      min: 0,
     };
-    expect(constraint.kind).toBe('placeholder');
-    expect(error.code).toBe('missing_constraint_kind');
+    const error: ConstraintValidationError = {
+      code: 'unknown_constraint_kind',
+      index: 0,
+      kind: 'placeholder',
+    };
+    expect(constraint.kind).toBe('range');
+    expect(error.code).toBe('unknown_constraint_kind');
     expect('validateConstraints' in core).toBe(false);
     expect('validateConstraintName' in core).toBe(false);
     expect('snapshotConstraints' in core).toBe(false);

@@ -64,6 +64,7 @@ export type {
   AnnotationValidationError,
   Annotations,
   Constraint,
+  ConstraintKind,
   ConstraintName,
   ConstraintValidationError,
   Field,
