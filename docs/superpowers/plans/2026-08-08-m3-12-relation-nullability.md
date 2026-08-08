@@ -1,8 +1,9 @@
 # M3.12 Relation Nullability — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (awaiting M5). REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-015. Reuse M3.1–M3.11 Resource / schema / field / relation / operation / annotation / projection surfaces. Do **not** implement null elements in `many`, empty-collection ≡ null / empty-vs-absent, runtime presence/value enforcement of association-reference nullability, wire/serialization of association-reference null vs absence, persistence/DB null, bounds/constraints/defaults, cascade/loading/direction/joins/traversal/execution, Operation optionality / kind / signature / execution, annotation vocabulary, field→metadata projection, Field floor changes (RFC-014 retained), dual-shape compatibility, or public `validateRelations` / `validateNullable` / `validateResourceSchema`.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-015. Reuse M3.1–M3.11 Resource / schema / field / relation / operation / annotation / projection surfaces. Do **not** implement null elements in `many`, empty-collection ≡ null / empty-vs-absent, runtime presence/value enforcement of association-reference nullability, wire/serialization of association-reference null vs absence, persistence/DB null, bounds/constraints/defaults, cascade/loading/direction/joins/traversal/execution, Operation optionality / kind / signature / execution, annotation vocabulary, field→metadata projection, Field floor changes (RFC-014 retained), dual-shape compatibility, or public `validateRelations` / `validateNullable` / `validateResourceSchema`.
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers. The plan faithfully implements Accepted RFC-015 without adding product semantics. Relation nullable is association-reference nullability only; the five-member closed Relation floor, exact boolean validation, missing-vs-invalid classification, order-independent own-key boundaries, equality/uniqueness separation, validate-before-snapshot, and projection non-participation are all executable and covered by explicit TDD tasks. Fields, Operations, annotations, and retained Relation contracts remain unchanged. M6 implementation is authorized only after this status update; task checkboxes remain open until execution. One PR with implementation for #53.  
 **Tracking:** [#53](https://github.com/rexescario-dev/resource-forge/issues/53)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.12 was blocked on Relation Nullability RFC  
 **Source RFC:** RFC-015 Relation Nullability (**Accepted**) — amends Relation member floor; partial supersession of RFC-013 Relation closed-member / equality text; association-reference nullability only  
@@ -556,31 +557,31 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-015
-- [ ] Relation closed exactly `{ name, target, multiplicity, optional, nullable }`; Field closed shape unchanged (RFC-014)
-- [ ] Exact boolean only; omit invalid; no defaults; no dual-shape
-- [ ] `nullable: true` / `false` mean association reference may/must be non-null (declaration constraints only; association-reference nullability)
-- [ ] Missing vs invalid `nullable` distinct causes on Relation
-- [ ] Shape classification table + order-independent own key-set comparison normative
-- [ ] Explicit boundary tests: `{name,target}` / `{name,target,multiplicity}` / `{name,target,multiplicity,optional}` / `{name,target,multiplicity,nullable}` / `{name,target,multiplicity,optional,default}`
-- [ ] Own-property `nullable` required (inherited does not satisfy closed contract); enumerability not newly elevated beyond M3.11 mechanism
-- [ ] M3.11 candidate-object acceptance only first; RFC-015 owns post-object Relation key-set classification (no premature M3.11 closed-key rejection)
-- [ ] Equality includes `nullable`; uniqueness remains name-only; tested separately
-- [ ] `nullable` fully orthogonal to RFC-013 `optional` and RFC-011 `multiplicity` (including `many + nullable` as valid declaration without defining null elements / empty≡null)
-- [ ] Validate-before-snapshot; no silent strip/default/coerce; no invented nullable on invalid candidates; verified without instrumentation seam
-- [ ] Task 1 splits fixture migration (1A) from deliberate four-member regressions (1B) and new assertions (1C); invalid shapes use runtime test seam/`unknown`
-- [ ] `checkRelations` remains the single Relation validation implementation reused by fixtures and `validateResource`
-- [ ] Fields / Operations / annotations / projection non-participation unchanged; `project.ts` preferred untouched
-- [ ] Prior Relation “`nullable` as extra” tests explicitly retargeted
-- [ ] Field floor remains RFC-014 (no Field product change)
-- [ ] Task checkboxes are M6 execution markers; M5 Accept updates Status only
-- [ ] Task 4 roadmap/docs commit is final delivery only (after M6+ gates)
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: one PR for [#53](https://github.com/rexescario-dev/resource-forge/issues/53) carries Accepted plan + implementation (process constraint; not a substitute for M5 Accept)
+- [x] No new product semantics beyond RFC-015
+- [x] Relation closed exactly `{ name, target, multiplicity, optional, nullable }`; Field closed shape unchanged (RFC-014)
+- [x] Exact boolean only; omit invalid; no defaults; no dual-shape
+- [x] `nullable: true` / `false` mean association reference may/must be non-null (declaration constraints only; association-reference nullability)
+- [x] Missing vs invalid `nullable` distinct causes on Relation
+- [x] Shape classification table + order-independent own key-set comparison normative
+- [x] Explicit boundary tests: `{name,target}` / `{name,target,multiplicity}` / `{name,target,multiplicity,optional}` / `{name,target,multiplicity,nullable}` / `{name,target,multiplicity,optional,default}`
+- [x] Own-property `nullable` required (inherited does not satisfy closed contract); enumerability not newly elevated beyond M3.11 mechanism
+- [x] M3.11 candidate-object acceptance only first; RFC-015 owns post-object Relation key-set classification (no premature M3.11 closed-key rejection)
+- [x] Equality includes `nullable`; uniqueness remains name-only; tested separately
+- [x] `nullable` fully orthogonal to RFC-013 `optional` and RFC-011 `multiplicity` (including `many + nullable` as valid declaration without defining null elements / empty≡null)
+- [x] Validate-before-snapshot; no silent strip/default/coerce; no invented nullable on invalid candidates; verified without instrumentation seam
+- [x] Task 1 splits fixture migration (1A) from deliberate four-member regressions (1B) and new assertions (1C); invalid shapes use runtime test seam/`unknown`
+- [x] `checkRelations` remains the single Relation validation implementation reused by fixtures and `validateResource`
+- [x] Fields / Operations / annotations / projection non-participation unchanged; `project.ts` preferred untouched
+- [x] Prior Relation “`nullable` as extra” tests explicitly retargeted
+- [x] Field floor remains RFC-014 (no Field product change)
+- [x] Task checkboxes are M6 execution markers; M5 Accept updates Status only
+- [x] Task 4 roadmap/docs commit is final delivery only (after M6+ gates)
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: one PR for [#53](https://github.com/rexescario-dev/resource-forge/issues/53) carries Accepted plan + implementation (process constraint; not a substitute for M5 Accept)
 
 ---
 
 ## Gate
 
-**M4 Draft complete.** Hand off to **M5 Plan Review**. Do not begin M6 until this plan’s **Status** is **Accepted**. Do not invent null-element/empty≡null/runtime/wire/persistence/direction-join semantics, dual-shape compatibility, or default/coerce/strip `nullable`. No invalid Relation may become valid through stripping, defaulting, coercion, or normalization before validation. Apply M3.11 candidate-object acceptance only before RFC-015 key-set classification; deliberate invalid-shape tests must exercise runtime validation.
+**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #53. Do not invent null-element/empty≡null/runtime/wire/persistence/direction-join semantics, dual-shape compatibility, or default/coerce/strip `nullable`. No invalid Relation may become valid through stripping, defaulting, coercion, or normalization before validation. Apply M3.11 candidate-object acceptance only before RFC-015 key-set classification; deliberate invalid-shape tests must exercise runtime validation.
