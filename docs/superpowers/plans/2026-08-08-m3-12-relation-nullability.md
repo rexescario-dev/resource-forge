@@ -602,7 +602,7 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-12-relation-nullability` |
-| PR | (pending) |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/54 |
 | Status | **Ready for M7** |
 
 ### Shipped
