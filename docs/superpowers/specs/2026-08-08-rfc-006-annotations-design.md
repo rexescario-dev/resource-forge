@@ -1,12 +1,13 @@
 # RFC-006: Annotations
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; projection ordering resolved via RFC-002  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#8](https://github.com/rexescario-dev/resource-forge/issues/8)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-002 (Metadata Model), RFC-005 (Resource Model)  
 **Followed by:** Annotation vocabulary RFC(s); later Resource Fields / Relations / Operations and richer projection/composition RFCs  
-**Blocks:** Non-empty annotation representation and annotation projection beyond the RFC-005 empty floor (M3.3+)
+**Unblocks:** M3.3 annotations implementation planning (M4→M5) then M6 — not implementation by itself
 
 ## Primary question
 
@@ -83,21 +84,23 @@ Annotations {
 
 | Invariant | Rule |
 | --- | --- |
-| Snapshot | Any change yields a new annotations snapshot; projection MUST NOT mutate the Resource |
-| Unordered | Entry order has no semantic meaning and MUST NOT affect equality or projection |
-| Unique keys | At most one entry per `MetadataKey`; duplicates are invalid |
+| Snapshot | Annotations have **snapshot-by-value** semantics. Once part of a Resource snapshot, annotation entries and their nested `JsonValue` data cannot be mutated through external aliases. Any change yields a new annotations snapshot. Projection MUST NOT mutate the Resource. |
+| Unordered | Mapping order has no semantic meaning and MUST NOT affect annotation equality |
+| Unique keys | At most one mapping per `MetadataKey`; duplicates are invalid |
 | Identity | Each key is an RFC-002 `MetadataKey`; its grammar, equality semantics, and namespace/reservation rules apply unless this RFC explicitly narrows them. **This RFC does not narrow them.** |
 | Values | Each value satisfies the RFC-002 `JsonValue` validity contract; RFC-006 does not add vocabulary-specific constraints. Values are opaque here—no vocabulary interpretation |
-| Empty | Zero entries; valid |
+| Empty | Zero mappings; valid |
 | Not metadata | Annotations reuse key/value contracts but are not the `ResourceMetadata` aggregate |
+
+Because annotation identity reuses RFC-002 `MetadataKey`, RFC-002 namespace and reservation rules—including the `rf` reserved namespace—apply unchanged. RFC-006 introduces no annotation-specific namespace reservation.
 
 Implementations MUST NOT silently drop, merge, normalize, or reinterpret conflicting or invalid annotation entries.
 
 ### 3.3 Equality
 
-Two annotations snapshots are equal if and only if they contain the same set of `MetadataKey`s mapped to equal `JsonValue`s (deep JSON equality under RFC-002).
+Two annotations snapshots are equal if and only if they contain the same set of `MetadataKey` → `JsonValue` mappings (deep JSON equality under RFC-002).
 
-- Entry order is irrelevant.
+- Mapping order is irrelevant.
 - Absence of a key is not equal to a key mapped to `null`.
 - Empty annotations snapshots are equal to each other.
 
@@ -118,10 +121,10 @@ Annotation-container validity is part of Resource validity (RFC-005 validation /
 
 A Resource’s annotations snapshot is valid only if all of the following hold:
 
-1. Each key satisfies RFC-002 `MetadataKey` rules (grammar, equality, and namespace/reservation rules apply; none are narrowed by this RFC).
+1. Each key satisfies RFC-002 `MetadataKey` rules (grammar, equality, and namespace/reservation rules—including reserved `rf`—apply unchanged; none are narrowed by this RFC).
 2. Keys are unique within the snapshot; duplicate `MetadataKey`s are invalid.
 3. Each value satisfies the RFC-002 `JsonValue` validity contract; RFC-006 does not add vocabulary-specific constraints.
-4. Empty (zero entries) is valid.
+4. Empty (zero mappings) is valid.
 
 Invalid annotations → invalid Resource.
 
@@ -137,12 +140,13 @@ Invalid annotations → invalid Resource.
 
 For a valid Resource, annotation participation is:
 
-1. **Direct entry projection** — each annotation mapping becomes a `ResourceMetadata` entry with the same `MetadataKey` and the same `JsonValue`.
-2. **Exact preservation** — projection MUST NOT interpret, normalize, transform, envelope, or rename keys or values.
-3. **Empty** — zero annotation entries contribute zero metadata entries from annotations.
-4. **Purity / one-way** — projection MUST NOT mutate the Resource; there is no reverse projection from `ResourceMetadata` to annotations.
-5. **Within-annotation collisions** — impossible for a valid snapshot (unique keys).
-6. **Cross-source collisions** — out of scope. This RFC does **not** define collision detection, precedence, or merge semantics between annotation-derived metadata entries and entries produced by other Resource projection sources. Those semantics belong to a future projection/composition contract.
+1. **Direct entry projection** — each annotation mapping contributes one metadata entry with an equal `MetadataKey` and equal `JsonValue`, preserving the complete JSON value without interpretation or transformation.
+2. **Exact preservation** — projection MUST NOT interpret, normalize, transform, envelope, or rename keys or values. “Equal `JsonValue`” means deep JSON equality under RFC-002, not object-reference identity in any programming language.
+3. **Order-independent semantics** — Projection MUST preserve the semantic equality of the annotation mapping; annotation mapping order MUST NOT cause two equivalent annotation snapshots to produce semantically different projected metadata. RFC-002 already defines `ResourceMetadata` as an unordered mapping whose equality ignores entry order; this RFC therefore introduces **no** canonical ordering algorithm for projected annotation entries.
+4. **Empty** — zero annotation mappings contribute zero metadata entries from annotations.
+5. **Purity / one-way** — projection MUST NOT mutate the Resource; there is no reverse projection from `ResourceMetadata` to annotations.
+6. **Within-annotation collisions** — impossible for a valid snapshot (unique keys).
+7. **Cross-source collisions** — out of scope. This RFC does **not** define collision detection, precedence, or merge semantics between annotation-derived metadata entries and entries produced by other Resource projection sources. Those semantics belong to a future projection/composition contract.
 
 ### 5.1 Structural relationship only
 
@@ -172,7 +176,7 @@ Empty annotations still project to identity plus empty entries (RFC-005 floor un
 ## 6. Design rationale
 
 - **Parallel metadata-shaped container** reuses RFC-002 `MetadataKey` / `JsonValue` without inventing a second identity/value model, while keeping annotations as authoritative Resource state (RFC-005), not as `ResourceMetadata` itself.
-- **Unordered + unique keys + reject duplicates** keep equality and projection deterministic without locking array/map representation.
+- **Unordered + unique keys + reject duplicates** keep annotation equality well-defined and make direct projection independent of authoring/storage order (semantic equality relies on RFC-002’s order-irrelevant `ResourceMetadata` equality; no array-serialization determinism is promised).
 - **Empty = zero entries** yields one annotation concept; M3.1 `EmptyAnnotations` remains an implementation migration artifact.
 - **Validate on Resource** matches authoritative-state ownership; projection revalidates the Resource (RFC-005 / M3.2) but is not a separate annotation-validation pathway.
 - **Direct 1:1 projection with exact preservation** makes “participate through projection” testable without vocabulary or envelopes.
@@ -212,7 +216,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 1. Annotations are unambiguously authoritative Resource state and not the `ResourceMetadata` aggregate.
 2. Container invariants are complete: immutable snapshot, unordered, unique `MetadataKey`, `JsonValue` values, empty = zero entries.
 3. Validation ownership is clear: part of Resource validity; distinct from metadata validation; no silent drop, merge, or normalize.
-4. Projection participation is clear: revalidate Resource; direct 1:1 exact preservation; empty → zero entries; purity / one-way.
+4. Projection participation is clear: revalidate Resource; direct 1:1 exact preservation (equal key/value, not reference identity); order-independent semantic equality via RFC-002; empty → zero mappings; purity / one-way.
 5. Cross-source collision / precedence / merge and named vocabulary remain explicitly deferred.
 6. No normative TypeScript API, adapter, registry, or RFC-001–005 semantic changes are introduced.
 
