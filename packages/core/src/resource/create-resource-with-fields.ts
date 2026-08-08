@@ -5,6 +5,7 @@ import { checkFields, snapshotFields } from './fields.js';
 import type {
   Annotations,
   EmptySchemaCollection,
+  Relation,
   Resource,
   ResourceValidationError,
 } from './types.js';
@@ -34,7 +35,7 @@ export function createResourceWithFieldsForTests(
     identity,
     schema: {
       fields,
-      relations: Object.freeze([]) as EmptySchemaCollection,
+      relations: Object.freeze([]) as ReadonlyArray<Relation>,
       operations: Object.freeze([]) as EmptySchemaCollection,
     },
     annotations,

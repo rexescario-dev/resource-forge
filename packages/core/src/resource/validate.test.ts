@@ -59,6 +59,26 @@ describe('validateResource', () => {
     ]);
   });
 
+  it('accepts valid non-empty relations', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    if (!identity.ok) return;
+    const result = validateResource({
+      identity: identity.value,
+      schema: {
+        fields: [],
+        relations: [{ name: 'author' }, { name: 'lineItems' }],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.schema.relations.map((r) => r.name)).toEqual([
+      'author',
+      'lineItems',
+    ]);
+  });
+
   it('rejects missing schema collection property', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     if (!identity.ok) return;
