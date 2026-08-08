@@ -370,7 +370,7 @@ For each implementation task after types: failing tests → implement → green 
 | M9 | N/A |
 | Branch | `feat/m3-14-concrete-constraint-kinds` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/64 |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -393,4 +393,6 @@ For each implementation task after types: failing tests → implement → green 
 
 ### Next Gate
 
-**None pending before merge** — M7 Approved. Merge #64 when ready; close #63 on merge.
+**None — slice complete**
+
+**M7 Approved** (2026-08-08). Faithful RFC-017 / plan realization. Closed exclusive `ConstraintKind`; Field-targeted discriminated members; declaration-time resolve + type-match; deterministic cause precedence; order-sensitive `enum.values` equality; breaking unknown-kind vs M3.13 open-kind floor; no runtime enforcement; projection non-participation retained. CI green on #64; merge completed as `main` @ `2348e65` (#64); tracking #63 closed.
