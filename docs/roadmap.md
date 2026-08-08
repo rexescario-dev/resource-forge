@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1 ✅; M3.2 Draft plan pending M5 |
+| M3 | Resource model | In progress — M3.1 ✅; M3.2 ✅; next M3.3+ blocked on RFC-006+ |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -92,14 +92,14 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1 task plan](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) Accepted (shipped). [M3.2 projection task plan](superpowers/plans/2026-08-08-m3-2-projection.md) **Draft** — next gate **M5 Plan Review**.
+**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1 task plan](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) Accepted (shipped). [M3.2 projection task plan](superpowers/plans/2026-08-08-m3-2-projection.md) Accepted (implementation complete). Next: M3.3+ blocked on RFC-006+.
 
 RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. Annotation representation and schema member vocabulary remain later RFCs.
 
 Suggested implementation slices (see M3 implementation plan):
 
-- **M3.1** — Resource / ResourceSchema contracts, minimal construction, validation
-- **M3.2** — `projectResourceMetadata` (RFC-005 floor only)
+- **M3.1** — Resource / ResourceSchema contracts, minimal construction, validation ✅
+- **M3.2** — `projectResourceMetadata` (RFC-005 floor only) ✅
 - **M3.3+** — deferred until RFC-006 and Resource Fields / Relations / Operations RFCs
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.

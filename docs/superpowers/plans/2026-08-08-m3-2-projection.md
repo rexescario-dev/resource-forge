@@ -396,12 +396,12 @@ Full suite: `pnpm --filter @resource-forge/core test`.
 
 ## Completion criteria (M3.2)
 
-- [ ] Parent plan §7 Projection checklist is green after M6 verification
-- [ ] Public exports match the locked surface above
-- [ ] Empty `entries` floor only — no metadata vocabulary
-- [ ] No `composeResourceMetadata` requirement in the public contract
-- [ ] No annotation / schema member work
-- [ ] Placeholder packages remain feature-free
+- [x] Parent plan §7 Projection checklist is green after M6 verification
+- [x] Public exports match the locked surface above
+- [x] Empty `entries` floor only — no metadata vocabulary
+- [x] No `composeResourceMetadata` requirement in the public contract
+- [x] No annotation / schema member work
+- [x] Placeholder packages remain feature-free
 
 ---
 

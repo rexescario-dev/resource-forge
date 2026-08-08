@@ -356,9 +356,9 @@ M3.1:
   code ✅ M3.1 complete (projection still M3.2)
 
 M3.2:
-  export decisions ⛔
-  task breakdown ⛔
-  code ⛔
+  export decisions ✅ Accepted task plan `2026-08-08-m3-2-projection.md`
+  task breakdown ✅ same
+  code ✅ M3.2 complete (RFC-005 floor)
 
 M3.3+:
   blocked on RFC-006 / schema RFCs
