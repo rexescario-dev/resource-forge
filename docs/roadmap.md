@@ -30,7 +30,8 @@ M3 gate RFCs:
 | --- | --- | --- |
 | RFC-005 | Resource model | Accepted |
 | RFC-006 | Annotations | Accepted — [#8](https://github.com/rexescario-dev/resource-forge/issues/8) |
-| RFC-007+ | Resource Fields / Relations / Operations; annotation vocabulary; richer projection | Planned |
+| RFC-007 | Resource Fields (member + ordered `fields` sequence) | Draft — [#13](https://github.com/rexescario-dev/resource-forge/issues/13) |
+| RFC-008+ | Field types / constraints; Relations / Operations; annotation vocabulary; richer projection | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
