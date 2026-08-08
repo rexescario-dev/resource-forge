@@ -3,7 +3,7 @@ workflow:
   profile: library
   packages:
     generic: 1.2.0
-    cursor: 0.1.2
+    cursor: 0.2.0
   assets:
     - path: docs/workflows/README.md
       package: generic
@@ -55,16 +55,28 @@ workflow:
       digest: sha256:303efbfb6c8b6dc8ea0443e1ad0a5139ce36e8ba5b71df4e11c37489aecced2b
     - path: .cursor/rules/workflow.mdc
       package: cursor
-      version: 0.1.2
+      version: 0.2.0
       digest: sha256:0e4ffc4d2d9130814a0c34d2337d121fc3ce3577c47e0e9f21f4d8b1e0361c91
     - path: docs/workflows/conventions/reporting-conventions.md
       package: generic
       version: 1.2.0
       digest: sha256:f5d3ee015f184bb866c0770c5de2aa3d8abcfb1b95b550026ef2c2a14d4e6208
+    - path: .cursor/rules/session-handoff.mdc
+      package: cursor
+      version: 0.2.0
+      digest: sha256:42ef51a9fb737a12ddf6b019956b463f55cc116956fb4946c39a4b83caaabd4f
+    - path: .cursor/skills/session-handoff/SKILL.md
+      package: cursor
+      version: 0.2.0
+      digest: sha256:4daed2b515612d0448b3268f19b8b2f65b968abdc24f036e1de13513fa14313e
+    - path: .cursor/skills/session-handoff/template.md
+      package: cursor
+      version: 0.2.0
+      digest: sha256:168e2635c412acf38c7f098d294010c6248e05563658de985d26996234ad1557
   installation:
-    installedAt: 2026-08-08T00:36:24.383Z
-    toolVersion: 0.1.0
-    catalogId: context-forge-local
+    installedAt: 2026-08-08T07:11:42.485Z
+    toolVersion: 0.0.0
+    catalogId: local
   providers:
     issueTracker: github
     sourceControl: github

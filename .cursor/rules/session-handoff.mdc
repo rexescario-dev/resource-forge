@@ -1,0 +1,10 @@
+---
+description: When user says handoff, activate the session-handoff skill
+alwaysApply: true
+---
+
+# Session Handoff
+
+When the user requests a session handoff (`handoff`, `create a handoff`, `prepare a session handoff`, or equivalent), use the `session-handoff` skill at `.cursor/skills/session-handoff/SKILL.md`.
+
+The handoff MUST be produced as standalone Markdown that can be copied into a new AI session.
