@@ -129,7 +129,7 @@ describe('RFC-008 relations', () => {
       identity.value,
       [{ name: 'author' }],
       emptyAnnotations,
-      [{ name: 'author' }],
+      [{ name: 'author', type: 'string' }],
     );
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;

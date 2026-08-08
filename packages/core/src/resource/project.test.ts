@@ -110,8 +110,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithFieldsForTests(identity.value, [
-      { name: 'id' },
-      { name: 'email' },
+      { name: 'id', type: 'string' },
+      { name: 'email', type: 'string' },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -142,7 +142,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithFieldsForTests(
       identity.value,
-      [{ name: 'id' }],
+      [{ name: 'id', type: 'string' }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -162,7 +162,27 @@ describe('projectResourceMetadata', () => {
     const projected = projectResourceMetadata({
       identity: { namespace: 'crm', name: 'Customer' },
       schema: {
-        fields: [{ name: 'id' }, { name: 'id' }],
+        fields: [
+          { name: 'id', type: 'string' },
+          { name: 'id', type: 'string' },
+        ],
+        relations: [],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
+  });
+
+  it('fails for name-only fields as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: {
+        fields: [{ name: 'id' } as { name: string; type: 'string' }],
         relations: [],
         operations: [],
       },

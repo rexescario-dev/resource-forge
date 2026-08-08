@@ -69,9 +69,10 @@ describe('M3.3 public exports', () => {
   });
 });
 
-describe('M3.4 public exports', () => {
-  it('does not export validateFields or internal field helpers', () => {
+describe('M3.4 / M3.6 public exports', () => {
+  it('exposes FieldType and does not export validateFields or internal field helpers', () => {
     expect('validateFields' in core).toBe(false);
+    expect('validateFieldType' in core).toBe(false);
     expect('validateFieldName' in core).toBe(false);
     expect('snapshotFields' in core).toBe(false);
     expect('fieldsEqual' in core).toBe(false);

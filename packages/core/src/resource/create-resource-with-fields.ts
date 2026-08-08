@@ -15,9 +15,10 @@ import { validateResource } from './validate.js';
  * Internal / test-only seam: validate candidates, then snapshot, then Resource gate.
  * NOT exported from package barrels.
  *
- * Validates candidate member shape, names, and uniqueness before constructing the
- * snapshot; successful construction freezes ordered `{ name }` members and then
- * passes the Resource through `validateResource`.
+ * Validates candidate member shape (`name` + `type` exactly), names, uniqueness,
+ * and FieldType membership before constructing the snapshot; successful
+ * construction freezes ordered `{ name, type }` members and then passes the
+ * Resource through `validateResource`.
  */
 export function createResourceWithFieldsForTests(
   identity: ResourceIdentity,

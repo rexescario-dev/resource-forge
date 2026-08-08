@@ -17,7 +17,8 @@ import { validateResource } from './validate.js';
  *
  * Validates candidate relation (and optional field) member shape, names, and
  * uniqueness before constructing the snapshot; successful construction freezes
- * ordered `{ name }` members and then passes the Resource through `validateResource`.
+ * ordered Relations `{ name }` and Fields `{ name, type }` and then passes the
+ * Resource through `validateResource`.
  */
 export function createResourceWithRelationsForTests(
   identity: ResourceIdentity,

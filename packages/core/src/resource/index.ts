@@ -4,6 +4,7 @@ export type {
   EmptySchemaCollection,
   Field,
   FieldName,
+  FieldType,
   FieldValidationError,
   Relation,
   RelationName,
