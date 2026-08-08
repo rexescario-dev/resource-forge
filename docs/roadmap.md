@@ -38,7 +38,8 @@ M3 gate RFCs:
 | RFC-012 | Resource Operations (name-only Operation + ordered `operations` sequence) | Accepted — [#36](https://github.com/rexescario-dev/resource-forge/issues/36) |
 | RFC-013 | Field/Relation Optionality (required `optional: boolean`) | Accepted — [#40](https://github.com/rexescario-dev/resource-forge/issues/40) |
 | RFC-014 | Field Nullability (required `nullable: boolean` on Field) | Accepted — [#46](https://github.com/rexescario-dev/resource-forge/issues/46) |
-| Later | Relation nullability; constraints; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins | Planned |
+| RFC-015 | Relation Nullability (required association-reference `nullable: boolean` on Relation) | Draft — [#51](https://github.com/rexescario-dev/resource-forge/issues/51) |
+| Later | Constraints; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
