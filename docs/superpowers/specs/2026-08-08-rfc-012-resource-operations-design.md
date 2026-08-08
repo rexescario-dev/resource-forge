@@ -7,7 +7,7 @@
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model — `operations` slot), RFC-006 (Annotations — projection boundary), RFC-007 (Resource Fields — parallel floor; independent namespaces), RFC-008 (Resource Relations — parallel floor; independent namespaces), RFC-009 / RFC-010 / RFC-011 (Fields/Relations member contracts — relied upon unchanged)  
 **Followed by:** Operation kind / signature / input-output; execution / handlers; optionality / nullability; annotation vocabulary; field→metadata projection; direction / joins / cascade / loading / persistence (orthogonal; not implied here)  
 **Unblocks:** M3.9 Operations implementation planning (M4→M5), then implementation (M6), after this RFC is Accepted — not implementation by itself  
-**Amends:** RFC-005 empty-only / deferred member semantics for the `operations` collection slot (member + sequence rules supplied here). Does **not** amend RFC-009 Field shape, RFC-010 association floor, or RFC-011 `{ name, target, multiplicity }` / `"one"|"many"`.
+**Amends:** RFC-005's deferred `operations` member slot by supplying the Operation member and sequence semantics. It does not alter RFC-005's Resource aggregate model or any previously accepted Field/Relation semantics. Does **not** amend RFC-009 Field shape, RFC-010 association floor, or RFC-011 `{ name, target, multiplicity }` / `"one"|"many"`.
 
 ## Primary question
 
@@ -15,7 +15,7 @@
 
 ## Thesis
 
-RFC-012 defines `operations` as an **immutable ordered sequence of name-only Operation members with unique dedicated `OperationName`s**. Empty (`operations` with zero members) remains valid. Validity is part of Resource validity via the schema. Collection equality is order-sensitive. No OperationName values are reserved by this RFC. Kind, signature, input/output, execution/runtime behavior, and any Operation contribution to `projectResourceMetadata` are deferred. This RFC does **not** reopen or reinterpret Field or Relation member contracts (RFC-007 / RFC-009 / RFC-008 / RFC-010 / RFC-011).
+RFC-012 defines `operations` as an **ordered sequence of name-only Operation members with unique dedicated `OperationName`s**. Empty (`operations` with zero members) remains valid. Validity is part of Resource validity via the schema. Collection equality is order-sensitive. No OperationName values are reserved by this RFC. Kind, signature, input/output, execution/runtime behavior, and any Operation contribution to `projectResourceMetadata` are deferred. This RFC does **not** reopen or reinterpret Field or Relation member contracts (RFC-007 / RFC-009 / RFC-008 / RFC-010 / RFC-011).
 
 ```text
 ResourceSchema
@@ -24,7 +24,7 @@ ResourceSchema
 └── operations: ordered sequence of Operation { name: OperationName }       ← this RFC
 ```
 
-Observable snapshot immutability is required; this RFC does not prescribe a particular TypeScript container or API for achieving it.
+The logical contract is an ordered sequence. Separately, once that sequence is part of a Resource snapshot, the exposed Resource state MUST NOT permit mutation of it (§4.2). This RFC does not prescribe a particular collection implementation or TypeScript API.
 
 **RFC-005 owns the schema slot names; RFC-012 owns Operation identity, closed member shape, and `operations` sequence semantics.**
 
@@ -32,16 +32,15 @@ Observable snapshot immutability is required; this RFC does not prescribe a part
 
 ### 1.1 Goals
 
-1. Define `OperationName` (grammar, exact equality, Resource-local uniqueness within `operations`, dedicated identity domain, no RFC-012 reservations).
-2. Define closed name-only `Operation = { name: OperationName }`.
-3. Define `operations` as an immutable **ordered sequence** with unique names within the sequence; empty valid (RFC-005 empty floor preserved as the zero-member case).
+1. Define `OperationName` (grammar, exact equality, uniqueness within `operations`, dedicated identity domain, no RFC-012 reservations).
+2. Define closed name-only `Operation = { name: OperationName }` (exactly one declared semantic property: `name`).
+3. Define `operations` as an **ordered sequence** with unique names within the sequence; empty valid (RFC-005 empty floor preserved as the zero-member case).
 4. Define order-sensitive sequence equality and Operation value equality-by-name (not Resource-wide equality).
 5. State **independent namespaces** relative to `fields` and `relations`: uniqueness is per collection; a Field, Relation, and Operation MAY share the same name string on one Resource.
-6. Place validation inside Resource validity via schema, with distinct conceptual error causes; validate-before-snapshot (invalid candidates are rejected before they can become Resource snapshot state); no silent drop, normalize, coerce, strip, dedupe, or reorder-to-repair; no public `validateOperations` pathway and no `validateResourceSchema` introduced merely for this slice.
+6. Place validation inside Resource validity via schema, with distinct conceptual error causes; validate-before-snapshot; no silent repair; no public `validateOperations` pathway and no `validateResourceSchema` introduced merely for this slice.
 7. State that RFC-012 introduces **no Operation contribution** to the existing `projectResourceMetadata` projection.
-8. Explicitly supersede the prior empty-only / deferred member constraint on `operations` with this sequence contract once Accepted and implemented; document compatibility as an expansion of validity (existing empty-`operations` Resources remain valid).
-9. Explicitly defer kind, signature, input/output, execution/handlers, persistence, loading, joins, cascade, direction, bounds, optionality/nullability, unified schema namespace, field→metadata projection, and annotation vocabulary.
-10. Leave RFC-009 / RFC-010 / RFC-011 authoritative and unchanged for Field and Relation member contracts.
+8. Once Accepted and implemented, replace the empty-only implementation floor for `operations` with the sequence contract defined here (validity expansion; existing empty-`operations` Resources remain valid).
+9. Explicitly defer kind, signature, input/output, and execution (see §1.2); leave RFC-009 / RFC-010 / RFC-011 authoritative and unchanged.
 
 ### 1.2 Non-goals
 
@@ -66,9 +65,9 @@ This RFC does not define:
 
 | Term | Meaning |
 | --- | --- |
-| `OperationName` | Resource-local operation identity: an ASCII string satisfying the normative grammar `^[a-z][a-zA-Z0-9]*$`, with exact string equality and a dedicated identity domain — not a `FieldName`, not a `RelationName`, and not a `MetadataKey` |
+| `OperationName` | Name identifying an Operation within a Resource's `operations` sequence: an ASCII string satisfying the normative grammar `^[a-z][a-zA-Z0-9]*$`, with exact string equality and a dedicated identity domain — not a `FieldName`, not a `RelationName`, and not a `MetadataKey` |
 | Operation | Name-only schema member `{ name: OperationName }` |
-| `operations` | Immutable **ordered sequence** of Operation members on `ResourceSchema` |
+| `operations` | **Ordered sequence** of Operation members on `ResourceSchema` |
 | Empty `operations` | The sequence with zero members; valid (preserves the RFC-005 empty-collection floor as the zero case) |
 | Declaration / contract floor | What this RFC specifies: named operation declarations on a Resource — not executable behavior |
 
@@ -84,7 +83,7 @@ OperationName ::= ^[a-z][a-zA-Z0-9]*$
 
 - **Identity:** exact `OperationName` string.
 - **Scope:** unique within a Resource’s `operations` sequence.
-- **Namespace:** none shared with `fields`, `relations`, or metadata; operations are Resource-local and collection-scoped.
+- **Namespace:** none shared with `fields`, `relations`, or metadata; uniqueness is scoped to the Resource's `operations` sequence.
 - **Grammar:** The regex above is the **sole normative** `OperationName` constraint. The label “camelCase” is descriptive only and MUST NOT be read as an additional rule beyond `^[a-z][a-zA-Z0-9]*$` (e.g. `createID` is grammar-valid). The pattern matches the RFC-007 `FieldName` / RFC-008 `RelationName` grammar for surface consistency but **does not** reuse those types/domains and **does not** reuse `MetadataKey`.
 - **Equality:** exact string equality; case-sensitive; MUST NOT perform case folding, normalization, or aliasing (`createOrder` and `createORDER` are distinct).
 - **Reservations:** none in this RFC. Every grammar-valid `OperationName` is allowed. No `rf` prefix, framework-reserved operation catalog, or special names (`create`, `read`, `update`, `delete`, etc.). Future RFCs may reserve names or introduce kind vocabulary only by explicit statement. RFC-012 introduces no reservation or kind semantics.
@@ -97,11 +96,11 @@ Operation {
 }
 ```
 
-- `name` is the **only** Operation member property.
-- An Operation is valid only when it is a closed Operation value containing exactly one `name` member whose value is a valid `OperationName`.
-- Every member MUST conform exactly to the RFC-012 `Operation` shape: `{ name: OperationName }`. Members containing additional properties are **invalid** (not ignored or stripped).
-- No `kind`, signature, input/output, nullability, constraints, defaults, descriptions, annotations, handlers, or arbitrary payload.
-- Later RFCs may extend the Operation model explicitly. Unknown properties MUST NOT silently become part of Operation semantics.
+- An Operation has exactly one declared semantic property, `name`. Additional semantic properties are invalid.
+- An Operation is valid only when that `name` is a valid `OperationName` and the candidate conforms to the closed RFC-012 shape `{ name: OperationName }`.
+- An Operation candidate containing additional semantic properties is **invalid** (not ignored or stripped).
+- No `kind`, signature, input/output, execution, or other deferred semantics are part of this floor.
+- Later RFCs may extend the Operation model explicitly. Unknown semantic properties MUST NOT silently become part of Operation semantics.
 - Two Operation **values** are equal iff their `OperationName` strings are exactly equal.
 
 ### 3.3 Independent namespaces (Fields / Relations / Operations)
@@ -138,15 +137,15 @@ operations: ordered sequence of Operation
 
 | Invariant | Rule |
 | --- | --- |
-| Snapshot | Once an `operations` sequence is included in a Resource snapshot, callers MUST NOT be able to mutate the snapshot's operation sequence or its members through the exposed Resource state. Any modification produces a new sequence/snapshot. |
+| Snapshot | Once an `operations` sequence is part of a Resource snapshot, the exposed Resource state MUST NOT permit mutation of that sequence or its Operation members. Any change MUST produce a new Resource/snapshot state. |
 | Ordered | Declaration order is preserved and participates in `operations` sequence equality. |
 | Unique names | At most one Operation per `OperationName` within the sequence; duplicates are invalid. |
 | Empty | Zero members; valid. |
-| Closed member | Every member MUST be a closed Operation value with exactly one `name` whose value is a valid `OperationName`; members with additional properties are invalid. |
+| Closed member | Every member MUST be a closed Operation with exactly one declared semantic property, `name`, whose value is a valid `OperationName`; candidates with additional semantic properties are invalid. |
 | Not metadata | Operation identity is not `MetadataKey`; operations are not annotation entries. |
 | Not FieldName / RelationName | `OperationName` is a dedicated domain; coexistence with an equal `FieldName` or `RelationName` string does not merge identities. |
 
-Implementations MUST NOT silently drop, merge, normalize, reorder for semantic equality, strip unknown properties, deduplicate, or reinterpret conflicting or invalid operation members.
+Implementations MUST NOT silently drop, merge, normalize, reorder for semantic equality, strip additional semantic properties, deduplicate, or reinterpret conflicting or invalid operation members.
 
 ### 4.3 Equality
 
@@ -175,14 +174,14 @@ Fields and Relations remain as defined by their Accepted RFCs. This RFC does not
 
 A Resource’s `operations` sequence is valid only if all of the following hold:
 
-1. Every member is a closed Operation value containing exactly one `name` member whose value is a valid `OperationName` (shape validation and name validation are separate checks).
+1. Every member is a closed Operation with exactly one declared semantic property, `name`, whose value is a valid `OperationName` (shape validation and name validation are separate checks).
 2. Each `name` satisfies the `OperationName` grammar.
 3. `OperationName`s are unique within the sequence; duplicates are invalid.
 4. Empty (zero members) is valid.
 
-Invalid `operations` → invalid Resource.
+Invalid `operations` → invalid Resource. A Resource remains valid only if the rest of its schema (and identity / annotations) is also valid.
 
-**Validate-before-snapshot:** Invalid candidates MUST be rejected before they can become Resource snapshot state. Implementations MUST NOT transform an invalid candidate into a valid Operation by discarding information (including stripping unknown properties) before validation.
+**Validate-before-snapshot:** Invalid candidates MUST be rejected before they can become Resource snapshot state. Implementations MUST NOT transform an invalid candidate into a valid Operation by discarding information (including stripping additional semantic properties) before validation.
 
 ### 5.1 Error ownership
 
@@ -192,10 +191,10 @@ Conceptual failure causes (concrete codes and TypeScript shapes are deferred; se
 | --- | --- |
 | Invalid operation name | `name` fails `OperationName` grammar |
 | Duplicate operation name | repeated `OperationName` in the sequence |
-| Invalid operation member | member is not a closed Operation with exactly one `name` member |
+| Invalid operation member | member is not a closed Operation with exactly one declared semantic property, `name` |
 
 - Operation/collection failures are Resource/schema validation failures.
-- They MUST remain distinct from RFC-002 metadata validation failures, RFC-006 annotation validation failures, RFC-007 / RFC-009 field validation failures, and RFC-008 / RFC-010 / RFC-011 relation validation failures.
+- They MUST remain distinct from metadata, annotation, field, and relation validation failures.
 - No silent dropping, normalization, or coercion.
 - A separate public `validateOperations` API is **not** required by this RFC.
 - `validateResourceSchema` MUST NOT be introduced merely to solve this slice; schema-level checks remain an internal/structural concern behind Resource validation.
@@ -210,12 +209,10 @@ Therefore, a Resource with invalid `operations` cannot successfully participate 
 
 For a valid Resource under this RFC:
 
-1. **No Operation contribution** — RFC-012 introduces no Operation contribution to the existing projection; `operations` do **not** contribute metadata entries.
-2. **No invented vocabulary** — projection MUST NOT invent operation-derived keys, envelopes, or reserved metadata from `OperationName`s.
-3. **Annotations unchanged** — RFC-006 annotation participation remains as specified; this RFC does not alter it.
-4. **Fields / Relations unchanged** — RFC-007 / RFC-009 field and RFC-008 / RFC-010 / RFC-011 relation projection rules remain unchanged (still no schema-member contribution from those floors unless a later RFC says otherwise).
-5. **Cross-source collisions** involving schema members — out of scope.
-6. **Purity / one-way** — projection MUST NOT mutate the Resource; there is no reverse projection from `ResourceMetadata` to operations.
+1. **No Operation contribution** — `operations` do **not** contribute metadata entries; projection MUST NOT invent operation-derived keys from `OperationName`s.
+2. **Upstream projection rules unchanged** — RFC-006 annotation participation and existing Field/Relation non-participation remain as specified.
+3. **Purity / one-way** — projection MUST NOT mutate the Resource; there is no reverse projection from `ResourceMetadata` to operations.
+4. **Cross-source collisions** involving schema members — out of scope.
 
 ### 6.1 Worked examples (conceptual)
 
@@ -304,31 +301,19 @@ This RFC may move from Draft to Accepted when Design Review finds:
 3. Independent Field/Relation/Operation namespaces are explicit (shared name strings allowed).
 4. Validation ownership is clear: Resource via schema; distinct conceptual causes; validate-before-snapshot; no silent coercion; no required public `validateOperations`.
 5. Projection non-participation is clear, including that invalid `operations` still fail the projection validation gate.
-6. Kind, signature, input/output, execution, persistence, loading, joins, cascade, direction, bounds, optionality/nullability, unified schema namespace, field→metadata projection, and annotation vocabulary remain explicitly deferred.
-7. RFC-009 / RFC-010 / RFC-011 are not reopened or reinterpreted.
-8. No normative TypeScript API or RFC-001–011 semantic breakage beyond filling the `operations` slot (empty floor preserved; validity expanded for conforming non-empty sequences).
+6. Kind, signature, input/output, and execution remain explicitly deferred (§1.2); RFC-009 / RFC-010 / RFC-011 are not reopened.
+7. No normative TypeScript API or RFC-001–011 semantic breakage beyond filling the `operations` slot (empty floor preserved; conforming non-empty `operations` become permissible schema states).
 
 ## 10. Explicit deferrals
 
-- Operation `kind`, verb catalogs, CRUD taxonomies, HTTP/RPC mapping
-- Signatures, parameters, return types, input/output schemas, error contracts
-- Execution, handlers, runtime dispatch, side effects, transactions
-- Persistence / ORM, loading / fetch, joins, cascade, direction, bounds
-- Optional vs required operations; nullability
-- Unified cross-collection schema namespace
-- Concrete TypeScript representation and public APIs
-- Field / Relation member-shape changes
-- Field → metadata projection; Operation → metadata contribution beyond “none”; cross-source collision, precedence, and merge
-- Annotation vocabulary
-- Reserved `OperationName` catalogs (only via a future explicit RFC)
-- Resource builders, editing workflows, serialization / wire formats, host adapters, reverse projection
+Deferred concerns are listed in §1.2. This ledger does not add scope; it records that reserved `OperationName` catalogs, builders, serialization / wire formats, host adapters, and reverse projection also remain out of scope unless a future RFC says otherwise.
 
 ## 11. Compatibility / impact
 
 | Concern | Impact |
 | --- | --- |
 | Existing empty `operations` Resources | Remain valid; empty sequence is still valid (RFC-005 floor preserved) |
-| Prior empty-only constraint | Once Accepted and implemented, conforming non-empty name-only `operations` sequences become valid — a **validity expansion**, not invalidation of existing empty Resources |
+| Prior empty-only implementation floor | Once Accepted and implemented, conforming non-empty `operations` sequences become permissible Resource schema states; existing empty-`operations` Resources remain valid. The entire Resource remains valid only if the rest of its schema (and identity / annotations) is also valid. |
 | RFC-007 / RFC-009 `fields` | Unchanged |
 | RFC-008 / RFC-010 / RFC-011 `relations` | Unchanged |
 | RFC-006 projection | Unchanged participation rules; Operations add no contribution |
@@ -340,7 +325,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 | --- | --- | --- |
 | Member shape | Name-only `{ name }` | Structural floor without kind/IO/execution |
 | Collection | Ordered sequence | Parallel to Fields/Relations; order participates in equality |
-| Name domain | Dedicated `OperationName`, same grammar as Field/Relation names | Symmetry without shared type/uniqueness |
+| Name domain | Dedicated `OperationName`, sequence-scoped uniqueness | Symmetry without shared type/uniqueness across collections |
 | Namespaces | Independent of Fields and Relations | Avoid unified schema namespace |
 | Projection | No Operation contribution; validation gate retained | Prevent metadata catalogs; no validation bypass |
 | Kind / signature / execution | Out of scope | Separate RFCs when requirements exist |
@@ -357,4 +342,4 @@ Coding that implements non-empty `operations` or RFC-012 operation validation ru
 
 Prefer **one pull request per tracking issue** for that delivery slice (Accepted plan + implementation together). Do not merge a plan-only PR before code for the same slice except as recovery.
 
-No production kind/signature/IO/execution semantics, Field/Relation reopen, field→metadata projection, annotation vocabulary, or unified schema namespace SHALL be introduced under this RFC alone.
+No production kind/signature/IO/execution semantics or Field/Relation reopen SHALL be introduced under this RFC alone.
