@@ -1,12 +1,13 @@
 # RFC-010: Relation Association Semantics
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; closed `{ name, target }` association floor; declarative `ResourceIdentity` target; **RFC-001 `user` validation context** for Relation targets; self-target allowed; cardinality and broader association dimensions deferred; breaking vs M3.5 name-only Relations; no dual-shape  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#26](https://github.com/rexescario-dev/resource-forge/issues/26)  
 **Depends on:** RFC-001 (Resource Identity — target representation), RFC-005 (Resource Model), RFC-006 (Annotations — projection boundary), RFC-008 (Resource Relations — collection semantics; Relation shape partially superseded), RFC-007 / RFC-009 (Fields — unchanged)  
 **Followed by:** Cardinality / multiplicity; direction / inverse; local-field handles / join mapping; cascade; loading/fetch; persistence/ORM mapping; polymorphic targets; registry-backed resolution; association→metadata projection; Resource Operations  
-**Unblocks:** M3.7+ Relation association implementation planning (M4→M5), then implementation (M6), after this RFC is Accepted — not implementation by itself  
+**Unblocks:** M3.7 Relation association implementation planning (M4→M5), then implementation (M6)  
 **Amends / supersedes:** RFC-008 §3.2 Relation member shape (and related closed-member / Relation equality text). See §3.
 
 ## Primary question
@@ -125,12 +126,14 @@ target: ResourceIdentity {
 
 Target validation reuses RFC-001’s existing identity grammar and equality semantics. This RFC MUST NOT redefine namespace/name grammars, identity equality, or reserved-namespace policy.
 
-**Design Review decision — RFC-001 validation context for Relation targets:**  
-RFC-001 states that identity validation MAY depend on the context in which an identity is being created (for example, framework-defined versus user-defined resources), including reserved-`rf` handling. **Design Review MUST select one of the validation contexts already defined by RFC-001 for Relation `target` validation. RFC-010 MUST NOT introduce a new validation context** and MUST NOT invent a Relation-local reservation policy. Until Design Review records that selection in the Accepted RFC, implementers have no normative answer for which RFC-001 context applies to `target`; that selection is an M3 decision for this document, not an open implementation choice.
+**RFC-001 validation context for Relation targets (M3 decision):**  
+RFC-001 states that identity validation MAY depend on the context in which an identity is being created (for example, framework-defined versus user-defined resources), including reserved-`rf` handling. **Relation `target` validation MUST use RFC-001’s existing `user` validation context.** RFC-010 introduces **no new validation context** and no Relation-local reservation policy.
+
+Rationale (M3): Relation targets are declarations made by the Resource author — declarative references to other Resources, not framework-internal implementation metadata. `rf`-reserved framework identities therefore MUST NOT become valid Relation targets merely because they appear as targets. Framework-owned associations, if eventually required, MUST use an explicitly defined framework-level contract rather than weakening this ordinary Resource Relation floor.
 
 ### 4.4 Self-target
 
-A Relation’s `target` MAY equal the owning Resource’s `ResourceIdentity` (self-association). This floor performs no graph / cycle analysis. Design Review may reverse this default if a normative prohibition is justified; until then, self-target is allowed.
+A Relation’s `target` MAY equal the owning Resource’s `ResourceIdentity` (self-association). This floor performs no graph / cycle analysis.
 
 ## 5. Relation member model
 
@@ -143,7 +146,7 @@ Relation {
 
 - A Relation MUST contain **exactly** the members `name` and `target`. No additional members are permitted.
 - `name` MUST be a valid `RelationName` (RFC-008).
-- `target` MUST be a valid declarative `ResourceIdentity` under §4 (RFC-001 rules + Design Review–chosen validation context).
+- `target` MUST be a valid declarative `ResourceIdentity` under §4 (RFC-001 rules under the **`user`** validation context).
 - Missing `target` is invalid.
 - Members with additional properties (including premature `cardinality`, `direction`, local-field handles, etc.) are invalid (not ignored or stripped).
 - Later RFCs may extend or amend the Relation model explicitly; such extensions do not become valid under this RFC merely because future evolution is anticipated. Unknown properties MUST NOT silently become part of Relation semantics.
@@ -182,7 +185,7 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 | Invalid relation member | Non-object, missing required member, extra member, or malformed member structure not attributable to a `RelationName` or `target` identity violation |
 | Invalid relation name | `name` fails `RelationName` grammar (RFC-008) |
 | Duplicate relation name | repeated `RelationName` in the sequence (RFC-008) |
-| Invalid relation target | `target` is present but fails RFC-001 identity validation under the Design Review–chosen existing validation context |
+| Invalid relation target | `target` is present but fails RFC-001 identity validation under the **`user`** validation context |
 
 - These remain Resource/schema validation failures, distinct from metadata, annotation, and field validation failures.
 - No silent dropping, normalization, or coercion.
@@ -257,12 +260,12 @@ This RFC may move from Draft to Accepted when Design Review finds:
 1. The closed Relation shape is unambiguously exactly `{ name, target }` with `target: ResourceIdentity`; missing `target` and extras are invalid.
 2. `target` is unambiguously declarative-only (no registry/existence/cross-Resource/registration-order/runtime load requirements).
 3. Target representation is structured RFC-001 identity (no string parse; no opaque ref grammar); RFC-001 rules are reused, not redefined.
-4. Design Review has selected one RFC-001-defined validation context for Relation `target`s; RFC-010 introduces no new validation context and no Relation-local reservation policy; the chosen context is recorded in the Accepted document.
+4. Relation `target` validation uses RFC-001’s **`user`** context; RFC-010 introduces no new validation context and no Relation-local reservation policy.
 5. Supersession of RFC-008 §3.2 (and related Relation equality / closed-member text) is explicit; collection ownership remains with RFC-008.
 6. Relation value equality (`name` **and** `target`) and uniqueness-by-name coexistence rules are unambiguous.
 7. Conceptual failure causes distinguish Invalid relation member vs Invalid relation target vs name/duplicate causes; no silent repair; no required public validate API.
 8. Breaking compatibility vs M3.5 / name-only Relations is explicit; no dual-shape period.
-9. Self-target default (allowed) is accepted or explicitly overturned with rationale.
+9. Self-target is allowed (no graph/cycle analysis in this floor).
 10. Cardinality, direction/inverse, local-field/join, cascade, loading/fetch, persistence/ORM, polymorphic targets, registry resolution, association projection, Fields, and Operations remain explicitly deferred or unchanged as stated.
 11. No normative TypeScript API prescription beyond conceptual Relation / `target` contracts.
 
@@ -289,7 +292,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 | Cardinality in this floor | Deferred | Distinct dimension (*how many*); keep M3 focused |
 | Target representation | Structured `ResourceIdentity` | Reuse RFC-001; no parse/opaque grammar |
 | Target semantics | Declarative only | Declaration ≠ resolution; no registry in validateResource |
-| `rf` / validation context | M3 selects one RFC-001-defined context | No new context; no Relation-local reservation policy |
+| `rf` / validation context | RFC-001 **`user`** context for targets | Author declarations; no new context; `rf` targets invalid |
 | Self-target | Allowed (default) | No graph analysis in this floor |
 | Relation shape | Exactly `{ name, target }` | Closed member; breaking widen |
 | Compatibility | Breaking; no dual-shape | Honest migration |
