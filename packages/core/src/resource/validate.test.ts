@@ -74,17 +74,24 @@ describe('validateResource', () => {
     }
   });
 
-  it('rejects non-empty annotations placeholder', () => {
+  it('rejects duplicate annotation keys with structured cause', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     if (!identity.ok) return;
+    const key = { namespace: 'docs', name: 'summary' };
     const result = validateResource({
       identity: identity.value,
       schema: createEmptyResourceSchema(),
-      annotations: { readonlyTag: 'EmptyAnnotations', extra: true } as never,
+      annotations: [
+        { key, value: 'a' },
+        { key, value: 'b' },
+      ],
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.code).toBe('invalid_annotations');
+      if (result.error.code === 'invalid_annotations') {
+        expect(result.error.cause.code).toBe('duplicate_key');
+      }
     }
   });
 });

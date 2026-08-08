@@ -12,7 +12,9 @@ export function projectResourceMetadata(
     return err({ code: 'invalid_resource', cause: validated.error });
   }
 
-  const metadata = createResourceMetadata(validated.value.identity, []);
+  const metadata = createResourceMetadata(validated.value.identity, [
+    ...validated.value.annotations,
+  ]);
   if (!metadata.ok) {
     return err({ code: 'invalid_metadata', cause: metadata.error });
   }

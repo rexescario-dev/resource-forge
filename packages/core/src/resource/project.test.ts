@@ -3,7 +3,11 @@ import {
   createResourceIdentity,
   resourceIdentitiesEqual,
 } from '../identity/index.js';
-import { validateResourceMetadata } from '../metadata/index.js';
+import {
+  resourceMetadataEqual,
+  validateResourceMetadata,
+} from '../metadata/index.js';
+import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
 import { createResource } from './create.js';
 import { emptyAnnotations } from './empty-annotations.js';
 import { projectResourceMetadata } from './project.js';
@@ -30,6 +34,32 @@ describe('projectResourceMetadata', () => {
     expect(validateResourceMetadata(projected.value).ok).toBe(true);
   });
 
+  it('projects non-empty annotations by direct 1:1 entry mapping', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithAnnotationsForTests(identity.value, [
+      { key: { namespace: 'docs', name: 'summary' }, value: 'A customer' },
+      { key: { namespace: 'docs', name: 'title' }, value: 'Customer' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+
+    expect(projected.value.entries).toHaveLength(2);
+    expect(validateResourceMetadata(projected.value).ok).toBe(true);
+
+    const reordered = {
+      identity: projected.value.identity,
+      entries: [...projected.value.entries].reverse(),
+    };
+    expect(resourceMetadataEqual(projected.value, reordered)).toBe(true);
+  });
+
   it('does not mutate the Resource', () => {
     const identity = createResourceIdentity('billing', 'Invoice');
     expect(identity.ok).toBe(true);
@@ -45,7 +75,6 @@ describe('projectResourceMetadata', () => {
   });
 
   it('fails for an invalid Resource without projecting', () => {
-    // M3.1 treats namespace `rf` as framework-capable; use an RFC-001-invalid name instead.
     const projected = projectResourceMetadata({
       identity: { namespace: 'crm', name: 'nope' },
       schema: createEmptyResourceSchema(),
@@ -54,5 +83,21 @@ describe('projectResourceMetadata', () => {
     expect(projected.ok).toBe(false);
     if (projected.ok) return;
     expect(projected.error.code).toBe('invalid_resource');
+  });
+
+  it('fails for invalid annotations as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: createEmptyResourceSchema(),
+      annotations: [
+        { key: { namespace: 'docs', name: 'summary' }, value: 'a' },
+        { key: { namespace: 'docs', name: 'summary' }, value: 'b' },
+      ],
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_annotations');
   });
 });
