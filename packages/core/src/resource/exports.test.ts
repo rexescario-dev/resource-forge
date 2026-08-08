@@ -209,3 +209,44 @@ describe('M3.16 public exports', () => {
     expect('validateConstraints' in core).toBe(false);
   });
 });
+
+describe('M3.17 public exports', () => {
+  it('exposes unique kind, checkPopulationUniqueness, and population error types', () => {
+    expect(typeof core.checkPopulationUniqueness).toBe('function');
+
+    const uniqueField: Constraint = {
+      name: 'emailUnique',
+      kind: 'unique',
+      field: 'email',
+    };
+    const uniqueFields: Constraint = {
+      name: 'tenantSeq',
+      kind: 'unique',
+      fields: ['tenantId', 'sequence'],
+    };
+    const violated: ConstraintEnforcementError = {
+      code: 'unique_constraint_violated',
+      index: 0,
+      constraintName: 'emailUnique',
+      field: 'email',
+    };
+    expect(uniqueField.kind).toBe('unique');
+    expect(uniqueFields.kind).toBe('unique');
+    expect(violated.code).toBe('unique_constraint_violated');
+    expect(violated.code).not.toBe('missing_occupancy_surface');
+
+    const identity = createResourceIdentity('crm', 'User');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+    const resource = createResource(identity.value);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const checked = core.checkPopulationUniqueness(
+      resource.value,
+      new Map(),
+      () => undefined,
+    );
+    expect(checked).toEqual({ ok: true, value: undefined });
+  });
+});

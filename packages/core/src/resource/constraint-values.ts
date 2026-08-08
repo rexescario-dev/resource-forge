@@ -118,7 +118,7 @@ function evaluateEqual(
   return true;
 }
 
-type GateOutcome =
+export type GateOutcome =
   | { readonly kind: 'skip' }
   | { readonly kind: 'fail'; readonly error: ConstraintEnforcementError }
   | {
@@ -126,7 +126,8 @@ type GateOutcome =
       readonly value: Exclude<FieldRuntimeValue, null>;
     };
 
-function gateField(
+/** Shared with population uniqueness; not a package public API. */
+export function gateField(
   field: Field,
   fieldName: FieldName,
   values: ReadonlyMap<string, FieldRuntimeValue>,
@@ -199,6 +200,10 @@ export function checkConstraintValues(
   for (let index = 0; index < constraints.length; index += 1) {
     const constraint = constraints[index]!;
     const constraintName = constraint.name;
+
+    if (constraint.kind === 'unique') {
+      continue;
+    }
 
     if (constraint.kind === 'distinct' || constraint.kind === 'equal') {
       const collected: Array<Exclude<FieldRuntimeValue, null>> = [];
