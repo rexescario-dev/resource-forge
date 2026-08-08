@@ -10,8 +10,32 @@ import type {
 
 export type EmptySchemaCollection = readonly [];
 
+/** Validated field identity string (RFC-007). */
+export type FieldName = string;
+
+/** Closed name-only Field member (RFC-007). */
+export type Field = {
+  readonly name: FieldName;
+};
+
+export type FieldValidationError =
+  | {
+      readonly code: 'invalid_field_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'duplicate_field_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'invalid_field_member';
+      readonly index: number;
+    };
+
 export type ResourceSchema = {
-  readonly fields: EmptySchemaCollection;
+  readonly fields: ReadonlyArray<Field>;
   readonly relations: EmptySchemaCollection;
   readonly operations: EmptySchemaCollection;
 };
@@ -47,7 +71,10 @@ export type ResourceValidationError =
       readonly code: 'invalid_identity';
       readonly cause: IdentityValidationError;
     }
-  | { readonly code: 'invalid_schema' }
+  | {
+      readonly code: 'invalid_schema';
+      readonly cause?: FieldValidationError;
+    }
   | {
       readonly code: 'invalid_annotations';
       readonly cause: AnnotationValidationError;
