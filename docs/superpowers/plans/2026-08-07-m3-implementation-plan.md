@@ -360,8 +360,11 @@ M3.2:
   task breakdown ✅ same
   code ✅ M3.2 complete (RFC-005 floor)
 
-M3.3+:
-  blocked on RFC-006 / schema RFCs
+M3.3:
+  plan ✅ Accepted
+  code ✅ M3.3 complete (RFC-006 annotations)
+M3.4+:
+  blocked on schema / vocabulary RFCs
 ```
 
 ---
