@@ -34,9 +34,33 @@ export type FieldValidationError =
       readonly index: number;
     };
 
+/** Validated relation identity string (RFC-008). */
+export type RelationName = string;
+
+/** Closed name-only Relation member (RFC-008). */
+export type Relation = {
+  readonly name: RelationName;
+};
+
+export type RelationValidationError =
+  | {
+      readonly code: 'invalid_relation_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'duplicate_relation_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'invalid_relation_member';
+      readonly index: number;
+    };
+
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;
-  readonly relations: EmptySchemaCollection;
+  readonly relations: ReadonlyArray<Relation>;
   readonly operations: EmptySchemaCollection;
 };
 
@@ -73,7 +97,7 @@ export type ResourceValidationError =
     }
   | {
       readonly code: 'invalid_schema';
-      readonly cause?: FieldValidationError;
+      readonly cause?: FieldValidationError | RelationValidationError;
     }
   | {
       readonly code: 'invalid_annotations';

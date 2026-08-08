@@ -78,3 +78,13 @@ describe('M3.4 public exports', () => {
     expect('createResourceWithFieldsForTests' in core).toBe(false);
   });
 });
+
+describe('M3.5 public exports', () => {
+  it('does not export validateRelations or internal relation helpers', () => {
+    expect('validateRelations' in core).toBe(false);
+    expect('validateRelationName' in core).toBe(false);
+    expect('snapshotRelations' in core).toBe(false);
+    expect('relationsEqual' in core).toBe(false);
+    expect('createResourceWithRelationsForTests' in core).toBe(false);
+  });
+});

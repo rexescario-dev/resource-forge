@@ -140,7 +140,7 @@ describe('RFC-007 fields', () => {
     ]);
   });
 
-  it('rejects non-empty relations without a field cause', () => {
+  it('rejects non-empty operations without a field cause', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
@@ -149,8 +149,8 @@ describe('RFC-007 fields', () => {
       identity: identity.value,
       schema: {
         fields: [],
-        relations: [{ name: 'x' }] as unknown as [],
-        operations: [],
+        relations: [],
+        operations: [{ name: 'create' }] as unknown as [],
       },
       annotations: emptyAnnotations,
     });

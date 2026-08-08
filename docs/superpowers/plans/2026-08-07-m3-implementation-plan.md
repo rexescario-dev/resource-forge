@@ -366,8 +366,11 @@ M3.3:
 M3.4:
   plan ✅ Accepted
   code ✅ M3.4 complete (RFC-007 fields)
-M3.5+:
-  blocked on field-type / Relations / Operations / vocabulary RFCs
+M3.5:
+  plan ✅ Accepted
+  code ✅ M3.5 complete (RFC-008 relations)
+M3.6+:
+  blocked on field-type / Operations / association / vocabulary RFCs
 ```
 
 ---

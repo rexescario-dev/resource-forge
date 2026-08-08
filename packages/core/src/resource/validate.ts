@@ -5,6 +5,7 @@ import {
 import { err, ok, type Result } from '../result.js';
 import { checkAnnotations } from './annotations.js';
 import { checkFields } from './fields.js';
+import { checkRelations } from './relations.js';
 import type {
   Annotations,
   EmptySchemaCollection,
@@ -36,9 +37,8 @@ export function validateResource(candidate: {
 
   if (
     !Array.isArray(schema.fields) ||
-    !('relations' in schema) ||
+    !Array.isArray(schema.relations) ||
     !('operations' in schema) ||
-    !isEmptySchemaCollection(schema.relations) ||
     !isEmptySchemaCollection(schema.operations)
   ) {
     return err({ code: 'invalid_schema' });
@@ -47,6 +47,11 @@ export function validateResource(candidate: {
   const fieldsResult = checkFields(schema.fields);
   if (!fieldsResult.ok) {
     return err({ code: 'invalid_schema', cause: fieldsResult.error });
+  }
+
+  const relationsResult = checkRelations(schema.relations);
+  if (!relationsResult.ok) {
+    return err({ code: 'invalid_schema', cause: relationsResult.error });
   }
 
   const annotationsResult = checkAnnotations(candidate.annotations);
@@ -61,7 +66,7 @@ export function validateResource(candidate: {
     identity: identityResult.value,
     schema: {
       fields: fieldsResult.value,
-      relations: schema.relations,
+      relations: relationsResult.value,
       operations: schema.operations,
     },
     // Authoritative snapshot already established at construction; do not re-snapshot here.
