@@ -45,8 +45,9 @@ describe('projectResourceMetadata', () => {
   });
 
   it('fails for an invalid Resource without projecting', () => {
+    // M3.1 treats namespace `rf` as framework-capable; use an RFC-001-invalid name instead.
     const projected = projectResourceMetadata({
-      identity: { namespace: 'rf', name: 'Nope' },
+      identity: { namespace: 'crm', name: 'nope' },
       schema: createEmptyResourceSchema(),
       annotations: emptyAnnotations,
     });
