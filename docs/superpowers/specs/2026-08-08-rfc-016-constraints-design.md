@@ -1,7 +1,8 @@
 # RFC-016: Constraints
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; required ordered `ResourceSchema.constraints`; closed `{ name, kind }`; `ConstraintName` grammar + dedicated namespace; open non-empty `kind` (no reserved vocabulary / no kind semantics); empty valid; omit/non-sequence invalid; no dual-shape; equality name+kind / uniqueness by name; validate-before-snapshot; no projection contribution; Field/Relation/Operation floors (incl. RFC-014/015) unchanged; concrete kinds/payloads/enforcement deferred  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#56](https://github.com/rexescario-dev/resource-forge/issues/56)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model — schema aggregate; amended here), RFC-006 (Annotations — projection boundary), RFC-007 (Resource Fields — parallel collection packaging; unchanged), RFC-008 (Resource Relations — parallel collection packaging; unchanged), RFC-012 (Resource Operations — parallel collection packaging; unchanged), RFC-013 / RFC-014 / RFC-015 (Field/Relation optionality and nullability floors — relied upon unchanged)  
@@ -50,7 +51,7 @@ The `constraints` floor is normative only **after this RFC is Accepted and the c
 4. Define `constraints` as a **required ordered sequence** on `ResourceSchema` with unique names within the sequence; empty valid; omit / non-sequence invalid; no dual-shape.
 5. Define order-sensitive sequence equality and Constraint value equality (`name` **and** `kind`); uniqueness remains **by name only** (same `kind` on different names allowed).
 6. State **independent namespaces** relative to `fields` / `relations` / `operations`: uniqueness is per collection; a Field, Relation, Operation, and Constraint MAY share the same name string on one Resource.
-7. Place validation inside Resource validity via schema, with distinct conceptual error causes; validate-before-snapshot; no silent repair; no public `validateConstraints` pathway and no `validateResourceSchema` introduced merely for this slice.
+7. Place validation inside Resource validity via schema, with distinct conceptual failure causes; concrete error codes and TypeScript shapes remain deferred; validate-before-snapshot; no silent repair; no public `validateConstraints` pathway and no `validateResourceSchema` introduced merely for this slice.
 8. State that RFC-016 introduces **no Constraint contribution** to `projectResourceMetadata`.
 9. Introduce a **breaking contract change once Accepted and implemented** relative to the M3.12 `ResourceSchema` shape; schemas omitting `constraints` become invalid; empty `constraints` remains the zero-member valid case.
 10. Explicitly defer concrete kinds, payloads, enforcement, and Field/Relation attachment (see §1.2); leave Field / Relation / Operation floors authoritative and unchanged.
@@ -334,7 +335,7 @@ Resource {
 ```text
 RFC-005 … RFC-015   Resource model through Relation nullability
         │
-RFC-016  Constraints framework     ← this RFC (Draft)
+RFC-016  Constraints framework     ← this RFC (Accepted)
         │
 Later    Concrete constraint kinds / payloads / enforcement
 Later    Operation kind / signature / execution
@@ -373,4 +374,4 @@ Deferred concerns are listed in §1.2. This ledger does not add scope; it record
 
 ## 13. Open questions for Design Review (M3)
 
-None from M2 dialogue — design locks above are complete for Draft. M3 may still return the document for revision if boundaries are insufficiently crisp.
+None. M3 Design Review Accepted (2026-08-08); editorial clarification only (§1.1 item 7 — conceptual failure causes; concrete codes/shapes deferred).

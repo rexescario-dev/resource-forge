@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1–M3.12 ✅; [RFC-016 Constraints](superpowers/specs/2026-08-08-rfc-016-constraints-design.md) Draft ([#56](https://github.com/rexescario-dev/resource-forge/issues/56)); further slices deferred until constraint kinds / operation kind-signature-execution / direction-join / vocabulary RFCs |
+| M3 | Resource model | In progress — M3.1–M3.12 ✅; [RFC-016 Constraints](superpowers/specs/2026-08-08-rfc-016-constraints-design.md) Accepted ([#56](https://github.com/rexescario-dev/resource-forge/issues/56)); further slices deferred until constraint kinds / operation kind-signature-execution / direction-join / vocabulary RFCs |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -39,7 +39,7 @@ M3 gate RFCs:
 | RFC-013 | Field/Relation Optionality (required `optional: boolean`) | Accepted — [#40](https://github.com/rexescario-dev/resource-forge/issues/40) |
 | RFC-014 | Field Nullability (required `nullable: boolean` on Field) | Accepted — [#46](https://github.com/rexescario-dev/resource-forge/issues/46) |
 | RFC-015 | Relation Nullability (required association-reference `nullable: boolean` on Relation) | Accepted — [#51](https://github.com/rexescario-dev/resource-forge/issues/51) |
-| RFC-016 | Constraints (required ordered `constraints` + closed `{ name, kind }` framework) | Draft — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
+| RFC-016 | Constraints (required ordered `constraints` + closed `{ name, kind }` framework) | Accepted — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
 | Later | Concrete constraint kinds / payloads / enforcement; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
