@@ -181,10 +181,10 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 
 **Files:** `packages/core/src/resource/types.ts`
 
-- [ ] **Step 1:** Widen `ConstraintKind` to include `'distinct' | 'equal'`
-- [ ] **Step 2:** Add Constraint arms `{ name, kind: 'distinct'|'equal', fields: ReadonlyArray<FieldName> }`
-- [ ] **Step 3:** Extend `ConstraintValidationError` with planning-lock codes
-- [ ] **Step 4:** Extend `ConstraintEnforcementError` with `distinct_constraint_violated` / `equal_constraint_violated` (each with `index`, `constraintName`, `field`)
+- [x] **Step 1:** Widen `ConstraintKind` to include `'distinct' | 'equal'`
+- [x] **Step 2:** Add Constraint arms `{ name, kind: 'distinct'|'equal', fields: ReadonlyArray<FieldName> }`
+- [x] **Step 3:** Extend `ConstraintValidationError` with planning-lock codes
+- [x] **Step 4:** Extend `ConstraintEnforcementError` with `distinct_constraint_violated` / `equal_constraint_violated` (each with `index`, `constraintName`, `field`)
 
 **Trace:** RFC-019 §4, §5, §6.1, §7.4–§7.5
 
@@ -192,11 +192,11 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 
 **Files:** `packages/core/src/resource/constraints.ts`, `constraints.test.ts`
 
-- [ ] **Step 1 (TDD):** Tests for valid `distinct` / `equal`; reject length &lt; 2; duplicates; unresolved; heterogeneous types; `field` on cross-member; `fields` on member-local; both present
-- [ ] **Step 2:** Extend `CONSTRAINT_KINDS` and closed-key handling
-- [ ] **Step 3:** Implement `fields` resolve + uniqueness + homogeneity
-- [ ] **Step 4:** Snapshot `fields` immutably; extend equality helper order-sensitively
-- [ ] **Step 5:** Confirm member-local declaration tests still pass
+- [x] **Step 1 (TDD):** Tests for valid `distinct` / `equal`; reject length &lt; 2; duplicates; unresolved; heterogeneous types; `field` on cross-member; `fields` on member-local; both present
+- [x] **Step 2:** Extend `CONSTRAINT_KINDS` and closed-key handling
+- [x] **Step 3:** Implement `fields` resolve + uniqueness + homogeneity
+- [x] **Step 4:** Snapshot `fields` immutably; extend equality helper order-sensitively
+- [x] **Step 5:** Confirm member-local declaration tests still pass
 
 **Trace:** RFC-019 §5–§6, §8
 
@@ -204,11 +204,11 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 
 **Files:** `packages/core/src/resource/constraint-values.ts`, `constraint-values.test.ts`
 
-- [ ] **Step 1 (TDD):** Gate-order skip (`optionalA` absent ⇒ skip without diagnosing `requiredB`); missing required when first in order; null skip; type mismatch; distinct pass/fail; equal pass/fail; `-0`/`0`; mixed sequence fail-fast with member-local
-- [ ] **Step 2:** Branch `checkConstraintValues` on targeting shape (`field` vs `fields`) without breaking member-local path
-- [ ] **Step 3:** Implement §7.2 multi-field gates (order, skip terminate, collect without coercion)
-- [ ] **Step 4:** Implement §7.4 / §7.5 kind evaluation; kind-violation `field` = `fields[0]`
-- [ ] **Step 5:** Confirm M3.15 constraint-values suite still passes
+- [x] **Step 1 (TDD):** Gate-order skip (`optionalA` absent ⇒ skip without diagnosing `requiredB`); missing required when first in order; null skip; type mismatch; distinct pass/fail; equal pass/fail; `-0`/`0`; mixed sequence fail-fast with member-local
+- [x] **Step 2:** Branch `checkConstraintValues` on targeting shape (`field` vs `fields`) without breaking member-local path
+- [x] **Step 3:** Implement §7.2 multi-field gates (order, skip terminate, collect without coercion)
+- [x] **Step 4:** Implement §7.4 / §7.5 kind evaluation; kind-violation `field` = `fields[0]`
+- [x] **Step 5:** Confirm M3.15 constraint-values suite still passes
 
 **Trace:** RFC-019 §7
 
@@ -216,9 +216,9 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 
 **Files:** `exports.test.ts`, `docs/roadmap.md`, this plan’s SCR
 
-- [ ] **Step 1:** Export smoke for new kinds / error codes as needed
-- [ ] **Step 2:** After M6+ gates, mark M3.16 ✅ on roadmap; fill SCR
-- [ ] **Step 3:** Do **not** claim population uniqueness anywhere
+- [x] **Step 1:** Export smoke for new kinds / error codes as needed
+- [x] **Step 2:** After M6+ gates, mark M3.16 ✅ on roadmap; fill SCR
+- [x] **Step 3:** Do **not** claim population uniqueness anywhere
 
 **Trace:** RFC-019 §13; roadmap discoverability
 
@@ -256,28 +256,93 @@ one delivery PR for tracking #72 (Accepted plan + implementation together)
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/72 |
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
-| M6 | — |
-| M7 | — |
-| M8 | — |
-| M9 | — |
-| Branch | `docs/rfc-019-uniqueness-cross-member` (delivery may continue under #72) |
-| PR | https://github.com/rexescario-dev/resource-forge/pull/71 (RFC Accept docs; delivery PR for #72 follows packaging) |
-| Status | **Ready for M6** |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
+| Branch | `feat/m3-16-cross-member-constraints` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/73 |
+| Status | **Slice complete** |
 
 ### Shipped
 
-_(filled at M6+)_
+- Widened `ConstraintKind` / `Constraint` with `distinct` / `equal` and `fields: FieldName[]`
+- Declaration validation: length ≥ 2, unique names, resolve, homogeneous `FieldType`, targeting-shape errors
+- Extended `checkConstraintValues` multi-field gates (gate-order, skip terminate, no coercion) + kind eval
+- Kind-violation diagnostics use `field = fields[0]` (planning lock)
+- Roadmap M3.1–M3.16 ✅; population uniqueness remains deferred
 
 ### Validation
 
 | Check | Result |
 | --- | --- |
-| Tests | N/A (plan Accept) |
-| Typecheck | N/A |
+| Tests | **Passed** (constraints 23; constraint-values 20; exports 9; validate 6) |
+| Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
 
 ### Next Gate
 
-**M6 Implementation** — task checkboxes remain open until execution.
+**None — slice complete**
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-16-cross-member-constraints
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-019-uniqueness-cross-member-constraints-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-08-m3-16-cross-member-constraints.md
+
+Plan tasks reviewed:
+- Task 1 types: ✓
+- Task 2 declaration validation: ✓
+- Task 3 runtime evaluation: ✓
+- Task 4 exports/docs/SCR: ✓
+
+Verification evidence:
+- vitest: constraints 23, constraint-values 20, exports 9, validate 6 — PASS
+- tsc --noEmit (@resource-forge/core) — PASS
+
+Review summary: Faithful RFC-019 / plan realization. Closed distinct/equal; field vs fields; gate-order skip; fields[0] kind diagnostics; member-local path retained; no population uniqueness surface.
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- Local vitest may emit tinypool teardown noise; per-file runs remain authoritative for this environment.
+
+Gate: Merge per human/project norms. M8/M9 may follow when appropriate.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Scope: packages/core/src/resource/constraints.ts + constraint-values.ts
+Goals considered: further extract cross-member helpers
+Rationale: Module changes are focused and covered; refactor risk exceeds benefit for this slice.
+Verification: N/A (no structural change)
+```
+
+### M9 Documentation
+
+Scope: `docs/roadmap.md` (Status + narrative + M3.16 ✅), plan SCR, specs README already Accepted for RFC-019.
+Content: RFC-019 / M3.16 discoverability; Later leads with population uniqueness.
+Editorial: Status consistency Accepted/✅ aligned with approved implementation.
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: workflow prompt library (installed docs/workflows)
+Governing specification: docs/workflows/specs/agent-workflow-design.md
+
+Asset inventory:
+- M1 conventions: conventions/prompt-library.md
+- M2–M10 prompts: specification, design-review, implementation-planning, plan-review, implementation-execution, code-review, refactoring, documentation-execution, workflow-validation
+- Reporting: conventions/reporting-conventions.md
+- README stage map present
+
+Blocking findings: None
+Non-blocking observations: This closeout exercised M2→M9 for a product slice; M10 confirms installed workflow assets remain coherent (no prompt edits required).
+Gate: Workflow validated
+```
