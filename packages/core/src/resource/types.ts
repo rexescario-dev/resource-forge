@@ -1,5 +1,6 @@
 import type { ResourceIdentity } from '../identity/types.js';
 import type { IdentityValidationError } from '../identity/types.js';
+import type { MetadataValidationError } from '../metadata/types.js';
 
 export type EmptySchemaCollection = readonly [];
 
@@ -26,3 +27,13 @@ export type ResourceValidationError =
     }
   | { readonly code: 'invalid_schema' }
   | { readonly code: 'invalid_annotations' };
+
+export type ResourceProjectionError =
+  | {
+      readonly code: 'invalid_resource';
+      readonly cause: ResourceValidationError;
+    }
+  | {
+      readonly code: 'invalid_metadata';
+      readonly cause: MetadataValidationError;
+    };

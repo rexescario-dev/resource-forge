@@ -2,6 +2,7 @@ export type {
   EmptyAnnotations,
   EmptySchemaCollection,
   Resource,
+  ResourceProjectionError,
   ResourceSchema,
   ResourceValidationError,
 } from './types.js';
