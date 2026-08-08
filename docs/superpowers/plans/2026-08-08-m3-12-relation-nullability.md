@@ -598,12 +598,12 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
+| M7 | **Approved** |
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-12-relation-nullability` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/54 |
-| Status | **Ready for M7** |
+| Status | **Ready for merge** |
 
 ### Shipped
 
@@ -618,7 +618,7 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 | Check | Result |
 | --- | --- |
-| Tests | **Passed** (per-file vitest: relations/fields/validate/project/operations/exports) |
+| Tests | **Passed** (per-file vitest; CI `ci` SUCCESS on #54) |
 | Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
 | Lint | Skipped |
 | Build | Skipped |
@@ -626,4 +626,6 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ### Next Gate
 
-**M7 — Code Review**
+**Merge** (then closeout as Slice complete)
+
+**M7 Approved** (2026-08-08). Faithful RFC-015 / plan realization. Closed Relation `{ name, target, multiplicity, optional, nullable }`; association-reference nullability only; missing vs invalid nullable causes; own-property + order-independent key sets; validate-before-snapshot; optional×multiplicity×nullable orthogonality; Fields unchanged; no projection contribution; no public nullable validate helpers. CI green on #54.
