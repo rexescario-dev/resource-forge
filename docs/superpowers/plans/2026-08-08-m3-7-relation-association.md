@@ -1,8 +1,9 @@
 # M3.7 Resource Relation Association — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (awaiting M5 Plan Review). After **Accepted**, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-010. Reuse M3.1–M3.6 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement cardinality, direction/inverse, local-field/join, cascade, loading/fetch, persistence/ORM, polymorphic targets, registry resolution, association→metadata projection, dual-shape compatibility, Operations widening, or public `validateRelations` / `validateRelationTarget` APIs.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-010. Reuse M3.1–M3.6 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement cardinality, direction/inverse, local-field/join, cascade, loading/fetch, persistence/ORM, polymorphic targets, registry resolution, association→metadata projection, dual-shape compatibility, Operations widening, or public `validateRelations` / `validateRelationTarget` APIs.
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers; target structural `{ namespace, name }` is closed Relation boundary only — RFC-001 remains authoritative for identity semantics via `validateResourceIdentity(..., { kind: 'user' })`; `resourceIdentitiesEqual` for equality; one PR with implementation for #28  
 **Tracking:** [#28](https://github.com/rexescario-dev/resource-forge/issues/28)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.7 was blocked on Relation Association RFC  
 **Source RFC:** RFC-010 Relation Association Semantics (**Accepted**) — amends Relation member shape; partial supersession of RFC-008 §3.2  
@@ -294,7 +295,7 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.test.ts` (fixture shapes)
 - Modify: `packages/core/src/resource/exports.test.ts`
 
-- [ ] **Step 1: Widen types**
+- [x] **Step 1: Widen types**
 
 ```ts
 export type Relation = {
@@ -315,7 +316,7 @@ export type RelationValidationError =
 
 Ensure `IdentityValidationError` is imported/available in `types.ts` (already used for identity failures).
 
-- [ ] **Step 2: Rewrite / add failing tests**
+- [x] **Step 2: Rewrite / add failing tests**
 
 Update existing fixtures that used name-only Relations so tests express the **post-M3.7** contract. Add explicit cases:
 
@@ -386,8 +387,8 @@ it('treats Relations equal only when name and target match (order-sensitive)', (
 
 Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to associated Relations.
 
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated association cases
-- [ ] **Step 4: Commit** `test(core): add failing M3.7 associated Relation contract tests`
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated association cases
+- [x] **Step 4: Commit** `test(core): add failing M3.7 associated Relation contract tests`
 
 ### Task 2: Validate-before-snapshot + validation integration
 
@@ -396,7 +397,7 @@ Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to associ
 - Modify: `packages/core/src/resource/create-resource-with-relations.ts` (comments / snapshot shape)
 - Confirm: `packages/core/src/resource/validate.ts` continues to call `checkRelations`
 
-- [ ] **Step 1: Widen `checkRelations`**
+- [x] **Step 1: Widen `checkRelations`**
 
 Keep the existing module-local `export function checkRelations`. For each candidate member:
 
@@ -410,7 +411,7 @@ Keep the existing module-local `export function checkRelations`. For each candid
 
 MUST NOT strip extras, parse canonical strings, invent `target`, or call the registry.
 
-- [ ] **Step 2: Widen `snapshotRelations` / `relationsEqual`**
+- [x] **Step 2: Widen `snapshotRelations` / `relationsEqual`**
 
 ```ts
 export function snapshotRelations(
@@ -444,9 +445,9 @@ export function relationsEqual(
 
 Snapshot ownership test (member + target + array); assert freezes.
 
-- [ ] **Step 3: Update fixture comments** to say freeze `{ name, target }`
-- [ ] **Step 4: Green** Task 1 relation/validate tests for associated acceptance + rejection causes
-- [ ] **Step 5: Commit** `feat(core): require associated Relations { name, target } (RFC-010)`
+- [x] **Step 3: Update fixture comments** to say freeze `{ name, target }`
+- [x] **Step 4: Green** Task 1 relation/validate tests for associated acceptance + rejection causes
+- [x] **Step 5: Commit** `feat(core): require associated Relations { name, target } (RFC-010)`
 
 ### Task 3: Projection non-participation + field coexistence regressions
 
@@ -455,10 +456,10 @@ Snapshot ownership test (member + target + array); assert freezes.
 - Touch `project.ts` only if needed (body should remain annotation-only)
 - Confirm fields tests still pass (fields unchanged; relation coexistence tests use associated Relations)
 
-- [ ] **Step 1: Ensure projection tests** use associated Relations; assert zero relation-derived entries; invalid relations → `invalid_resource`; purity
-- [ ] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
-- [ ] **Step 3: Full suite green including fields / annotations**
-- [ ] **Step 4: Commit** `test(core): associated relations do not contribute to metadata projection`
+- [x] **Step 1: Ensure projection tests** use associated Relations; assert zero relation-derived entries; invalid relations → `invalid_resource`; purity
+- [x] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
+- [x] **Step 3: Full suite green including fields / annotations**
+- [x] **Step 4: Commit** `test(core): associated relations do not contribute to metadata projection`
 
 ### Task 4: Exports, roadmap, plan status hygiene
 
@@ -467,10 +468,10 @@ Snapshot ownership test (member + target + array); assert freezes.
 - Modify: `docs/roadmap.md` — mark RFC-010 Accepted and M3.7 **implementation** complete only after M6 verification is green
 - Update this plan’s Status / M5 note only when Plan Review Accepts (M5), and checkboxes when M6 completes
 
-- [ ] **Step 1: Export smoke** — widened `Relation` / `RelationValidationError`; no `validateRelations` / `validateRelationTarget`
-- [ ] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 134; net new association cases)
-- [ ] **Step 3: Docs status updates only after verification**
-- [ ] **Step 4: Commit** `docs: record M3.7 relation association slice complete`
+- [x] **Step 1: Export smoke** — widened `Relation` / `RelationValidationError`; no `validateRelations` / `validateRelationTarget`
+- [x] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 134; net new association cases)
+- [x] **Step 3: Docs status updates only after verification**
+- [x] **Step 4: Commit** `docs: record M3.7 relation association slice complete`
 
 ---
 
@@ -506,27 +507,82 @@ Retained RFC-008 collection rules (RelationName, order, uniqueness-by-name, empt
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-010 (+ retained RFC-008 collection rules + RFC-001 `user` context)
-- [ ] Relation is exactly `{ name, target }`; name-only rejected; no dual-shape
-- [ ] Target is structured `ResourceIdentity`; validated via `validateResourceIdentity(..., { kind: 'user' })`
-- [ ] No string parse; no registry/existence/resolution
-- [ ] Missing `target` / extras / malformed target structure → `invalid_relation_member`
-- [ ] Identity grammar / reserved `rf` failures → `invalid_relation_target` with cause
-- [ ] Relation equality includes `target`; uniqueness remains by name only
-- [ ] Self-target allowed; same target under different names allowed
-- [ ] Snapshot construction separated from `validateResource`; candidates validated before `{ name, target }` materialization
-- [ ] `snapshotRelations` never strips unknown properties or invents default `target`; freezes relation + target
-- [ ] Non-empty Resources via internal/test seams only (no public builder)
-- [ ] Relation helpers internal/test-only (existing module-local export mechanism); public validation remains `validateResource`
-- [ ] Projection non-participation required and tested
-- [ ] Cardinality / direction / join / cascade / load / persistence / polymorphism / registry resolution deferred
-- [ ] Fields / operations / annotations unchanged
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: Accepted plan + implementation in **one PR** for [#28](https://github.com/rexescario-dev/resource-forge/issues/28) (no plan-only merge)
+- [x] No new product semantics beyond RFC-010 (+ retained RFC-008 collection rules + RFC-001 `user` context)
+- [x] Relation is exactly `{ name, target }`; name-only rejected; no dual-shape
+- [x] Target is structured `ResourceIdentity`; validated via `validateResourceIdentity(..., { kind: 'user' })`
+- [x] No string parse; no registry/existence/resolution
+- [x] Missing `target` / extras / malformed target structure → `invalid_relation_member`
+- [x] Identity grammar / reserved `rf` failures → `invalid_relation_target` with cause
+- [x] Relation equality includes `target`; uniqueness remains by name only
+- [x] Self-target allowed; same target under different names allowed
+- [x] Snapshot construction separated from `validateResource`; candidates validated before `{ name, target }` materialization
+- [x] `snapshotRelations` never strips unknown properties or invents default `target`; freezes relation + target
+- [x] Non-empty Resources via internal/test seams only (no public builder)
+- [x] Relation helpers internal/test-only (existing module-local export mechanism); public validation remains `validateResource`
+- [x] Projection non-participation required and tested
+- [x] Cardinality / direction / join / cascade / load / persistence / polymorphism / registry resolution deferred
+- [x] Fields / operations / annotations unchanged
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: Accepted plan + implementation in **one PR** for [#28](https://github.com/rexescario-dev/resource-forge/issues/28) (no plan-only merge)
+
+---
+
+## M5 review record
+
+```text
+Decision: Accepted
+Subject (plan): docs/superpowers/plans/2026-08-08-m3-7-relation-association.md
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-010-relation-association-semantics-design.md
+Delivery goal: Breaking widen Relation to exactly { name, target } with declarative ResourceIdentity under RFC-001 user context; validate-before-snapshot; no dual-shape; projection unchanged
+Review summary: No plan blockers. Implementation caution recorded: target structural { namespace, name } is closed Relation boundary only; RFC-001 validateResourceIdentity(..., { kind: 'user' }) remains identity authority; resourceIdentitiesEqual for equality.
+Findings: None (no plan blockers)
+Traceability: adequate (coverage + deferrals checked)
+Gate: Proceed to M6. No implementation activity before this Accept.
+Authority: Plan governs sequencing/execution; specification governs product semantics.
+```
+
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.7 Relation Association |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/28 |
+| M4 | Plan **Accepted** (Draft reviewed) |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | **Ready for M7** |
+| M8 | Pending |
+| M9 | Pending (roadmap updated with verification) |
+| Branch | `feat/m3-7-relation-association` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/29 |
+| Status | **Ready for M7** |
+
+### Shipped
+
+- Accepted M3.7 implementation plan for RFC-010 associated Relations
+- Breaking Relation widen to exactly `{ name, target }` with declarative `ResourceIdentity`
+- Target validation via `validateResourceIdentity(..., { kind: 'user' })`; `invalid_relation_target` vs `invalid_relation_member`
+- Validate-before-snapshot; frozen ownership of relation + target; `resourceIdentitiesEqual` for equality
+- Projection non-participation retained; fields/annotations/operations unchanged
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | **Passed** (142) |
+| Typecheck | **Passed** |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
+| CI | Pending PR checks |
+
+### Next Gate
+
+**M7 Code Review** on [#29](https://github.com/rexescario-dev/resource-forge/pull/29)
 
 ---
 
 ## Gate
 
-**M4 Draft complete.** Ready for **M5 Plan Review**. Do not begin M6 until this plan is **Accepted**.
+**M6 complete.** Ready for **M7 Code Review** on [#28](https://github.com/rexescario-dev/resource-forge/issues/28) / [#29](https://github.com/rexescario-dev/resource-forge/pull/29).
