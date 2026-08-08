@@ -28,10 +28,21 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function hasExactOwnKeys(
+  value: Record<string, unknown>,
+  expected: readonly string[],
+): boolean {
+  const keys = Object.keys(value);
+  if (keys.length !== expected.length) {
+    return false;
+  }
+  return expected.every((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
 /**
- * Internal: validate raw candidate members (closed shape, names, uniqueness, type)
- * before any `{ name, type }` materialization. MUST NOT strip unknown properties
- * or invent a default type.
+ * Internal: validate raw candidate members (closed shape, names, uniqueness, type,
+ * optional) before any `{ name, type, optional }` materialization. MUST NOT strip
+ * unknown properties or invent a default optional.
  */
 export function checkFields(
   candidate: readonly unknown[],
@@ -49,8 +60,15 @@ export function checkFields(
       return err({ code: 'invalid_field_member', index });
     }
 
-    const keys = new Set(Object.keys(member));
-    if (keys.size !== 2 || !keys.has('name') || !keys.has('type')) {
+    const hasOptional = Object.prototype.hasOwnProperty.call(member, 'optional');
+    if (!hasOptional) {
+      if (hasExactOwnKeys(member, ['name', 'type'])) {
+        return err({ code: 'missing_field_optional', index });
+      }
+      return err({ code: 'invalid_field_member', index });
+    }
+
+    if (!hasExactOwnKeys(member, ['name', 'type', 'optional'])) {
       return err({ code: 'invalid_field_member', index });
     }
 
@@ -90,7 +108,20 @@ export function checkFields(
       });
     }
 
-    accepted.push({ name: nameResult.value, type: typeResult.value });
+    const rawOptional = member.optional;
+    if (typeof rawOptional !== 'boolean') {
+      return err({
+        code: 'invalid_field_optional',
+        index,
+        optional: rawOptional,
+      });
+    }
+
+    accepted.push({
+      name: nameResult.value,
+      type: typeResult.value,
+      optional: rawOptional,
+    });
   }
 
   return ok(accepted);
@@ -98,17 +129,22 @@ export function checkFields(
 
 /**
  * Internal: freeze an ordered sequence of already-validated Fields.
- * MUST NOT accept raw candidates, discard unknown properties, or invent type.
+ * MUST NOT accept raw candidates, discard unknown properties, invent type, or
+ * invent optional.
  */
 export function snapshotFields(fields: readonly Field[]): ReadonlyArray<Field> {
   return Object.freeze(
     fields.map((field) =>
-      Object.freeze({ name: field.name, type: field.type }),
+      Object.freeze({
+        name: field.name,
+        type: field.type,
+        optional: field.optional,
+      }),
     ),
   );
 }
 
-/** Internal / test-only: order-sensitive Field sequence equality (name and type). */
+/** Internal / test-only: order-sensitive Field sequence equality (name, type, optional). */
 export function fieldsEqual(
   left: readonly Field[],
   right: readonly Field[],
@@ -121,6 +157,9 @@ export function fieldsEqual(
       return false;
     }
     if (left[i]!.type !== right[i]!.type) {
+      return false;
+    }
+    if (left[i]!.optional !== right[i]!.optional) {
       return false;
     }
   }

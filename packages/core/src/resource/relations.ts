@@ -41,9 +41,9 @@ function hasExactOwnKeys(
 
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness,
- * declarative target, multiplicity) before `{ name, target, multiplicity }`
- * materialization. MUST NOT strip unknown properties or invent a default
- * multiplicity.
+ * declarative target, multiplicity, optional) before
+ * `{ name, target, multiplicity, optional }` materialization. MUST NOT strip
+ * unknown properties or invent a default multiplicity/optional.
  *
  * Target structural keys `{ namespace, name }` are the closed Relation boundary;
  * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
@@ -76,7 +76,15 @@ export function checkRelations(
       return err({ code: 'invalid_relation_member', index });
     }
 
-    if (!hasExactOwnKeys(member, ['name', 'target', 'multiplicity'])) {
+    const hasOptional = Object.prototype.hasOwnProperty.call(member, 'optional');
+    if (!hasOptional) {
+      if (hasExactOwnKeys(member, ['name', 'target', 'multiplicity'])) {
+        return err({ code: 'missing_relation_optional', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    if (!hasExactOwnKeys(member, ['name', 'target', 'multiplicity', 'optional'])) {
       return err({ code: 'invalid_relation_member', index });
     }
 
@@ -141,11 +149,21 @@ export function checkRelations(
       });
     }
 
+    const rawOptional = member.optional;
+    if (typeof rawOptional !== 'boolean') {
+      return err({
+        code: 'invalid_relation_optional',
+        index,
+        optional: rawOptional,
+      });
+    }
+
     seen.add(nameResult.value);
     accepted.push({
       name: nameResult.value,
       target: targetResult.value,
       multiplicity: rawMultiplicity as RelationMultiplicity,
+      optional: rawOptional,
     });
   }
 
@@ -168,6 +186,7 @@ export function snapshotRelations(
           name: relation.target.name,
         }),
         multiplicity: relation.multiplicity,
+        optional: relation.optional,
       }),
     ),
   );
@@ -189,6 +208,9 @@ export function relationsEqual(
       return false;
     }
     if (left[i]!.multiplicity !== right[i]!.multiplicity) {
+      return false;
+    }
+    if (left[i]!.optional !== right[i]!.optional) {
       return false;
     }
   }

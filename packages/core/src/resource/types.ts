@@ -14,10 +14,11 @@ export type FieldName = string;
 /** Closed FieldType vocabulary (RFC-009). */
 export type FieldType = 'string' | 'number' | 'boolean';
 
-/** Closed typed Field member (RFC-009; amends RFC-007 §3.2). */
+/** Closed typed Field member (RFC-013; supersedes RFC-009 member floor). */
 export type Field = {
   readonly name: FieldName;
   readonly type: FieldType;
+  readonly optional: boolean;
 };
 
 export type FieldValidationError =
@@ -39,6 +40,15 @@ export type FieldValidationError =
       readonly code: 'invalid_field_type';
       readonly index: number;
       readonly type: unknown;
+    }
+  | {
+      readonly code: 'missing_field_optional';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_field_optional';
+      readonly index: number;
+      readonly optional: unknown;
     };
 
 /** Validated relation identity string (RFC-008). */
@@ -47,11 +57,12 @@ export type RelationName = string;
 /** Closed relationship-shape vocabulary (RFC-011). */
 export type RelationMultiplicity = 'one' | 'many';
 
-/** Closed associated Relation member (RFC-011; amends RFC-010 §5). */
+/** Closed associated Relation member (RFC-013; supersedes RFC-011 member floor). */
 export type Relation = {
   readonly name: RelationName;
   readonly target: ResourceIdentity;
   readonly multiplicity: RelationMultiplicity;
+  readonly optional: boolean;
 };
 
 export type RelationValidationError =
@@ -82,6 +93,15 @@ export type RelationValidationError =
       readonly code: 'invalid_relation_multiplicity';
       readonly index: number;
       readonly multiplicity: unknown;
+    }
+  | {
+      readonly code: 'missing_relation_optional';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_optional';
+      readonly index: number;
+      readonly optional: unknown;
     };
 
 /** Operation identity string conforming to RFC-012 grammar. */

@@ -9,6 +9,12 @@ import {
   resourceIdentitiesEqual,
   validateResource,
 } from '../index.js';
+import type {
+  Field,
+  FieldValidationError,
+  Relation,
+  RelationValidationError,
+} from '../index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
 
 describe('M3.1 public exports', () => {
@@ -69,9 +75,17 @@ describe('M3.3 public exports', () => {
   });
 });
 
-describe('M3.4 / M3.6 public exports', () => {
-  it('exposes FieldType and does not export validateFields or internal field helpers', () => {
+describe('M3.4 / M3.6 / M3.10 public exports', () => {
+  it('exposes widened Field contracts without exporting optional validation helpers', () => {
+    const field: Field = { name: 'email', type: 'string', optional: true };
+    const error: FieldValidationError = {
+      code: 'missing_field_optional',
+      index: 0,
+    };
+    expect(field.optional).toBe(true);
+    expect(error.code).toBe('missing_field_optional');
     expect('validateFields' in core).toBe(false);
+    expect('validateOptional' in core).toBe(false);
     expect('validateFieldType' in core).toBe(false);
     expect('validateFieldName' in core).toBe(false);
     expect('snapshotFields' in core).toBe(false);
@@ -80,8 +94,21 @@ describe('M3.4 / M3.6 public exports', () => {
   });
 });
 
-describe('M3.5 / M3.7 / M3.8 public exports', () => {
-  it('exposes RelationMultiplicity and does not export relation validate helpers', () => {
+describe('M3.5 / M3.7 / M3.8 / M3.10 public exports', () => {
+  it('exposes widened Relation contracts without exporting relation validate helpers', () => {
+    const relation: Relation = {
+      name: 'customer',
+      target: { namespace: 'crm', name: 'Customer' },
+      multiplicity: 'one',
+      optional: false,
+    };
+    const error: RelationValidationError = {
+      code: 'invalid_relation_optional',
+      index: 0,
+      optional: 'false',
+    };
+    expect(relation.optional).toBe(false);
+    expect(error.code).toBe('invalid_relation_optional');
     expect(typeof core).toBe('object');
     expect('validateRelations' in core).toBe(false);
     expect('validateRelationTarget' in core).toBe(false);

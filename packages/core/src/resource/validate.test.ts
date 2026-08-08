@@ -46,8 +46,8 @@ describe('validateResource', () => {
       identity: identity.value,
       schema: {
         fields: [
-          { name: 'id', type: 'string' },
-          { name: 'email', type: 'string' },
+          { name: 'id', type: 'string', optional: false },
+          { name: 'email', type: 'string', optional: true },
         ],
         relations: [],
         operations: [],
@@ -74,11 +74,13 @@ describe('validateResource', () => {
             name: 'author',
             target: { namespace: 'crm', name: 'User' },
             multiplicity: 'one',
+            optional: false,
           },
           {
             name: 'lineItems',
             target: { namespace: 'crm', name: 'LineItem' },
             multiplicity: 'many',
+            optional: true,
           },
         ],
         operations: [],

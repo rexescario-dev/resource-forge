@@ -111,8 +111,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithFieldsForTests(identity.value, [
-      { name: 'id', type: 'string' },
-      { name: 'email', type: 'string' },
+      { name: 'id', type: 'string', optional: false },
+      { name: 'email', type: 'string', optional: true },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -143,7 +143,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithFieldsForTests(
       identity.value,
-      [{ name: 'id', type: 'string' }],
+      [{ name: 'id', type: 'string', optional: false }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -164,8 +164,8 @@ describe('projectResourceMetadata', () => {
       identity: { namespace: 'crm', name: 'Customer' },
       schema: {
         fields: [
-          { name: 'id', type: 'string' },
-          { name: 'id', type: 'string' },
+          { name: 'id', type: 'string', optional: false },
+          { name: 'id', type: 'string', optional: true },
         ],
         relations: [],
         operations: [],
@@ -196,6 +196,25 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.cause.code).toBe('invalid_schema');
   });
 
+  it('fails for two-member fields missing optional as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: {
+        fields: [{ name: 'id', type: 'string' } as never],
+        relations: [],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
+    if (projected.error.cause.code !== 'invalid_schema') return;
+    expect(projected.error.cause.cause?.code).toBe('missing_field_optional');
+  });
+
   it('does not contribute relations to projected metadata', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
@@ -206,11 +225,13 @@ describe('projectResourceMetadata', () => {
         name: 'author',
         target: { namespace: 'crm', name: 'User' },
         multiplicity: 'one',
+        optional: false,
       },
       {
         name: 'lineItems',
         target: { namespace: 'crm', name: 'LineItem' },
         multiplicity: 'many',
+        optional: true,
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -247,6 +268,7 @@ describe('projectResourceMetadata', () => {
           name: 'author',
           target: { namespace: 'crm', name: 'User' },
           multiplicity: 'one',
+          optional: false,
         },
       ],
       annotations.value,
@@ -274,11 +296,13 @@ describe('projectResourceMetadata', () => {
             name: 'author',
             target: { namespace: 'crm', name: 'User' },
             multiplicity: 'one',
+            optional: false,
           },
           {
             name: 'author',
             target: { namespace: 'crm', name: 'Account' },
             multiplicity: 'one',
+            optional: true,
           },
         ],
         operations: [],
@@ -310,6 +334,31 @@ describe('projectResourceMetadata', () => {
     expect(projected.ok).toBe(false);
     if (projected.ok) return;
     expect(projected.error.code).toBe('invalid_resource');
+  });
+
+  it('fails for three-member relations missing optional as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Order' },
+      schema: {
+        fields: [],
+        relations: [
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'User' },
+            multiplicity: 'one',
+          } as never,
+        ],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
+    if (projected.error.cause.code !== 'invalid_schema') return;
+    expect(projected.error.cause.cause?.code).toBe('missing_relation_optional');
   });
 
   it('does not contribute operations to projected metadata', () => {
