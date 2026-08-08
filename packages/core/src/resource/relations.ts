@@ -41,13 +41,15 @@ function hasExactOwnKeys(
 
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness,
- * declarative target, multiplicity, optional) before
- * `{ name, target, multiplicity, optional }` materialization. MUST NOT strip
- * unknown properties or invent a default multiplicity/optional.
+ * declarative target, multiplicity, optional, nullable) before
+ * `{ name, target, multiplicity, optional, nullable }` materialization.
+ * MUST NOT strip unknown properties or invent a default multiplicity/optional/nullable.
  *
  * Target structural keys `{ namespace, name }` are the closed Relation boundary;
  * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
  * for identity semantics (no second identity validity definition).
+ *
+ * `nullable` is association-reference nullability only (RFC-015).
  */
 export function checkRelations(
   candidate: readonly unknown[],
@@ -61,6 +63,7 @@ export function checkRelations(
 
   for (let index = 0; index < candidate.length; index += 1) {
     const member = candidate[index];
+    // M3.11 candidate-object acceptance only (not closed key-set classification).
     if (!isPlainObject(member)) {
       return err({ code: 'invalid_relation_member', index });
     }
@@ -84,7 +87,23 @@ export function checkRelations(
       return err({ code: 'invalid_relation_member', index });
     }
 
-    if (!hasExactOwnKeys(member, ['name', 'target', 'multiplicity', 'optional'])) {
+    const hasNullable = Object.prototype.hasOwnProperty.call(member, 'nullable');
+    if (!hasNullable) {
+      if (hasExactOwnKeys(member, ['name', 'target', 'multiplicity', 'optional'])) {
+        return err({ code: 'missing_relation_nullable', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    if (
+      !hasExactOwnKeys(member, [
+        'name',
+        'target',
+        'multiplicity',
+        'optional',
+        'nullable',
+      ])
+    ) {
       return err({ code: 'invalid_relation_member', index });
     }
 
@@ -158,12 +177,22 @@ export function checkRelations(
       });
     }
 
+    const rawNullable = member.nullable;
+    if (typeof rawNullable !== 'boolean') {
+      return err({
+        code: 'invalid_relation_nullable',
+        index,
+        nullable: rawNullable,
+      });
+    }
+
     seen.add(nameResult.value);
     accepted.push({
       name: nameResult.value,
       target: targetResult.value,
       multiplicity: rawMultiplicity as RelationMultiplicity,
       optional: rawOptional,
+      nullable: rawNullable,
     });
   }
 
@@ -172,7 +201,8 @@ export function checkRelations(
 
 /**
  * Internal: freeze an ordered sequence of already-validated Relations.
- * MUST NOT accept raw candidates or discard unknown properties.
+ * MUST NOT accept raw candidates, discard unknown properties, invent optional,
+ * or invent nullable.
  */
 export function snapshotRelations(
   relations: readonly Relation[],
@@ -187,12 +217,16 @@ export function snapshotRelations(
         }),
         multiplicity: relation.multiplicity,
         optional: relation.optional,
+        nullable: relation.nullable,
       }),
     ),
   );
 }
 
-/** Internal / test-only: order-sensitive Relation sequence equality. */
+/**
+ * Internal / test-only: order-sensitive Relation sequence equality
+ * (name, target, multiplicity, optional, nullable).
+ */
 export function relationsEqual(
   left: readonly Relation[],
   right: readonly Relation[],
@@ -211,6 +245,9 @@ export function relationsEqual(
       return false;
     }
     if (left[i]!.optional !== right[i]!.optional) {
+      return false;
+    }
+    if (left[i]!.nullable !== right[i]!.nullable) {
       return false;
     }
   }

@@ -173,6 +173,7 @@ describe('RFC-012 resource operations', () => {
           target: { ...customer },
           multiplicity: 'one',
           optional: false,
+          nullable: false,
         },
       ],
     );

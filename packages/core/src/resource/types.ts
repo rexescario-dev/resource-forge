@@ -67,12 +67,13 @@ export type RelationName = string;
 /** Closed relationship-shape vocabulary (RFC-011). */
 export type RelationMultiplicity = 'one' | 'many';
 
-/** Closed associated Relation member (RFC-013; supersedes RFC-011 member floor). */
+/** Closed associated Relation member (RFC-015; supersedes RFC-013 Relation member floor). */
 export type Relation = {
   readonly name: RelationName;
   readonly target: ResourceIdentity;
   readonly multiplicity: RelationMultiplicity;
   readonly optional: boolean;
+  readonly nullable: boolean;
 };
 
 export type RelationValidationError =
@@ -112,6 +113,15 @@ export type RelationValidationError =
       readonly code: 'invalid_relation_optional';
       readonly index: number;
       readonly optional: unknown;
+    }
+  | {
+      readonly code: 'missing_relation_nullable';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_nullable';
+      readonly index: number;
+      readonly nullable: unknown;
     };
 
 /** Operation identity string conforming to RFC-012 grammar. */
