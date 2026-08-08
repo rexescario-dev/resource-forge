@@ -1,8 +1,9 @@
 # M3.13 Constraints Framework — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft**. REQUIRED SUB-SKILL (after M5 Accept): Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-016. Reuse M3.1–M3.12 Resource / schema / field / relation / operation / annotation / projection surfaces. Do **not** implement concrete constraint kind vocabulary or semantics, payloads/`spec` bags, Field/Relation-attached constraints, runtime enforcement, wire/persistence, Operation kind / signature / execution, annotation vocabulary, field→metadata projection, dual-shape omit-as-empty, or public `validateConstraints` / `validateResourceSchema`.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-016. Reuse M3.1–M3.12 Resource / schema / field / relation / operation / annotation / projection surfaces. Do **not** implement concrete constraint kind vocabulary or semantics, payloads/`spec` bags, Field/Relation-attached constraints, runtime enforcement, wire/persistence, Operation kind / signature / execution, annotation vocabulary, field→metadata projection, dual-shape omit-as-empty, or public `validateConstraints` / `validateResourceSchema`.
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers. The plan faithfully implements Accepted RFC-016 without adding product semantics. Required ordered `constraints`, closed `{ name, kind }`, open non-empty `kind`, empty valid / omit invalid (no dual-shape), shape-classification boundaries (missing-kind vs invalid-member), `checkConstraints` as the single validation path, validate-before-snapshot, independent namespaces, and projection non-participation are all executable and covered by explicit TDD tasks. Field / Relation / Operation floors (RFC-012 / RFC-014 / RFC-015) remain unchanged; concrete kinds/payloads/enforcement remain deferred. M6 implementation is authorized only after this status update; task checkboxes remain open until execution. One PR with implementation for #58.  
 **Tracking:** [#58](https://github.com/rexescario-dev/resource-forge/issues/58)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.13 was blocked on Constraints RFC  
 **Source RFC:** RFC-016 Constraints (**Accepted**) — amends RFC-005 `ResourceSchema` with required `constraints` collection + Constraint member/sequence contract  
@@ -154,7 +155,7 @@ constraints: []                  → valid (empty)
 | `ConstraintName` | type | Constraint identity string conforming to RFC-016 grammar |
 | `Constraint` | type | `{ readonly name; readonly kind }` |
 | `ConstraintValidationError` | type | Collection + member cause codes under `invalid_schema` |
-| `ResourceSchema` | type | Prior collections unchanged; `constraints: ReadonlyArray<Constraint>` required |
+| `ResourceSchema` | type | Public validated schema: prior collections unchanged; `constraints: ReadonlyArray<Constraint>` required. Runtime schema candidates may still be `unknown` / structurally invalid before validation (omit, non-sequence, bad members); those fail via the collection/member causes below. |
 | `Resource` | type | Unchanged shape; schema carries `constraints` |
 | `validateResource` | function | Validates identity, schema (fields + relations + operations + constraints), annotations |
 | `createResource` / `createEmptyResourceSchema` | function | Empty collections including `constraints: []` |
@@ -498,27 +499,27 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-016
-- [ ] `constraints` is required ordered sequence; empty valid; omit/non-sequence invalid; no dual-shape
-- [ ] `Constraint` closed `{ name, kind }`; `ConstraintName` grammar sole name constraint; dedicated domain
-- [ ] `kind` required non-empty open string; no reserved vocabulary; no identifier grammar
-- [ ] Independent Field/Relation/Operation/Constraint namespaces explicit; kind uniqueness not required
-- [ ] `checkConstraints` is the single Constraint-validation implementation; reused by fixtures and `validateResource`
-- [ ] Snapshot construction separated from materialization; validate-before-snapshot; no strip/default/coerce
-- [ ] Collection causes (`missing_constraints` / `invalid_constraints_collection`) distinct from member causes
-- [ ] Shape-classification table preserves missing-kind vs invalid-member boundaries
-- [ ] Non-empty Resources via internal/test seam only (no public builder)
-- [ ] Constraint helpers internal; public validation remains `validateResource`
-- [ ] Fields / Relations / Operations floors unchanged (RFC-012 / RFC-014 / RFC-015)
-- [ ] Projection non-participation required and tested; invalid constraints still fail projection gate
-- [ ] Concrete kinds / payloads / enforcement / attachment deferred
-- [ ] Prior omit-`constraints` fixtures explicitly retargeted; deliberate omit regressions retained
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: one PR for [#58](https://github.com/rexescario-dev/resource-forge/issues/58) carries Accepted plan + implementation (process constraint; not a substitute for M5 Accept)
+- [x] No new product semantics beyond RFC-016
+- [x] `constraints` is required ordered sequence; empty valid; omit/non-sequence invalid; no dual-shape
+- [x] `Constraint` closed `{ name, kind }`; `ConstraintName` grammar sole name constraint; dedicated domain
+- [x] `kind` required non-empty open string; no reserved vocabulary; no identifier grammar
+- [x] Independent Field/Relation/Operation/Constraint namespaces explicit; kind uniqueness not required
+- [x] `checkConstraints` is the single Constraint-validation implementation; reused by fixtures and `validateResource`
+- [x] Snapshot construction separated from materialization; validate-before-snapshot; no strip/default/coerce
+- [x] Collection causes (`missing_constraints` / `invalid_constraints_collection`) distinct from member causes
+- [x] Shape-classification table preserves missing-kind vs invalid-member boundaries
+- [x] Non-empty Resources via internal/test seam only (no public builder)
+- [x] Constraint helpers internal; public validation remains `validateResource`
+- [x] Fields / Relations / Operations floors unchanged (RFC-012 / RFC-014 / RFC-015)
+- [x] Projection non-participation required and tested; invalid constraints still fail projection gate
+- [x] Concrete kinds / payloads / enforcement / attachment deferred
+- [x] Prior omit-`constraints` fixtures explicitly retargeted; deliberate omit regressions retained
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: one PR for [#58](https://github.com/rexescario-dev/resource-forge/issues/58) carries Accepted plan + implementation (process constraint; not a substitute for M5 Accept)
 
 ---
 
 ## Gate
 
-**M4 Draft complete.** Ready for **M5 Plan Review**. M6 MUST NOT begin until this plan’s Status is **Accepted**. Do not invent kind semantics, payloads, enforcement, Field/Relation attachment, dual-shape omit-as-empty, or a public constraints builder.
+**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #58. Do not invent kind semantics, payloads, enforcement, Field/Relation attachment, dual-shape omit-as-empty, or a public constraints builder. `checkConstraints` remains the single Constraint-validation implementation. Task checkboxes remain open until M6 execution.
