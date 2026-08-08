@@ -576,6 +576,47 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 
 ---
 
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.8 Relation Multiplicity |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/33 |
+| M4 | Plan **Accepted** (Draft reviewed) |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | **Ready for M7** |
+| M8 | Pending |
+| M9 | Pending (roadmap updated with verification) |
+| Branch | `feat/m3-8-relation-multiplicity` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/34 |
+| Status | **Ready for M7** |
+
+### Shipped
+
+- Accepted M3.8 implementation plan for RFC-011 Relation Multiplicity
+- Breaking Relation widen to exactly `{ name, target, multiplicity }` with closed `"one" | "many"`
+- `missing_relation_multiplicity` vs `invalid_relation_multiplicity`; extras remain `invalid_relation_member`
+- Validate-before-snapshot; frozen ownership; equality includes multiplicity; no defaulting
+- Projection non-participation retained; fields/annotations/operations unchanged
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | **Passed** (144) |
+| Typecheck | **Passed** |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
+| CI | Pending PR checks |
+
+### Next Gate
+
+**M7 Code Review** on [#34](https://github.com/rexescario-dev/resource-forge/pull/34)
+
+---
+
 ## Gate
 
-**M5 Accepted.** Proceed to **M6 Implementation** on [#33](https://github.com/rexescario-dev/resource-forge/issues/33) / [#34](https://github.com/rexescario-dev/resource-forge/pull/34).
+**M6 complete.** Ready for **M7 Code Review** on [#33](https://github.com/rexescario-dev/resource-forge/issues/33) / [#34](https://github.com/rexescario-dev/resource-forge/pull/34).
