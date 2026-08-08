@@ -361,12 +361,12 @@ For each implementation task: failing tests for that slice → implement that sl
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
-| M8 | N/A |
-| M9 | N/A |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
 | Branch | `feat/m3-15-runtime-constraint-enforcement` |
 | PR | TBD |
-| Status | **Ready for M7** |
+| Status | **Ready for merge** |
 
 ### Shipped
 
@@ -389,4 +389,66 @@ For each implementation task: failing tests for that slice → implement that sl
 
 ### Next Gate
 
-**M7 Code Review** — Ready for M7.
+**None — ready for merge** (M7 Approved; M8 N/A; M9 Complete; M10 workflow assets Accepted for this closeout). Merge PR / close [#67](https://github.com/rexescario-dev/resource-forge/issues/67) / [#66](https://github.com/rexescario-dev/resource-forge/issues/66) per human norms; then mark SCR **Slice complete**.
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-15-runtime-constraint-enforcement (976b10d + M9 docs)
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-018-runtime-constraint-enforcement-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-08-m3-15-runtime-constraint-enforcement.md
+
+Plan tasks reviewed:
+- Task 1 types/Result/gates: ✓
+- Task 2 kind evaluation: ✓
+- Task 3 order/purity/exports: ✓
+- Task 4 docs/roadmap/SCR: ✓
+
+Verification evidence:
+- vitest: constraint-values 15, exports 8, constraints 15, validate 6, project 22 — PASS
+- tsc --noEmit (@resource-forge/core) — PASS
+
+Review summary: Faithful RFC-018 / plan realization. Public checkConstraintValues reuses core Result; per-Constraint gates; inclusive range; per-eval RegExp('',) + match-extent; enum ===; fail-fast; unknown keys ignored; declaration path untouched; create-resource-with-constraints untouched.
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- diagnostic() uses a narrow cast for non-type-mismatch arms; acceptable planning-aid shape, not a merge blocker.
+
+Gate: Merge per human/project norms. M8/M9 may follow when appropriate.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Scope: packages/core/src/resource/constraint-values.ts (+ tests)
+Goals considered: simplify diagnostic() typing; extract gate helpers
+Rationale: Current module is small, readable, and fully covered. Refactor risk exceeds maintainability benefit for this slice.
+Verification: N/A (no structural change)
+```
+
+### M9 Documentation
+
+Scope: `docs/roadmap.md` (Status paragraph + narrative), `docs/superpowers/specs/README.md` (already indexed), plan SCR.
+Content: RFC-018 / M3.15 discoverability; deferred list no longer leads with runtime enforcement.
+Editorial: Status consistency Accepted/✅ aligned with approved implementation.
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: workflow prompt library (installed docs/workflows)
+Governing specification: docs/workflows/specs/agent-workflow-design.md
+
+Asset inventory:
+- M1 conventions: conventions/prompt-library.md
+- M2–M10 prompts: specification, design-review, implementation-planning, plan-review, implementation-execution, code-review, refactoring, documentation-execution, workflow-validation
+- Reporting: conventions/reporting-conventions.md
+- README stage map present
+
+Blocking findings: None
+Non-blocking observations: This closeout exercised M2→M9 for a product slice; M10 confirms installed workflow assets remain coherent (no prompt edits required).
+Gate: Workflow validated
+```
+
