@@ -1,12 +1,13 @@
 # RFC-007: Resource Fields
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; Fields-only boundary confirmed; grammar regex is sole normative `FieldName` constraint  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#13](https://github.com/rexescario-dev/resource-forge/issues/13)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model), RFC-006 (Annotations — structural parallel; projection boundary)  
 **Followed by:** Field type / constraints RFCs; Resource Relations; Resource Operations; field→metadata projection and richer cross-source composition; annotation vocabulary (separate)  
-**Unblocks:** M3.4+ fields implementation planning (M4→M5) then M6 — not implementation by itself
+**Unblocks:** M3.4 fields implementation planning (M4→M5) then M6 — not implementation by itself
 
 ## Primary question
 
@@ -70,7 +71,7 @@ FieldName ::= ^[a-z][a-zA-Z0-9]*$
 - **Identity:** exact `FieldName` string.
 - **Scope:** unique within a Resource’s `fields` sequence.
 - **Namespace:** none; fields are Resource-local.
-- **Grammar:** camelCase ASCII, aligned with the RFC-002 metadata *name* component regex where appropriate, but **not** reusing `MetadataKey`. Metadata and schema fields are different identity domains.
+- **Grammar:** The regex above is the **sole normative** `FieldName` constraint. The label “camelCase” is descriptive only and MUST NOT be read as an additional rule beyond `^[a-z][a-zA-Z0-9]*$` (e.g. `userID` is grammar-valid). The pattern aligns with the RFC-002 metadata *name* component where appropriate, but **does not** reuse `MetadataKey`. Metadata and schema fields are different identity domains.
 - **Equality:** exact string equality; case-sensitive; MUST NOT perform case folding, normalization, or aliasing (`userId` and `userID` are distinct).
 - **Reservations:** none in this RFC. Every grammar-valid `FieldName` is allowed. No `rf` prefix, framework-reserved field catalog, or special names (`id`, `type`, `createdAt`, etc.). Future RFCs may reserve names only by explicit statement; existing valid Resources MUST NOT become invalid merely because of an implied reservation in this RFC.
 
@@ -232,7 +233,7 @@ RFC-005  Resource
         │
 RFC-006  Annotations
         │
-RFC-007  Resource Fields          ← this RFC (Draft)
+RFC-007  Resource Fields          ← this RFC (Accepted)
         │
 Later    Field types / constraints
         │
