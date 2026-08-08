@@ -8,8 +8,6 @@ import type {
   MetadataValidationError,
 } from '../metadata/types.js';
 
-export type EmptySchemaCollection = readonly [];
-
 /** Validated field identity string (RFC-007). */
 export type FieldName = string;
 
@@ -86,10 +84,34 @@ export type RelationValidationError =
       readonly multiplicity: unknown;
     };
 
+/** Operation identity string conforming to RFC-012 grammar. */
+export type OperationName = string;
+
+/** Closed name-only Operation member (RFC-012). */
+export type Operation = {
+  readonly name: OperationName;
+};
+
+export type OperationValidationError =
+  | {
+      readonly code: 'invalid_operation_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'duplicate_operation_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'invalid_operation_member';
+      readonly index: number;
+    };
+
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;
   readonly relations: ReadonlyArray<Relation>;
-  readonly operations: EmptySchemaCollection;
+  readonly operations: ReadonlyArray<Operation>;
 };
 
 /** Implementation representation of RFC-006 Annotations (unordered semantically). */
@@ -125,7 +147,10 @@ export type ResourceValidationError =
     }
   | {
       readonly code: 'invalid_schema';
-      readonly cause?: FieldValidationError | RelationValidationError;
+      readonly cause?:
+        | FieldValidationError
+        | RelationValidationError
+        | OperationValidationError;
     }
   | {
       readonly code: 'invalid_annotations';

@@ -9,6 +9,7 @@ import {
 } from '../metadata/index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
 import { createResourceWithFieldsForTests } from './create-resource-with-fields.js';
+import { createResourceWithOperationsForTests } from './create-resource-with-operations.js';
 import { createResourceWithRelationsForTests } from './create-resource-with-relations.js';
 import { createResource } from './create.js';
 import { emptyAnnotations } from './empty-annotations.js';
@@ -309,5 +310,79 @@ describe('projectResourceMetadata', () => {
     expect(projected.ok).toBe(false);
     if (projected.ok) return;
     expect(projected.error.code).toBe('invalid_resource');
+  });
+
+  it('does not contribute operations to projected metadata', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithOperationsForTests(identity.value, [
+      { name: 'create' },
+      { name: 'cancel' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const before = structuredClone(resource.value);
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+
+    expect(projected.value.entries).toEqual([]);
+    expect(resource.value).toEqual(before);
+    expect(resource.value.schema.operations.map((o) => o.name)).toEqual([
+      'create',
+      'cancel',
+    ]);
+  });
+
+  it('projects annotations only when operations are also present', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const annotations = snapshotAnnotations([
+      { key: { namespace: 'docs', name: 'summary' }, value: 'An order' },
+    ]);
+    expect(annotations.ok).toBe(true);
+    if (!annotations.ok) return;
+
+    const resource = createResourceWithOperationsForTests(
+      identity.value,
+      [{ name: 'create' }],
+      annotations.value,
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+    expect(projected.value.entries).toHaveLength(1);
+    expect(projected.value.entries[0]?.key).toEqual({
+      namespace: 'docs',
+      name: 'summary',
+    });
+  });
+
+  it('fails for invalid operations as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Order' },
+      schema: {
+        fields: [],
+        relations: [],
+        operations: [
+          { name: 'create' },
+          { name: 'create' },
+        ],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
   });
 });
