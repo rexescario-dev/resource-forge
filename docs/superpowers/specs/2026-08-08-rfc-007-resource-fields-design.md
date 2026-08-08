@@ -7,7 +7,8 @@
 **Tracking:** [#13](https://github.com/rexescario-dev/resource-forge/issues/13)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model), RFC-006 (Annotations — structural parallel; projection boundary)  
 **Followed by:** Field type / constraints RFCs; Resource Relations; Resource Operations; field→metadata projection and richer cross-source composition; annotation vocabulary (separate)  
-**Unblocks:** M3.4 fields implementation planning (M4→M5) then M6 — not implementation by itself
+**Unblocks:** M3.4 fields implementation planning (M4→M5) then M6 — not implementation by itself  
+**Superseded in part:** §3.2 Field member shape (and related closed-member / Field equality text) is superseded by [RFC-009](2026-08-08-rfc-009-resource-field-types-design.md) once that floor is Accepted and implemented. This RFC remains authoritative for `FieldName`, ordered `fields` sequence, uniqueness, snapshot/ownership, and field projection non-participation.
 
 ## Primary question
 
