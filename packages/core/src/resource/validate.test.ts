@@ -70,8 +70,16 @@ describe('validateResource', () => {
       schema: {
         fields: [],
         relations: [
-          { name: 'author', target: { namespace: 'crm', name: 'User' } },
-          { name: 'lineItems', target: { namespace: 'crm', name: 'LineItem' } },
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'User' },
+            multiplicity: 'one',
+          },
+          {
+            name: 'lineItems',
+            target: { namespace: 'crm', name: 'LineItem' },
+            multiplicity: 'many',
+          },
         ],
         operations: [],
       },
@@ -86,6 +94,10 @@ describe('validateResource', () => {
     expect(result.value.schema.relations.map((r) => r.target)).toEqual([
       { namespace: 'crm', name: 'User' },
       { namespace: 'crm', name: 'LineItem' },
+    ]);
+    expect(result.value.schema.relations.map((r) => r.multiplicity)).toEqual([
+      'one',
+      'many',
     ]);
   });
 

@@ -1,8 +1,9 @@
 # M3.8 Resource Relation Multiplicity — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-011. Reuse M3.1–M3.7 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement optional/required, nullability, min/max bounds, direction/inverse, local-field/join, cascade, loading/fetch, persistence/ORM, polymorphic targets, registry resolution, association→metadata projection, dual-shape compatibility, Operations widening, or public `validateRelations` / `validateRelationMultiplicity` APIs.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-011. Reuse M3.1–M3.7 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement optional/required, nullability, min/max bounds, direction/inverse, local-field/join, cascade, loading/fetch, persistence/ORM, polymorphic targets, registry resolution, association→metadata projection, dual-shape compatibility, Operations widening, or public `validateRelations` / `validateRelationMultiplicity` APIs.
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers; hygiene: Task 2 helpers remain module-local (same-package seams only, not barrel-exported); `validateRelationMultiplicity` optional/inline; Task 1 split fixture updates vs new failing cases; one PR with implementation for #33  
 **Tracking:** [#33](https://github.com/rexescario-dev/resource-forge/issues/33)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.8 was blocked on Relation Multiplicity RFC  
 **Source RFC:** RFC-011 Relation Multiplicity (**Accepted**) — amends Relation member shape; partial supersession of RFC-010 §5  
@@ -74,7 +75,7 @@ These freeze the M3.8 implementation surface. They MUST NOT invent product seman
 | `fields` / `operations` | Unchanged from M3.7. |
 | Snapshot vs validation | **Separated, non-lossy.** Validate candidates **before** materializing `{ name, target, multiplicity }`. `snapshotRelations` freezes already-valid members; MUST NOT invent default `multiplicity`. |
 | Non-empty Resource construction | **No public builder.** Tests use existing **internal** `createResourceWithRelationsForTests` (validate-before-snapshot). |
-| Internal helpers | `validateRelationName` / `checkRelations` / `snapshotRelations` / `relationsEqual` remain module-local (not barrel-exported). Optional internal `validateRelationMultiplicity` — MUST NOT be package-exported. |
+| Internal helpers | `validateRelationName` / `checkRelations` / `snapshotRelations` / `relationsEqual` remain **module-local same-package seams** (existing M3.5–M3.7 mechanism; MUST NOT be barrel-/package-exported). The implementation MAY validate multiplicity **inline** in `checkRelations`; a separate internal `validateRelationMultiplicity` helper is **optional** and MUST NOT become public. |
 | Validation ownership | Part of `validateResource` via schema. No public `validateRelations` / `validateRelationMultiplicity`. |
 | Schema error taxonomy | Relation failures: `invalid_schema` **with** `cause: RelationValidationError` using existing causes plus **`missing_relation_multiplicity`** and **`invalid_relation_multiplicity`**. |
 | Projection | Still annotation-only. Relations MUST NOT contribute entries. |
@@ -296,7 +297,7 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.test.ts` (fixture shapes)
 - Modify: `packages/core/src/resource/exports.test.ts`
 
-- [ ] **Step 1: Widen types**
+- [x] **Step 1: Widen types**
 
 ```ts
 export type RelationMultiplicity = 'one' | 'many';
@@ -324,9 +325,11 @@ export type RelationValidationError =
     };
 ```
 
-- [ ] **Step 2: Rewrite / add failing tests**
+- [x] **Step 2: Update fixtures + add failing multiplicity tests**
 
-Update all M3.7 fixtures that used `{ name, target }` to include `multiplicity`. Add explicit cases:
+1. Update existing **valid** M3.7 fixtures that used `{ name, target }` to the new accepted three-member shape (prerequisite compatibility — these should stay green once implemented).
+2. Add **new** RFC-011 regression tests that initially fail (missing multiplicity, invalid vocabulary, extras, equality includes multiplicity).
+3. Run tests and expect failure specifically from the new multiplicity behavior (not from fixture typos).
 
 ```ts
 it('accepts closed Relations with multiplicity one and many', () => {
@@ -405,8 +408,8 @@ it('treats Relations equal only when name, target, and multiplicity match', () =
 
 Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to three-member Relations.
 
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated multiplicity cases
-- [ ] **Step 4: Commit** `test(core): add failing M3.8 Relation multiplicity contract tests`
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated multiplicity cases
+- [x] **Step 4: Commit** `test(core): add failing M3.8 Relation multiplicity contract tests`
 
 ### Task 2: Validate-before-snapshot + validation integration
 
@@ -415,7 +418,7 @@ Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to three-
 - Modify: `packages/core/src/resource/create-resource-with-relations.ts` (comments / snapshot shape)
 - Confirm: `packages/core/src/resource/validate.ts` continues to call `checkRelations`
 
-- [ ] **Step 1: Widen `checkRelations`**
+- [x] **Step 1: Widen `checkRelations`**
 
 Recommended per-member order (planning aid; preserve reject-don’t-repair):
 
@@ -426,15 +429,20 @@ Recommended per-member order (planning aid; preserve reject-don’t-repair):
 5. uniqueness-by-name → `duplicate_relation_name`
 6. `target` plain object with keys exactly `{ namespace, name }` → else `invalid_relation_member`
 7. `validateResourceIdentity(..., { kind: 'user' })` → on failure `invalid_relation_target`
-8. `multiplicity` exact membership in `"one" \| "many"` → else `invalid_relation_multiplicity` with `multiplicity: unknown`
+8. `multiplicity` exact membership in `"one" \| "many"` → else `invalid_relation_multiplicity` with `multiplicity: unknown` (inline check is fine; separate helper optional)
 9. push `{ name, target, multiplicity }`
+
+For step 2: prefer `missing_relation_multiplicity` when keys are exactly `{ name, target }` (multiplicity absent, no extras). Name-only / other malformed shapes without a clean two-member absence continue to map to `invalid_relation_member`.
 
 MUST NOT strip extras, invent `multiplicity`, coerce aliases, or validate live instance counts.
 
-- [ ] **Step 2: Widen `snapshotRelations` / `relationsEqual`**
+- [x] **Step 2: Widen `snapshotRelations` / `relationsEqual` (module-local only)**
+
+Same-package module-local seams (existing mechanism — **not** public/barrel exports):
 
 ```ts
-export function snapshotRelations(
+// module-local only — MUST NOT barrel-export
+function snapshotRelations(
   relations: readonly Relation[],
 ): ReadonlyArray<Relation> {
   return Object.freeze(
@@ -451,7 +459,8 @@ export function snapshotRelations(
   );
 }
 
-export function relationsEqual(
+// module-local only — MUST NOT barrel-export
+function relationsEqual(
   left: readonly Relation[],
   right: readonly Relation[],
 ): boolean {
@@ -465,9 +474,11 @@ export function relationsEqual(
 }
 ```
 
-- [ ] **Step 3: Update fixture comments** to say freeze `{ name, target, multiplicity }`
-- [ ] **Step 4: Green** Task 1 multiplicity acceptance + rejection causes
-- [ ] **Step 5: Commit** `feat(core): require Relation multiplicity one|many (RFC-011)`
+Retain the existing M3.5–M3.7 TypeScript module-local visibility pattern for same-package imports/tests; do not package-export these helpers.
+
+- [x] **Step 3: Update fixture comments** to say freeze `{ name, target, multiplicity }`
+- [x] **Step 4: Green** Task 1 multiplicity acceptance + rejection causes
+- [x] **Step 5: Commit** `feat(core): require Relation multiplicity one|many (RFC-011)`
 
 ### Task 3: Projection non-participation + field coexistence regressions
 
@@ -475,10 +486,10 @@ export function relationsEqual(
 - Modify: `packages/core/src/resource/project.test.ts` (finish multiplicity fixtures if needed)
 - Touch `project.ts` only if needed (body should remain annotation-only)
 
-- [ ] **Step 1: Ensure projection tests** use three-member Relations; assert zero relation-derived entries; invalid two-member relations → `invalid_resource`; purity
-- [ ] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
-- [ ] **Step 3: Full suite green including fields / annotations**
-- [ ] **Step 4: Commit** `test(core): multiplicity relations do not contribute to metadata projection`
+- [x] **Step 1: Ensure projection tests** use three-member Relations; assert zero relation-derived entries; invalid two-member relations → `invalid_resource`; purity
+- [x] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
+- [x] **Step 3: Full suite green including fields / annotations**
+- [x] **Step 4: Commit** `test(core): multiplicity relations do not contribute to metadata projection`
 
 ### Task 4: Exports, roadmap, plan status hygiene
 
@@ -487,10 +498,10 @@ export function relationsEqual(
 - Modify: `docs/roadmap.md` — mark M3.8 **implementation** complete only after M6 verification is green
 - Update this plan’s Status / M5 note only when Plan Review Accepts (M5), and checkboxes when M6 completes
 
-- [ ] **Step 1: Export smoke** — `RelationMultiplicity` exported; widened `Relation` / `RelationValidationError`; no `validateRelationMultiplicity` / `validateRelations`
-- [ ] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 142; net new multiplicity cases)
-- [ ] **Step 3: Docs status updates only after verification**
-- [ ] **Step 4: Commit** `docs: record M3.8 relation multiplicity slice complete`
+- [x] **Step 1: Export smoke** — `RelationMultiplicity` exported; widened `Relation` / `RelationValidationError`; no `validateRelationMultiplicity` / `validateRelations`
+- [x] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 142; net new multiplicity cases)
+- [x] **Step 3: Docs status updates only after verification**
+- [x] **Step 4: Commit** `docs: record M3.8 relation multiplicity slice complete`
 
 ---
 
@@ -530,25 +541,41 @@ Retained RFC-008 collection rules and RFC-010 target rules are exercised across 
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-011 (+ retained RFC-008 / RFC-010 / RFC-001 rules)
-- [ ] Relation is exactly `{ name, target, multiplicity }`; two-member rejected; no dual-shape
-- [ ] `RelationMultiplicity` is closed `"one" \| "many"` by exact membership
-- [ ] `"one"` / `"many"` are shape-only (not bounds / optional / null / instance counts)
-- [ ] Missing `multiplicity` → `missing_relation_multiplicity`; present-but-invalid → `invalid_relation_multiplicity`
-- [ ] Extras → `invalid_relation_member`; target still via `validateResourceIdentity(..., { kind: 'user' })`
-- [ ] Relation equality includes `multiplicity`; uniqueness remains by name only
-- [ ] Snapshot construction separated from `validateResource`; no default `multiplicity`
-- [ ] Non-empty Resources via internal/test seams only (no public builder)
-- [ ] Relation helpers internal/test-only; public validation remains `validateResource`
-- [ ] Projection non-participation required and tested
-- [ ] Optional/required / nullability / min-max / direction / join / load / persistence / polymorphism / Operations deferred
-- [ ] Fields / operations / annotations unchanged
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: Accepted plan + implementation in **one PR** for [#33](https://github.com/rexescario-dev/resource-forge/issues/33) (no plan-only merge)
+- [x] No new product semantics beyond RFC-011 (+ retained RFC-008 / RFC-010 / RFC-001 rules)
+- [x] Relation is exactly `{ name, target, multiplicity }`; two-member rejected; no dual-shape
+- [x] `RelationMultiplicity` is closed `"one" \| "many"` by exact membership
+- [x] `"one"` / `"many"` are shape-only (not bounds / optional / null / instance counts)
+- [x] Missing `multiplicity` → `missing_relation_multiplicity`; present-but-invalid → `invalid_relation_multiplicity`
+- [x] Extras → `invalid_relation_member`; target still via `validateResourceIdentity(..., { kind: 'user' })`
+- [x] Relation equality includes `multiplicity`; uniqueness remains by name only
+- [x] Snapshot construction separated from `validateResource`; no default `multiplicity`
+- [x] Non-empty Resources via internal/test seams only (no public builder)
+- [x] Relation helpers internal/test-only; public validation remains `validateResource`
+- [x] Projection non-participation required and tested
+- [x] Optional/required / nullability / min-max / direction / join / load / persistence / polymorphism / Operations deferred
+- [x] Fields / operations / annotations unchanged
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: Accepted plan + implementation in **one PR** for [#33](https://github.com/rexescario-dev/resource-forge/issues/33) (no plan-only merge)
+
+---
+
+## M5 review record
+
+```text
+Decision: Accepted
+Subject (plan): docs/superpowers/plans/2026-08-08-m3-8-relation-multiplicity.md
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-011-relation-multiplicity-design.md
+Delivery goal: Breaking widen Relation to exactly { name, target, multiplicity } with closed "one"|"many"; missing vs invalid multiplicity; validate-before-snapshot; no dual-shape; projection unchanged
+Review summary: No plan blockers. Hygiene recorded: helpers module-local/not barrel-exported; validateRelationMultiplicity optional/inline; Task 1 fixture updates vs new failing cases clarified.
+Findings: None (no plan blockers)
+Traceability: adequate (coverage + deferrals checked)
+Gate: Proceed to M6. No implementation activity before this Accept.
+Authority: Plan governs sequencing/execution; specification governs product semantics.
+```
 
 ---
 
 ## Gate
 
-**M4 complete (Draft plan).** Ready for **M5 Plan Review** on [#33](https://github.com/rexescario-dev/resource-forge/issues/33). Do not begin M6 until this plan is **Accepted**.
+**M5 Accepted.** Proceed to **M6 Implementation** on [#33](https://github.com/rexescario-dev/resource-forge/issues/33) / [#34](https://github.com/rexescario-dev/resource-forge/pull/34).

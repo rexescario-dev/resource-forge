@@ -46,10 +46,14 @@ export type FieldValidationError =
 /** Validated relation identity string (RFC-008). */
 export type RelationName = string;
 
-/** Closed associated Relation member (RFC-010; amends RFC-008 §3.2). */
+/** Closed relationship-shape vocabulary (RFC-011). */
+export type RelationMultiplicity = 'one' | 'many';
+
+/** Closed associated Relation member (RFC-011; amends RFC-010 §5). */
 export type Relation = {
   readonly name: RelationName;
   readonly target: ResourceIdentity;
+  readonly multiplicity: RelationMultiplicity;
 };
 
 export type RelationValidationError =
@@ -71,6 +75,15 @@ export type RelationValidationError =
       readonly code: 'invalid_relation_target';
       readonly index: number;
       readonly cause: IdentityValidationError;
+    }
+  | {
+      readonly code: 'missing_relation_multiplicity';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_multiplicity';
+      readonly index: number;
+      readonly multiplicity: unknown;
     };
 
 export type ResourceSchema = {

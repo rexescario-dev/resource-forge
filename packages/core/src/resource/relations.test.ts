@@ -10,15 +10,15 @@ const customer = { namespace: 'crm', name: 'Customer' } as const;
 const lineItem = { namespace: 'crm', name: 'LineItem' } as const;
 const user = { namespace: 'crm', name: 'User' } as const;
 
-describe('RFC-010 associated relations', () => {
-  it('accepts closed associated Relations and preserves order + targets', () => {
+describe('RFC-011 relation multiplicity', () => {
+  it('accepts closed Relations with multiplicity one and many', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'customer', target: { ...customer } },
-      { name: 'lineItems', target: { ...lineItem } },
+      { name: 'customer', target: { ...customer }, multiplicity: 'one' },
+      { name: 'lineItems', target: { ...lineItem }, multiplicity: 'many' },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -31,16 +31,20 @@ describe('RFC-010 associated relations', () => {
       customer,
       lineItem,
     ]);
+    expect(resource.value.schema.relations.map((r) => r.multiplicity)).toEqual([
+      'one',
+      'many',
+    ]);
     expect(
       relationsEqual(resource.value.schema.relations, [
-        { name: 'customer', target: customer },
-        { name: 'lineItems', target: lineItem },
+        { name: 'customer', target: customer, multiplicity: 'one' },
+        { name: 'lineItems', target: lineItem, multiplicity: 'many' },
       ]),
     ).toBe(true);
     expect(
       relationsEqual(resource.value.schema.relations, [
-        { name: 'lineItems', target: lineItem },
-        { name: 'customer', target: customer },
+        { name: 'lineItems', target: lineItem, multiplicity: 'many' },
+        { name: 'customer', target: customer, multiplicity: 'one' },
       ]),
     ).toBe(false);
   });
@@ -51,7 +55,11 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'parent', target: { namespace: 'crm', name: 'Order' } },
+      {
+        name: 'parent',
+        target: { namespace: 'crm', name: 'Order' },
+        multiplicity: 'one',
+      },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -59,6 +67,7 @@ describe('RFC-010 associated relations', () => {
       namespace: 'crm',
       name: 'Order',
     });
+    expect(resource.value.schema.relations[0]?.multiplicity).toBe('one');
   });
 
   it('allows the same target under different RelationNames', () => {
@@ -67,8 +76,8 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author', target: { ...user } },
-      { name: 'editor', target: { ...user } },
+      { name: 'author', target: { ...user }, multiplicity: 'one' },
+      { name: 'editor', target: { ...user }, multiplicity: 'one' },
     ]);
     expect(resource.ok).toBe(true);
   });
@@ -79,7 +88,7 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'userID', target: { ...user } },
+      { name: 'userID', target: { ...user }, multiplicity: 'one' },
     ]);
     expect(resource.ok).toBe(true);
   });
@@ -101,13 +110,55 @@ describe('RFC-010 associated relations', () => {
     }
   });
 
+  it('rejects two-member Relations as missing_relation_multiplicity (breaking)', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'customer', target: { ...customer } },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error.code).toBe('invalid_schema');
+      if (resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('missing_relation_multiplicity');
+      }
+    }
+  });
+
+  it('rejects invalid multiplicity vocabulary as invalid_relation_multiplicity', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const multiplicity of ['toOne', 'One', '0..*', 'many '] as const) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity,
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error.code).toBe('invalid_schema');
+        if (resource.error.code === 'invalid_schema') {
+          expect(resource.error.cause?.code).toBe(
+            'invalid_relation_multiplicity',
+          );
+        }
+      }
+    }
+  });
+
   it('rejects string targets without parsing', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'customer', target: 'crm/Customer' },
+      { name: 'customer', target: 'crm/Customer', multiplicity: 'one' },
     ]);
     expect(resource.ok).toBe(false);
     if (!resource.ok) {
@@ -124,7 +175,11 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'meta', target: { namespace: 'rf', name: 'Resource' } },
+      {
+        name: 'meta',
+        target: { namespace: 'rf', name: 'Resource' },
+        multiplicity: 'one',
+      },
     ]);
     expect(resource.ok).toBe(false);
     if (!resource.ok) {
@@ -144,7 +199,11 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'customer', target: { namespace: 'CRM', name: 'Customer' } },
+      {
+        name: 'customer',
+        target: { namespace: 'CRM', name: 'Customer' },
+        multiplicity: 'one',
+      },
     ]);
     expect(resource.ok).toBe(false);
     if (!resource.ok) {
@@ -165,7 +224,7 @@ describe('RFC-010 associated relations', () => {
 
     for (const name of ['Author', 'line-items', '']) {
       const resource = createResourceWithRelationsForTests(identity.value, [
-        { name, target: { ...customer } },
+        { name, target: { ...customer }, multiplicity: 'one' },
       ]);
       expect(resource.ok).toBe(false);
       if (!resource.ok) {
@@ -183,8 +242,12 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author', target: { ...user } },
-      { name: 'author', target: { namespace: 'crm', name: 'Account' } },
+      { name: 'author', target: { ...user }, multiplicity: 'one' },
+      {
+        name: 'author',
+        target: { namespace: 'crm', name: 'Account' },
+        multiplicity: 'many',
+      },
     ]);
     expect(resource.ok).toBe(false);
     if (!resource.ok) {
@@ -203,7 +266,8 @@ describe('RFC-010 associated relations', () => {
     const candidate = {
       name: 'customer',
       target: { ...customer },
-      cardinality: 'many',
+      multiplicity: 'one' as const,
+      optional: true,
     };
     const resource = createResourceWithRelationsForTests(identity.value, [
       candidate,
@@ -234,17 +298,29 @@ describe('RFC-010 associated relations', () => {
     }
   });
 
-  it('treats Relations equal only when name and target match', () => {
+  it('treats Relations equal only when name, target, and multiplicity match', () => {
     expect(
       relationsEqual(
-        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
-        [{ name: 'a', target: { namespace: 'crm', name: 'B' } }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' }, multiplicity: 'one' }],
+        [
+          {
+            name: 'a',
+            target: { namespace: 'crm', name: 'A' },
+            multiplicity: 'many',
+          },
+        ],
       ),
     ).toBe(false);
     expect(
       relationsEqual(
-        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
-        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' }, multiplicity: 'one' }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'B' }, multiplicity: 'one' }],
+      ),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' }, multiplicity: 'one' }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' }, multiplicity: 'one' }],
       ),
     ).toBe(true);
   });
@@ -256,7 +332,7 @@ describe('RFC-010 associated relations', () => {
 
     const resource = createResourceWithRelationsForTests(
       identity.value,
-      [{ name: 'author', target: { ...user } }],
+      [{ name: 'author', target: { ...user }, multiplicity: 'one' }],
       emptyAnnotations,
       [{ name: 'author', type: 'string' }],
     );
@@ -274,10 +350,14 @@ describe('RFC-010 associated relations', () => {
     if (!identity.ok) return;
 
     const target = { namespace: 'crm', name: 'User' };
-    const candidate = { name: 'author', target };
+    const candidate = {
+      name: 'author',
+      target,
+      multiplicity: 'one' as const,
+    };
     const list: object[] = [
       candidate,
-      { name: 'lineItems', target: { ...lineItem } },
+      { name: 'lineItems', target: { ...lineItem }, multiplicity: 'many' },
     ];
     const resource = createResourceWithRelationsForTests(identity.value, list);
     expect(resource.ok).toBe(true);
@@ -285,13 +365,21 @@ describe('RFC-010 associated relations', () => {
 
     candidate.name = 'mutated';
     target.name = 'Mutated';
-    list.push({ name: 'extra', target: { ...customer } });
+    list.push({
+      name: 'extra',
+      target: { ...customer },
+      multiplicity: 'one',
+    });
 
     expect(resource.value.schema.relations.map((r) => r.name)).toEqual([
       'author',
       'lineItems',
     ]);
     expect(resource.value.schema.relations[0]?.target).toEqual(user);
+    expect(resource.value.schema.relations.map((r) => r.multiplicity)).toEqual([
+      'one',
+      'many',
+    ]);
     expect(Object.isFrozen(resource.value.schema.relations)).toBe(true);
     expect(Object.isFrozen(resource.value.schema.relations[0])).toBe(true);
     expect(Object.isFrozen(resource.value.schema.relations[0]?.target)).toBe(

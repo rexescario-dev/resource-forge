@@ -201,8 +201,16 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author', target: { namespace: 'crm', name: 'User' } },
-      { name: 'lineItems', target: { namespace: 'crm', name: 'LineItem' } },
+      {
+        name: 'author',
+        target: { namespace: 'crm', name: 'User' },
+        multiplicity: 'one',
+      },
+      {
+        name: 'lineItems',
+        target: { namespace: 'crm', name: 'LineItem' },
+        multiplicity: 'many',
+      },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -233,7 +241,13 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithRelationsForTests(
       identity.value,
-      [{ name: 'author', target: { namespace: 'crm', name: 'User' } }],
+      [
+        {
+          name: 'author',
+          target: { namespace: 'crm', name: 'User' },
+          multiplicity: 'one',
+        },
+      ],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -255,8 +269,16 @@ describe('projectResourceMetadata', () => {
       schema: {
         fields: [],
         relations: [
-          { name: 'author', target: { namespace: 'crm', name: 'User' } },
-          { name: 'author', target: { namespace: 'crm', name: 'Account' } },
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'User' },
+            multiplicity: 'one',
+          },
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'Account' },
+            multiplicity: 'one',
+          },
         ],
         operations: [],
       },
@@ -269,12 +291,17 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.cause.code).toBe('invalid_schema');
   });
 
-  it('fails for name-only relations as invalid_resource', () => {
+  it('fails for two-member relations as invalid_resource', () => {
     const projected = projectResourceMetadata({
       identity: { namespace: 'crm', name: 'Order' },
       schema: {
         fields: [],
-        relations: [{ name: 'author' } as never],
+        relations: [
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'User' },
+          } as never,
+        ],
         operations: [],
       },
       annotations: emptyAnnotations,

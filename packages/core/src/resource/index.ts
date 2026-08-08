@@ -7,6 +7,7 @@ export type {
   FieldType,
   FieldValidationError,
   Relation,
+  RelationMultiplicity,
   RelationName,
   RelationValidationError,
   Resource,
