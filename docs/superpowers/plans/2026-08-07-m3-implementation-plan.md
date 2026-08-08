@@ -363,8 +363,11 @@ M3.2:
 M3.3:
   plan ✅ Accepted
   code ✅ M3.3 complete (RFC-006 annotations)
-M3.4+:
-  blocked on schema / vocabulary RFCs
+M3.4:
+  plan ✅ Accepted
+  code ✅ M3.4 complete (RFC-007 fields)
+M3.5+:
+  blocked on field-type / Relations / Operations / vocabulary RFCs
 ```
 
 ---
