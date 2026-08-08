@@ -101,23 +101,25 @@ describe('M3.4 / M3.6 / M3.10 / M3.11 public exports', () => {
   });
 });
 
-describe('M3.5 / M3.7 / M3.8 / M3.10 public exports', () => {
-  it('exposes widened Relation contracts without exporting relation validate helpers', () => {
+describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
+  it('exposes widened Relation contracts without exporting relation/nullable validate helpers', () => {
     const relation: Relation = {
       name: 'customer',
       target: { namespace: 'crm', name: 'Customer' },
       multiplicity: 'one',
       optional: false,
+      nullable: true,
     };
     const error: RelationValidationError = {
-      code: 'invalid_relation_optional',
+      code: 'missing_relation_nullable',
       index: 0,
-      optional: 'false',
     };
     expect(relation.optional).toBe(false);
-    expect(error.code).toBe('invalid_relation_optional');
+    expect(relation.nullable).toBe(true);
+    expect(error.code).toBe('missing_relation_nullable');
     expect(typeof core).toBe('object');
     expect('validateRelations' in core).toBe(false);
+    expect('validateNullable' in core).toBe(false);
     expect('validateRelationTarget' in core).toBe(false);
     expect('validateRelationMultiplicity' in core).toBe(false);
     expect('validateRelationName' in core).toBe(false);

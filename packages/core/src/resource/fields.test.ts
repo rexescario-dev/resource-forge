@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createResourceIdentity } from '../identity/index.js';
 import { createResourceWithFieldsForTests } from './create-resource-with-fields.js';
-import { createResourceWithRelationsForTests } from './create-resource-with-relations.js';
 import { checkFields, fieldsEqual } from './fields.js';
 import { validateResource } from './validate.js';
 import { emptyAnnotations } from './empty-annotations.js';
@@ -387,29 +386,6 @@ describe('RFC-014 field nullability', () => {
     for (const candidate of invalid) {
       const checked = checkFields([candidate]);
       expect(checked.ok).toBe(false);
-    }
-  });
-
-  it('rejects Relation nullable as invalid_relation_member', () => {
-    const identity = createResourceIdentity('crm', 'Customer');
-    expect(identity.ok).toBe(true);
-    if (!identity.ok) return;
-
-    const resource = createResourceWithRelationsForTests(identity.value, [
-      {
-        name: 'customer',
-        target: { namespace: 'crm', name: 'Customer' },
-        multiplicity: 'one',
-        optional: false,
-        nullable: true,
-      },
-    ]);
-    expect(resource.ok).toBe(false);
-    if (!resource.ok) {
-      expect(resource.error.code).toBe('invalid_schema');
-      if (resource.error.code === 'invalid_schema') {
-        expect(resource.error.cause?.code).toBe('invalid_relation_member');
-      }
     }
   });
 

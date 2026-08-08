@@ -17,10 +17,12 @@ import { validateResource } from './validate.js';
  *
  * Validates candidate relation (and optional field) member shape, names,
  * uniqueness, declarative targets (RFC-001 user context), multiplicity
- * (`"one" | "many"`), and required `optional: boolean` before constructing the
- * snapshot; successful construction freezes ordered Relations
- * `{ name, target, multiplicity, optional }` and Fields `{ name, type, optional }`
- * and then passes the Resource through `validateResource`.
+ * (`"one" | "many"`), required `optional: boolean`, and required association-
+ * reference `nullable: boolean` before constructing the snapshot; successful
+ * construction freezes ordered Relations
+ * `{ name, target, multiplicity, optional, nullable }` and Fields
+ * `{ name, type, optional, nullable }` and then passes the Resource through
+ * `validateResource`.
  */
 export function createResourceWithRelationsForTests(
   identity: ResourceIdentity,

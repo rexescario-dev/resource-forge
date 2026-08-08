@@ -247,12 +247,14 @@ describe('projectResourceMetadata', () => {
         target: { namespace: 'crm', name: 'User' },
         multiplicity: 'one',
         optional: false,
+        nullable: false,
       },
       {
         name: 'lineItems',
         target: { namespace: 'crm', name: 'LineItem' },
         multiplicity: 'many',
         optional: true,
+        nullable: true,
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -290,6 +292,7 @@ describe('projectResourceMetadata', () => {
           target: { namespace: 'crm', name: 'User' },
           multiplicity: 'one',
           optional: false,
+          nullable: false,
         },
       ],
       annotations.value,
@@ -318,12 +321,14 @@ describe('projectResourceMetadata', () => {
             target: { namespace: 'crm', name: 'User' },
             multiplicity: 'one',
             optional: false,
+            nullable: false,
           },
           {
             name: 'author',
             target: { namespace: 'crm', name: 'Account' },
             multiplicity: 'one',
             optional: true,
+            nullable: true,
           },
         ],
         operations: [],
@@ -335,6 +340,32 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.code).toBe('invalid_resource');
     if (projected.error.code !== 'invalid_resource') return;
     expect(projected.error.cause.code).toBe('invalid_schema');
+  });
+
+  it('fails for four-member relations missing nullable as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Order' },
+      schema: {
+        fields: [],
+        relations: [
+          {
+            name: 'author',
+            target: { namespace: 'crm', name: 'User' },
+            multiplicity: 'one',
+            optional: false,
+          } as never,
+        ],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
+    if (projected.error.cause.code !== 'invalid_schema') return;
+    expect(projected.error.cause.cause?.code).toBe('missing_relation_nullable');
   });
 
   it('fails for two-member relations as invalid_resource', () => {
