@@ -1,8 +1,9 @@
 # M3.3 Annotations — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (awaiting M5 Plan Review). After **Accepted**, use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-006. Reuse M2 metadata key/value validators and M3.1/M3.2 Resource / projection surfaces. Do **not** implement annotation vocabulary, reserved annotation catalogs, schema members, or cross-source merge/precedence.
+> **For agentic workers:** Status is **Draft** (M5 Returned for Revision once; revised for re-review). After **Accepted**, use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-006. Reuse M2 metadata key/value validators and M3.1/M3.2 Resource / projection surfaces. Do **not** implement annotation vocabulary, reserved annotation catalogs, schema members, or cross-source merge/precedence.
 
 **Status:** Draft  
+**M5:** Returned for Revision (2026-08-08) — blockers below addressed in this revision; awaiting re-review Accept  
 **Tracking:** [#10](https://github.com/rexescario-dev/resource-forge/issues/10)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.3+ was blocked on RFC-006  
 **Source RFC:** RFC-006 Annotations (**Accepted**) — fills RFC-005 deferred annotations slot  
@@ -12,7 +13,28 @@
 
 **Goal:** Replace the M3.1 `EmptyAnnotations` placeholder with the RFC-006 zero-or-more-entry annotation snapshot, validate it as part of `validateResource`, and project valid annotations by direct 1:1 into `ResourceMetadata` entries.
 
-**Architecture:** Annotations are authoritative Resource state (not `ResourceMetadata`). Representation is an immutable snapshot of unordered unique `MetadataKey → JsonValue` mappings. Validation reuses RFC-002 key/value rules (including reserved `rf`). Projection revalidates the Resource, then passes annotation mappings as metadata entries to `createResourceMetadata` with exact deep-value preservation and no vocabulary interpretation. Order is non-semantic; RFC-002 metadata equality already ignores entry order.
+**Architecture:**
+
+```text
+candidate annotation mappings
+          │
+          ▼
+   snapshot construction   ← establishes snapshot-by-value (Resource construction / internal fixture seam)
+          │
+          ▼
+ immutable Annotations
+          │
+          ▼
+       Resource
+          │
+          ▼
+    validateResource       ← validity only; does NOT silently normalize/rebuild annotation state
+          │
+          ▼
+ projectResourceMetadata   ← revalidate Resource; direct 1:1 entries
+```
+
+Annotations are authoritative Resource state (not `ResourceMetadata`). The M3.3 representation is an implementation of the RFC-006 abstract collection. Validation reuses RFC-002 key/value rules (including reserved `rf`). Projection revalidates the Resource, then passes annotation mappings as metadata entries to `createResourceMetadata` with exact deep-value preservation and no vocabulary interpretation. Order is non-semantic; RFC-002 metadata equality already ignores entry order.
 
 **Tech Stack:** TypeScript strict, Vitest (existing `packages/core` scripts)
 
@@ -27,17 +49,21 @@ These freeze the M3.3 implementation surface. They MUST NOT invent product seman
 | Decision | Lock |
 | --- | --- |
 | Annotation identity / value | Reuse RFC-002 `MetadataKey` + `JsonValue` (and `MetadataEntry` as `{ key, value }`) |
-| Container representation | `Annotations` = frozen `ReadonlyArray<MetadataEntry>` (array order non-semantic) |
-| Empty | Zero-length array; public `emptyAnnotations` becomes that empty snapshot (migrate off `readonlyTag` sentinel) |
-| `EmptyAnnotations` type | Remove from public surface (or keep only as deprecated type alias to empty array if needed for a single transition commit—prefer remove in this slice) |
+| Container representation | **Implementation-level:** `Annotations` = `ReadonlyArray<MetadataEntry>`. This is an M3.3 representation of the RFC-006 abstract collection contract. Array order is non-semantic and MUST NOT leak into equality or projection semantics. |
+| Empty | Zero-length array; public `emptyAnnotations` is that empty snapshot |
+| `EmptyAnnotations` type | **Remove from the public API in M3.3** (no deprecated alias unless a concrete in-repo consumer requires it—none today) |
 | `Resource.annotations` | Type widens from `EmptyAnnotations` → `Annotations` |
-| Snapshot-by-value | On successful validation/construction, store deep-cloned + frozen entries/values so external aliases cannot mutate Resource state |
+| Snapshot construction vs validation | **Separated.** Snapshot-by-value is established at Resource construction / fixture seams. `validateResource` validates; it MUST NOT become a silent normalizer/constructor that deep-clones caller-owned mutable annotations into a new Resource as its primary job. |
+| Snapshot-by-value depth | Semantic requirement: once part of a Resource, annotation entries and their nested `JsonValue` graphs MUST NOT be mutable through external aliases. Deep snapshotting MUST cover the entry/key containers and the complete nested `JsonValue` graph as needed. Do **not** prescribe a particular clone API unless the repo already has one. |
+| Non-empty Resource construction | **No public builder/mutator.** Public `createResource(identity)` remains empty-annotations only. Tests/fixtures needing non-empty Resources use an **internal** test/implementation seam (not a new product API) that constructs a Resource whose annotations are already snapshotted. |
+| Internal helpers | Annotation snapshot + validation helpers (e.g. anything named like `snapshotAnnotations` / `validateAnnotations`) are **internal module helpers**, not public exports, unless an existing package pattern already exports every validator (it does not for this slice). Public validation surface remains `validateResource`. |
 | Validation | Part of `validateResource`; reuse `validateMetadataKey` / `validateJsonValue` / duplicate-key detection |
 | Annotation errors | Stay under Resource validation (`invalid_annotations` + structured `cause`); MUST NOT use `invalid_metadata` |
+| Error taxonomy | Only `invalid_key` / `invalid_value` / `duplicate_key` under `AnnotationValidationError`. No separate malformed-container error unless the chosen representation makes such a failure observable at the Resource validation boundary (it should not for `ReadonlyArray<MetadataEntry>` candidates). |
 | Projection | After `validateResource`, `createResourceMetadata(identity, annotationEntries)`; equal key/value (deep JSON), no transform |
 | Order | No canonical sort; rely on RFC-002 unordered metadata equality for semantic determinism |
 | Vocabulary / cross-source merge | Out of scope |
-| Equality helper | Optional internal/test helper `annotationsEqual` (order-insensitive); public Resource equality still deferred |
+| Equality helper | **Test/internal only** `annotationsEqual` (order-insensitive) if needed; MUST NOT be a public product API. Public Resource equality remains deferred. |
 | Compose / registry | SHALL NOT require `composeResourceMetadata`; SHALL NOT register |
 
 ---
@@ -46,21 +72,24 @@ These freeze the M3.3 implementation surface. They MUST NOT invent product seman
 
 | Symbol | Kind | Role |
 | --- | --- | --- |
-| `Annotations` | type | Immutable snapshot: `ReadonlyArray<MetadataEntry>` (unordered semantically) |
-| `emptyAnnotations` | const | Canonical empty annotations snapshot (`Object.freeze([])`) |
+| `Annotations` | type | Implementation representation: `ReadonlyArray<MetadataEntry>` (unordered semantically) |
+| `emptyAnnotations` | const | Canonical empty annotations snapshot |
 | `Resource` | type | `annotations: Annotations` (no `metadata` property) |
-| `validateResource` | function | Validates identity, empty schema collections, and annotation container |
-| `createResource` | function | Still constructs minimal Resource with empty annotations |
+| `validateResource` | function | Validates identity, empty schema collections, and annotation container **without** establishing snapshot-by-value from mutable caller aliases |
+| `createResource` | function | Constructs minimal Resource with **empty** snapshotted annotations |
 | `projectResourceMetadata` | function | Projects identity + direct annotation entries |
-| `ResourceValidationError` | type | Extends annotation failure detail (see below) |
+| `ResourceValidationError` | type | Includes annotation failure detail (see below) |
 | `ResourceProjectionError` | type | Unchanged codes; annotation failures surface as `invalid_resource` |
 
 **Not public in M3.3:**
 
+- `EmptyAnnotations` (removed)
+- `validateAnnotations` / `snapshotAnnotations` / `annotationsEqual` (internal or test-only)
+- Public Resource builders/mutators / `createResource(identity, annotations)`
 - Named annotation vocabulary / reserved catalogs
 - Cross-source collision / precedence / merge
 - Schema field / relation / operation members
-- Resource equality / builders / mutators as product APIs
+- Public Resource equality
 - Reverse projection; registry helpers
 
 **Retain:** M2 exports; M3.1 schema empties; M3.2 projection error codes; `PACKAGE_NAME` / `PACKAGE_VERSION`.
@@ -97,20 +126,42 @@ type ResourceValidationError =
     };
 ```
 
-Note: M3.1 used `{ code: 'invalid_annotations' }` without `cause`. M3.3 **adds** `cause` for non-empty validation failures. Empty/malformed container failures that cannot attach an entry index MAY use a minimal cause or a dedicated cause code only if tests require it—prefer always attaching `cause` when rejecting a candidate entry list.
+M3.1 used `{ code: 'invalid_annotations' }` without `cause`. M3.3 **adds** required `cause` using the three codes above. Do not invent additional cause codes for test convenience.
+
+### Construction vs validation (normative for this plan)
+
+| Concern | Owner |
+| --- | --- |
+| Establish snapshot-by-value `Annotations` | Resource construction seams (`createResource` for empty; **internal** fixture/helper for non-empty tests) |
+| Decide validity of a Resource’s annotations | `validateResource` |
+| Project annotations | `projectResourceMetadata` after revalidation |
+
+**Internal non-empty fixture seam (Option B):** M3.3 does not introduce a public Resource builder/mutator API. Tests requiring non-empty Resources MAY construct validated Resource fixtures through an internal test helper or the minimal internal implementation seam necessary to exercise the existing Resource contract—provided that seam is **not** exported from package barrels as a product API.
+
+Example shape (planning aid only; names non-normative):
+
+```ts
+// internal / test-only — NOT exported from packages/core public API
+function createResourceWithAnnotationsForTests(
+  identity: ResourceIdentity,
+  candidateEntries: readonly MetadataEntry[],
+): Result<Resource, ResourceValidationError>
+```
+
+That helper MUST snapshot candidate entries (deep nested `JsonValue` graph) **before** the Resource is considered constructed, then run `validateResource` (or equivalent) for validity.
 
 ### Projection behavior (RFC-006)
 
 ```text
 projectResourceMetadata(resource)
-  1. validateResource(resource)     // includes annotation rules
+  1. validateResource(resource)     // includes annotation validity rules
   2. on failure → invalid_resource
-  3. createResourceMetadata(identity, validated.annotations as entry list)
+  3. createResourceMetadata(identity, [...resource.annotations])
   4. on metadata failure → invalid_metadata (defensive; do not fabricate)
   5. success → ResourceMetadata with same identity and annotation mappings as entries
 ```
 
-MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values.
+MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values. MUST NOT invent a canonical entry sort.
 
 ---
 
@@ -123,7 +174,7 @@ MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values.
 - validate annotations as part of Resource validity
 - inherit RFC-002 key grammar / equality / `rf` reservation unchanged
 - project by direct 1:1 equal key/value (deep JSON equality)
-- preserve snapshot-by-value semantics
+- preserve snapshot-by-value semantics at the construction boundary
 - keep annotation errors distinct from metadata validation errors
 
 ### SHALL NOT
@@ -134,6 +185,9 @@ MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values.
 - prescribe wire formats or host adapters
 - silently drop/merge/normalize invalid or conflicting annotations
 - introduce a canonical sort “for determinism” beyond RFC-002 equality
+- make `validateResource` the place that silently converts mutable caller-owned annotation aliases into authoritative state
+- export a new public Resource builder solely to support annotation tests
+- export `validateAnnotations` / `annotationsEqual` as public product APIs in this slice
 
 ---
 
@@ -141,7 +195,7 @@ MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values.
 
 ### `@resource-forge/core` owns
 
-- `packages/core/src/resource/*` annotation types, validation, projection updates
+- `packages/core/src/resource/*` annotation types, internal snapshot helpers, validation integration, projection updates
 - tests for RFC-006 container / validation / projection participation
 
 ### Consume only
@@ -158,20 +212,21 @@ MUST NOT mutate Resource. MUST NOT interpret/normalize/rename keys or values.
 
 | Path | Responsibility |
 | --- | --- |
-| `packages/core/src/resource/types.ts` | `Annotations`, widened `Resource`, annotation error types |
+| `packages/core/src/resource/types.ts` | `Annotations`, widened `Resource`, annotation error types; remove public `EmptyAnnotations` |
 | `packages/core/src/resource/empty-annotations.ts` | empty snapshot const |
-| `packages/core/src/resource/annotations.ts` | validate/normalize annotations snapshot (deep clone + freeze) |
-| `packages/core/src/resource/annotations.test.ts` | container / equality / snapshot-by-value tests |
-| `packages/core/src/resource/validate.ts` | call annotation validation |
-| `packages/core/src/resource/validate.test.ts` | update for non-empty + failure cases |
-| `packages/core/src/resource/create.ts` | continue empty-annotations construction |
+| `packages/core/src/resource/annotations.ts` | **internal** snapshot construction + annotation rule checking helpers (not barrel-exported) |
+| `packages/core/src/resource/annotations.test.ts` | container / snapshot-by-value / validation integration tests (via Resource seams) |
+| `packages/core/src/resource/validate.ts` | incorporate annotation **validity** into Resource validation |
+| `packages/core/src/resource/validate.test.ts` | empty + invalid annotation cases via `validateResource` |
+| `packages/core/src/resource/create.ts` | empty-annotations construction with snapshot semantics |
+| `packages/core/src/resource/*test-helpers*` or colocated test helper | internal non-empty Resource fixture seam (not public) |
 | `packages/core/src/resource/project.ts` | pass annotation entries into `createResourceMetadata` |
 | `packages/core/src/resource/project.test.ts` | non-empty direct projection + order-insensitive equality |
-| `packages/core/src/resource/empty-annotations.test.ts` | empty snapshot shape |
-| `packages/core/src/resource/exports.test.ts` | public export smoke |
-| `packages/core/src/resource/index.ts` / `packages/core/src/index.ts` | exports |
+| `packages/core/src/resource/empty-annotations.test.ts` | empty snapshot shape (no `readonlyTag`) |
+| `packages/core/src/resource/exports.test.ts` | public export smoke; assert `EmptyAnnotations` not exported |
+| `packages/core/src/resource/index.ts` / `packages/core/src/index.ts` | public exports only |
 
-Planning note: `annotations.ts` is a file-layout choice, not a product module boundary required by RFC-006.
+Planning note: `annotations.ts` and test-helper file names are layout choices, not product module boundaries required by RFC-006.
 
 ---
 
@@ -181,46 +236,50 @@ For each task: write failing tests → implement → green → commit.
 
 **Must cover:**
 
-1. Empty annotations valid; equal to each other
-2. Unique valid mappings accepted; duplicates rejected (`invalid_annotations` / `duplicate_key`)
+1. Empty annotations valid; empty snapshots equal
+2. Unique valid mappings accepted on a Resource constructed via the internal fixture seam; duplicates rejected (`invalid_annotations` / `duplicate_key`) via `validateResource`
 3. Invalid `MetadataKey` / reserved `rf` misuse / invalid `JsonValue` rejected as annotation errors (not `invalid_metadata`)
-4. Snapshot-by-value: mutating a caller-owned object after `validateResource` success does not change Resource annotations
-5. Projection: empty → zero entries (M3.2 regression)
-6. Projection: non-empty → equal keys/values; `resourceMetadataEqual` holds if entry order differs
-7. Projection: invalid Resource (including bad annotations) → `invalid_resource`
-8. Purity: projection does not mutate Resource
-9. No vocabulary assertions (`displayName`, etc.)
+4. Snapshot-by-value at construction: after building a Resource via `createResource` or the internal non-empty fixture seam, mutating the original caller-owned entry/value objects MUST NOT change `resource.annotations`
+5. `validateResource` on an already-constructed valid Resource succeeds without requiring re-snapshot as a public behavior
+6. Projection: empty → zero entries (M3.2 regression)
+7. Projection: non-empty → equal keys/values; `resourceMetadataEqual` holds if entry order differs
+8. Projection: invalid Resource (including bad annotations) → `invalid_resource`
+9. Purity: projection does not mutate Resource
+10. Public surface: `emptyAnnotations` is the zero-entry snapshot; `EmptyAnnotations` is not exported; `validateAnnotations` is not exported
+11. No vocabulary assertions (`displayName`, etc.)
 
 **Do not:** fabricate `invalid_metadata` for annotation failures; test annotation failures via `validateResource` / `invalid_resource` only.
 
 ---
 
-### Task 1: Types + annotation validation helper (failing tests)
+### Task 1: Contract types + failing tests
 
 **Files:**
 - Modify: `packages/core/src/resource/types.ts`
-- Create: `packages/core/src/resource/annotations.ts` (stub exports OK until Task 2)
-- Create: `packages/core/src/resource/annotations.test.ts`
-- Modify: `packages/core/src/resource/empty-annotations.ts` / `.test.ts` as needed for empty array shape
-- Modify: `packages/core/src/resource/index.ts` — export new types
+- Modify: `packages/core/src/resource/empty-annotations.ts` / `.test.ts` (empty array snapshot expectations)
+- Modify: `packages/core/src/resource/index.ts` — export `Annotations`; stop exporting `EmptyAnnotations`
+- Create: `packages/core/src/resource/annotations.test.ts` (and/or extend `validate.test.ts`) with failing expectations
 
-- [ ] **Step 1: Widen types** — `Annotations`, `AnnotationValidationError`, update `Resource` / `ResourceValidationError`; remove public `EmptyAnnotations` sentinel type
-- [ ] **Step 2: Write failing tests** for empty, duplicate key, invalid key, invalid value, snapshot-by-value (via `validateAnnotations` or through `validateResource` once wired)
+- [ ] **Step 1: Widen types** — `Annotations`, `AnnotationValidationError`, update `Resource` / `ResourceValidationError`; **remove** public `EmptyAnnotations`
+- [ ] **Step 2: Write failing tests** for empty snapshot shape, invalid key/value/duplicate via `validateResource`, and public-export expectations (`EmptyAnnotations` absent)
 - [ ] **Step 3: Run tests — expect FAIL**
-- [ ] **Step 4: Commit** `test(core): add failing M3.3 annotation container tests`
+- [ ] **Step 4: Commit** `test(core): add failing M3.3 annotation contract tests`
 
-### Task 2: Implement annotation snapshot validation
+### Task 2: Snapshot construction + validation integration
 
 **Files:**
-- Implement: `packages/core/src/resource/annotations.ts`
-- Update: `empty-annotations.ts` → `Object.freeze([])` (or equivalent empty snapshot)
-- Wire: `validate.ts` to validate/normalize annotations into snapshot-by-value `Annotations`
-- Update: existing validate/create/empty tests that assumed `readonlyTag`
+- Create/implement: `packages/core/src/resource/annotations.ts` (**internal** helpers)
+- Update: `empty-annotations.ts` → empty snapshotted array
+- Update: `create.ts` — empty path uses snapshot construction boundary
+- Add: internal/test-only non-empty Resource fixture seam
+- Wire: `validate.ts` to **validate** annotation rules (no silent normalize-from-alias as the construction path)
+- Update: existing tests that assumed `readonlyTag`
 
-- [ ] **Step 1: Implement validate + deep clone/freeze**
-- [ ] **Step 2: Reuse `validateMetadataKey` with same kind rules as metadata (`rf` → framework)**
-- [ ] **Step 3: Green annotation + validate tests**
-- [ ] **Step 4: Commit** `feat(core): validate Resource annotations per RFC-006`
+- [ ] **Step 1: Internal snapshot helper** — deep snapshot covering entry/key containers and nested `JsonValue` graph; empty + non-empty
+- [ ] **Step 2: Internal non-empty fixture seam** — constructs Resource with snapshotted annotations; not barrel-exported
+- [ ] **Step 3: `validateResource` integrates annotation validity** using the three `AnnotationValidationError` causes; reuse `validateMetadataKey` (`rf` → framework kind)
+- [ ] **Step 4: Green construction / snapshot-by-value / validate tests**
+- [ ] **Step 5: Commit** `feat(core): Resource annotation snapshots and validation (RFC-006)`
 
 ### Task 3: Direct annotation projection
 
@@ -228,9 +287,9 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.ts`
 - Modify: `packages/core/src/resource/project.test.ts`
 
-- [ ] **Step 1: Failing tests** for non-empty direct projection + order-insensitive `resourceMetadataEqual` + purity
-- [ ] **Step 2: Implement** `createResourceMetadata(identity, [...validated.annotations])` (entry list copy OK; values already snapshotted)
-- [ ] **Step 3: Green tests including M3.2 empty floor regression**
+- [ ] **Step 1: Failing tests** for non-empty direct projection (via internal fixture) + order-insensitive `resourceMetadataEqual` + purity + empty regression
+- [ ] **Step 2: Implement** `createResourceMetadata(identity, [...validated.annotations])` — no sort, no compose, no registry
+- [ ] **Step 3: Green tests**
 - [ ] **Step 4: Commit** `feat(core): project annotations into ResourceMetadata entries`
 
 ### Task 4: Exports, roadmap, parent-plan note
@@ -240,7 +299,7 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `docs/roadmap.md` — mark M3.3 **implementation** complete only after M6 verification is green
 - Optionally note in parent M3 plan that M3.3 code is complete (only after green)
 
-- [ ] **Step 1: Export smoke for Annotations / emptyAnnotations / projection with entries**
+- [ ] **Step 1: Export smoke** — `Annotations` / `emptyAnnotations` / projection with entries; confirm no `EmptyAnnotations` / no `validateAnnotations`
 - [ ] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
 - [ ] **Step 3: Docs status updates only after verification**
 - [ ] **Step 4: Commit** `docs: record M3.3 annotations slice complete`
@@ -251,7 +310,8 @@ For each task: write failing tests → implement → green → commit.
 
 | Task | RFC-006 sections |
 | --- | --- |
-| Task 1–2 | §§2–4 container, identity/value reuse, validation, snapshot-by-value, `rf` inheritance |
+| Task 1 | §§2–3 container terms; public surface migration |
+| Task 2 | §§3–4 snapshot-by-value, validation ownership, `rf` inheritance, empty = zero |
 | Task 3 | §5 projection participation (direct 1:1, order-independent via RFC-002) |
 | Task 4 | Implementation gate / roadmap hygiene |
 
@@ -262,7 +322,8 @@ For each task: write failing tests → implement → green → commit.
 - Annotation vocabulary RFC(s)
 - Cross-source projection composition / precedence
 - Schema Fields / Relations / Operations
-- Public Resource equality / builders
+- Public Resource equality / builders / `createResource(identity, annotations?)`
+- Public `validateAnnotations` export
 - Host adapters
 
 ---
@@ -270,9 +331,12 @@ For each task: write failing tests → implement → green → commit.
 ## M5 Plan Review checklist (for reviewers)
 
 - [ ] No new product semantics beyond RFC-006
-- [ ] `EmptyAnnotations` migration is explicit
-- [ ] Annotation errors distinct from `invalid_metadata`
-- [ ] Snapshot-by-value required without prescribing “deep clone” as the only mechanism
+- [ ] `EmptyAnnotations` **removed** from public API; `emptyAnnotations` is zero-entry snapshot
+- [ ] Snapshot construction separated from `validateResource`
+- [ ] Non-empty Resources via internal/test seam only (no public builder)
+- [ ] Annotation helpers internal; public validation remains `validateResource`
+- [ ] Deep snapshot-by-value required across nested `JsonValue` without mandating a specific clone API
+- [ ] Annotation errors distinct from `invalid_metadata`; only three annotation causes
 - [ ] Projection order independence relies on RFC-002 (no invented sort)
 - [ ] Vocabulary / cross-source merge deferred
 - [ ] TDD tasks executable without inventing sequencing
