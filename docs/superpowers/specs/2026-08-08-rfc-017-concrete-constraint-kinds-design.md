@@ -1,8 +1,8 @@
 # RFC-017: Concrete Constraint Kinds
 
 **Date:** 2026-08-08  
-**Status:** Draft  
-**M3:** Pending Design Review  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; closed exclusive `ConstraintKind = "range" | "pattern" | "enum"`; kind-discriminated closed members (no `spec`); schema-level `constraints` + required `field: FieldName`; resolve + type-match at declaration time; finite numeric bounds; practical kind rules; order-sensitive `enum.values` equality intentional; multiple constraints per Field; runtime enforcement / uniqueness / cross-member / Relation targeting deferred; prominent breaking specialization of RFC-016 open-`kind` floor; packaging / projection / Field–Relation–Operation floors retained  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#61](https://github.com/rexescario-dev/resource-forge/issues/61)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model — schema aggregate), RFC-006 (Annotations — projection boundary), RFC-007 (Resource Fields — `FieldName` / ordered `fields`; targeting surface), RFC-009 (Resource Field Types — `FieldType` ∈ {string, number, boolean}), RFC-013 / RFC-014 (Field optionality / nullability floors — relied upon unchanged), RFC-016 (Constraints framework — specialized here)  
@@ -406,4 +406,4 @@ Deferred concerns are listed in §1.2. This ledger does not add scope; it record
 
 ## 15. Open questions for Design Review (M3)
 
-None anticipated from the approved M2 locks. Reviewers should confirm the prominent breaking change and the declaration-vs-runtime boundary are acceptable as written.
+None. M3 Design Review Accepted (2026-08-08). Scrutinized `enum.values` equality: order-sensitive sequence equality is **intentional** (`["open","closed"]` ≠ `["closed","open"]` as Constraint values); set-membership equivalence is not introduced. Finite-number rule retained. No Draft edits required beyond Accept status.
