@@ -1,8 +1,9 @@
 # M3.9 Resource Operations — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (M4). REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` **only after M5 Accepts this plan**. Follow TDD; do not invent semantics beyond RFC-012. Reuse M3.1–M3.8 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement `kind`, signatures, IO, execution, persistence, loading, joins, cascade, direction, bounds, optionality/nullability, Field/Relation reopen (RFC-009/010/011), unified schema namespace, field→metadata projection, or public `validateOperations` / `validateResourceSchema`.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-012. Reuse M3.1–M3.8 Resource / schema / field / relation / annotation / projection surfaces. Do **not** implement `kind`, signatures, IO, execution, persistence, loading, joins, cascade, direction, bounds, optionality/nullability, Field/Relation reopen (RFC-009/010/011), unified schema namespace, field→metadata projection, or public `validateOperations` / `validateResourceSchema`.
 
-**Status:** Draft  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no plan blockers after validation-ownership correction; `checkOperations` is the single internal Operation validation implementation reused by construction fixtures and `validateResource`; one PR with implementation for #38  
 **Tracking:** [#38](https://github.com/rexescario-dev/resource-forge/issues/38)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.9 was blocked on Resource Operations RFC  
 **Source RFC:** RFC-012 Resource Operations (**Accepted**) — fills RFC-005 deferred `operations` member slot  
@@ -15,28 +16,33 @@
 **Architecture:**
 
 ```text
-candidate operations sequence
+raw candidate
           │
           ▼
- validate candidate member shape   ← closed `{ name }` only; additional semantic props → failure (no stripping)
+ checkOperations(candidate)        ← single internal RFC-012 operation validation (shape + names + uniqueness)
+          │
+          ├── failure → OperationValidationError
           │
           ▼
- validate names + uniqueness       ← OperationName grammar + duplicates within operations → failure
+ validated Operation values
           │
           ▼
- snapshot exact valid Operations   ← freeze ordered `{ readonly name }` only; never lossy-normalize candidates
+ snapshotOperations(validated)     ← freeze ordered `{ readonly name }` only; never lossy-normalize candidates
           │
           ▼
-       Resource.schema
+       Resource snapshot
           │
           ▼
-    validateResource               ← authoritative Resource gate; fields + relations unchanged; operations per RFC-012
-          │
+ validateResource(resource)        ← authoritative final Resource validity gate
+          │                         (delegates operation member/sequence validation to checkOperations;
+          │                          MUST NOT duplicate a second operation-validation algorithm)
           ▼
  projectResourceMetadata           ← revalidate Resource; annotation-derived metadata only; operations contribute nothing
 ```
 
 **Invariant:** No implementation step may transform an invalid candidate into a valid Operation by discarding information before validation.
+
+`checkOperations` is the internal implementation of RFC-012 operation collection validation and is reused by construction fixtures and `validateResource`. `validateResource` remains the authoritative Resource-level validation gate; it delegates operation member/sequence validation to the same internal operation validation logic.
 
 `OperationName` is a dedicated identity domain scoped to the Resource's `operations` sequence (not `FieldName`, not `RelationName`, not `MetadataKey`). `Operation` is closed: `{ name: OperationName }` only (exactly one declared semantic property). Declaration order is preserved and participates in sequence equality. Field, Relation, and Operation uniqueness are independent (same name string may coexist across collections). Equality of sequences is order-sensitive (test/internal helper only; public Resource equality remains deferred).
 
@@ -59,10 +65,10 @@ These freeze the M3.9 implementation surface. They MUST NOT invent product seman
 | `fields` / `relations` | Unchanged RFC-007/009 and RFC-008/010/011 contracts. |
 | `EmptySchemaCollection` | **Stop using** for `operations`. After this slice, `ResourceSchema.operations` is `ReadonlyArray<Operation>` (may be empty). If `EmptySchemaCollection` has no remaining callers, remove the type from barrels; do not keep a permanently empty-typed operations slot. |
 | Namespaces | Uniqueness within `operations` only. Field/Relation/Operation sharing the same name string is valid. No cross-collection uniqueness check. |
-| Snapshot construction vs validation | **Separated, non-lossy.** Raw candidate validation (closed shape, names, uniqueness) happens **before** any snapshot that materializes `{ name }` only. `snapshotOperations` accepts only already-validated `Operation` members and freezes an ordered sequence; it MUST NOT discard, strip, or normalize unknown semantic properties. `validateResource` is the final Resource validity gate. |
-| Non-empty Resource construction | **No public builder.** Public `createResource(identity)` remains empty schema collections + empty annotations. Tests needing non-empty `operations` use an **internal** fixture seam (not barrel-exported) that validates candidates before snapshotting. Coexistence tests may pass optional candidate fields/relations through the same internal seam (or colocated helpers). |
+| Snapshot construction vs validation | **Separated, non-lossy.** `checkOperations` validates raw candidates (closed shape, names, uniqueness) **before** any snapshot that materializes `{ name }` only. `snapshotOperations` accepts only already-validated `Operation` members and freezes an ordered sequence; it MUST NOT discard, strip, or normalize unknown semantic properties. `validateResource` is the authoritative final Resource validity gate and **reuses** `checkOperations` — it MUST NOT implement a second, independent operation-validation algorithm. |
+| Non-empty Resource construction | **No public builder.** Public `createResource(identity)` remains empty schema collections + empty annotations. Tests needing non-empty `operations` use an **internal** fixture seam (not barrel-exported) that calls `checkOperations` before snapshotting. Coexistence tests may pass optional candidate fields/relations through the same internal seam (or colocated helpers). |
 | Internal helpers | `validateOperationName` / `checkOperations` / `snapshotOperations` / `operationsEqual` are **internal or test-only**, not public product APIs. Public validation remains `validateResource`. |
-| Validation ownership | Part of `validateResource` via schema. No public `validateOperations` / `validateResourceSchema`. |
+| Validation ownership | `checkOperations` owns Operation collection semantics (single implementation). `validateResource` owns Resource-level validity and delegates to `checkOperations`. No public `validateOperations` / `validateResourceSchema`. |
 | Schema error taxonomy | Operation failures: `invalid_schema` **with** `cause: OperationValidationError` using only `invalid_operation_name` / `duplicate_operation_name` / `invalid_operation_member` (maps RFC-012 prose causes). Field/Relation failures retain their existing causes. Non-member schema failures (missing collections, non-object schema): `invalid_schema` **without** field/relation/operation cause. |
 | `ResourceValidationError.invalid_schema.cause` | Widen to `FieldValidationError \| RelationValidationError \| OperationValidationError` (optional). |
 | Projection | After revalidation, still `createResourceMetadata(identity, [...annotations])` only. Operations MUST NOT contribute entries. Field/Relation projection rules remain unchanged. |
@@ -77,7 +83,7 @@ These freeze the M3.9 implementation surface. They MUST NOT invent product seman
 
 | Symbol | Kind | Role |
 | --- | --- | --- |
-| `OperationName` | type | Validated operation identity string (planning aid: plain `string` after validation) |
+| `OperationName` | type | Operation identity string conforming to RFC-012 grammar |
 | `Operation` | type | `{ readonly name: OperationName }` |
 | `OperationValidationError` | type | Three cause codes under `invalid_schema` |
 | `ResourceSchema` | type | `fields` / `relations` unchanged; `operations: ReadonlyArray<Operation>` |
@@ -146,10 +152,10 @@ Do not invent additional operation cause codes for test convenience. Do not put 
 
 | Concern | Owner |
 | --- | --- |
-| Validate raw operation candidates (shape / names / uniqueness) | Internal fixture / construction seam — **before** snapshot |
-| Establish snapshotted ordered `operations` from **already-valid** Operations | Resource construction seams (`createEmptyResourceSchema` / `createResource` for empty; **internal** fixture for non-empty tests) |
-| Decide validity of a Resource’s operations | `validateResource` (final gate on the constructed Resource) |
-| Project metadata | `projectResourceMetadata` after revalidation — annotations only |
+| Validate raw operation candidates (shape / names / uniqueness) | Internal Operation validation logic (`checkOperations`), reused by construction seams and `validateResource` |
+| Establish snapshotted ordered `operations` | Resource construction seams; only from already-valid Operations (`snapshotOperations`) |
+| Decide validity of a Resource | `validateResource` (authoritative final gate; delegates operations to `checkOperations`) |
+| Project metadata | `projectResourceMetadata` after `validateResource`; annotations only |
 
 **Internal non-empty operations fixture seam:**
 
@@ -165,9 +171,9 @@ function createResourceWithOperationsForTests(
 ): Result<Resource, ResourceValidationError>
 ```
 
-`createResourceWithOperationsForTests` validates candidate operation (and optional field/relation) member shape, names, and uniqueness **before** constructing the snapshot; successful construction freezes the ordered `{ readonly name }` operation members (and validated field/relation members as applicable) and then passes the resulting Resource through `validateResource`. Default annotations: `emptyAnnotations`. Default fields/relations: empty sequences.
+`createResourceWithOperationsForTests` calls `checkOperations` (and optional `checkFields` / `checkRelations`) **before** constructing the snapshot; successful construction freezes the ordered `{ readonly name }` operation members (and validated field/relation members as applicable) and then passes the resulting Resource through `validateResource`. Default annotations: `emptyAnnotations`. Default fields/relations: empty sequences.
 
-Failure mapping for the fixture MUST use the same `invalid_schema` + field/relation/operation causes as `validateResource` (no silent success after stripping).
+Failure mapping for the fixture MUST use the same `invalid_schema` + field/relation/operation causes as `validateResource` (no silent success after stripping). `validateResource` MUST call the same `checkOperations` — not a duplicated algorithm.
 
 Existing `createResourceWithFieldsForTests` / `createResourceWithRelationsForTests` remain for field/relation-focused tests; after this slice they MUST construct empty `operations` as `ReadonlyArray<Operation>` (empty array), not as `EmptySchemaCollection`.
 
@@ -313,9 +319,9 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/schema.ts` / `create-resource-with-fields.ts` / `create-resource-with-relations.ts` for empty `ReadonlyArray<Operation>`
 - Update: `fields.test.ts` / `relations.test.ts` non-empty-operations expectations
 
-- [ ] **Step 1: Internal helpers** — `validateOperationName` (`/^[a-z][a-zA-Z0-9]*$/`); `checkOperations` for closed shape + uniqueness; `snapshotOperations` accepts only already-validated Operation members and creates a new frozen ordered sequence — MUST NOT discard or normalize additional semantic properties. Raw candidate validation occurs before snapshotting.
-- [ ] **Step 2: Internal fixture** — `createResourceWithOperationsForTests` validates candidates before snapshot; optional fields/relations; then `validateResource`; not barrel-exported
-- [ ] **Step 3: `validateResource`** — validate authoritative `operations` via the same closed-shape / grammar / uniqueness rules; retain field/relation checks; remove empty-only `isEmptySchemaCollection(schema.operations)` gate; empty operations still ok; wire `invalid_schema` + operation `cause`; snapshot operations like fields/relations
+- [ ] **Step 1: Internal helpers** — `validateOperationName` (`/^[a-z][a-zA-Z0-9]*$/`); **`checkOperations` as the single Operation-validation implementation** (closed shape + uniqueness); `snapshotOperations` accepts only already-validated Operation members and creates a new frozen ordered sequence — MUST NOT discard or normalize additional semantic properties. Raw candidate validation via `checkOperations` occurs before snapshotting.
+- [ ] **Step 2: Internal fixture** — `createResourceWithOperationsForTests` calls `checkOperations` before snapshot; optional fields/relations; then `validateResource`; not barrel-exported
+- [ ] **Step 3: `validateResource`** — **delegate** authoritative `operations` validation to `checkOperations` (MUST NOT duplicate the algorithm); retain field/relation checks; remove empty-only `isEmptySchemaCollection(schema.operations)` gate; empty operations still ok; wire `invalid_schema` + operation `cause`; snapshot operations like fields/relations
 - [ ] **Step 4: Green construction / snapshot / validate / order-sensitive equality / independent-namespace tests** — include proof that `{ name: 'create', kind: 'command' }` fails with `invalid_operation_member` (no silent strip-to-valid)
 - [ ] **Step 5: Commit** `feat(core): Resource operations sequence and validation (RFC-012)`
 
@@ -375,25 +381,26 @@ For each task: write failing tests → implement → green → commit.
 
 ## M5 Plan Review checklist (for reviewers)
 
-- [ ] No new product semantics beyond RFC-012
-- [ ] `operations` is ordered sequence; equality order-sensitive (test/internal)
-- [ ] `Operation` closed name-only; regex is sole `OperationName` constraint; dedicated domain (not Field/Relation name)
-- [ ] Independent Field/Relation/Operation namespaces explicit and tested
-- [ ] Snapshot construction separated from `validateResource`; candidates validated before any `{ name }`-only materialization
-- [ ] `snapshotOperations` never strips additional semantic properties; invalid candidates cannot become valid Operations by discard
-- [ ] Non-empty Resources via internal/test seam only (no public builder)
-- [ ] Operation helpers internal; public validation remains `validateResource`
-- [ ] Operation errors under `invalid_schema` with only three cause codes; field/relation causes unchanged
-- [ ] Fields / Relations contracts unchanged (RFC-009 / RFC-010 / RFC-011)
-- [ ] Projection non-participation required and tested; invalid operations still fail projection gate
-- [ ] Kind / signature / execution / reserved names / unified namespace deferred
-- [ ] Prior “non-empty operations always fail” tests explicitly retargeted
-- [ ] TDD tasks executable without inventing sequencing
-- [ ] M6 must not start until this plan is **Accepted**
-- [ ] Delivery packaging: Accepted plan + implementation in **one PR** for [#38](https://github.com/rexescario-dev/resource-forge/issues/38) (no plan-only merge)
+- [x] No new product semantics beyond RFC-012
+- [x] `operations` is ordered sequence; equality order-sensitive (test/internal)
+- [x] `Operation` closed name-only; regex is sole `OperationName` constraint; dedicated domain (not Field/Relation name)
+- [x] Independent Field/Relation/Operation namespaces explicit and tested
+- [x] `checkOperations` is the single Operation-validation implementation; reused by fixtures and `validateResource` (no duplicated algorithm)
+- [x] Snapshot construction separated from `validateResource`; candidates validated via `checkOperations` before any `{ name }`-only materialization
+- [x] `snapshotOperations` never strips additional semantic properties; invalid candidates cannot become valid Operations by discard
+- [x] Non-empty Resources via internal/test seam only (no public builder)
+- [x] Operation helpers internal; public validation remains `validateResource`
+- [x] Operation errors under `invalid_schema` with only three cause codes; field/relation causes unchanged
+- [x] Fields / Relations contracts unchanged (RFC-009 / RFC-010 / RFC-011)
+- [x] Projection non-participation required and tested; invalid operations still fail projection gate
+- [x] Kind / signature / execution / reserved names / unified namespace deferred
+- [x] Prior “non-empty operations always fail” tests explicitly retargeted
+- [x] TDD tasks executable without inventing sequencing
+- [x] M6 must not start until this plan is **Accepted**
+- [x] Delivery packaging: Accepted plan + implementation in **one PR** for [#38](https://github.com/rexescario-dev/resource-forge/issues/38) (no plan-only merge)
 
 ---
 
 ## Gate
 
-**M4 Draft complete.** Hand off to **M5 Plan Review**. Do not implement until this plan is **Accepted**. Do not invent kind/IO/execution semantics, Field/Relation reopen, or a public operations builder.
+**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #38. Do not invent kind/IO/execution semantics, Field/Relation reopen, or a public operations builder. `checkOperations` remains the single Operation-validation implementation.
