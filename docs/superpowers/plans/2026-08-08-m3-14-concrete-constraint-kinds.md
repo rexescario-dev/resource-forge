@@ -3,7 +3,7 @@
 > **For agentic workers:** Status is **Draft** until M5 Accepts. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-017. Reuse M3.1–M3.13 Resource / schema / field / relation / operation / annotation / projection / constraint-framework surfaces. Do **not** implement runtime enforcement, inclusive/exclusive `range` evaluation, pattern dialect/matching, uniqueness, cross-member constraints, Relation targeting, Field-local constraint slots, `spec` bags, registries, wire/persistence, or public `validateConstraints` / `validateResourceSchema`.
 
 **Status:** Draft  
-**M5:** Pending Plan Review  
+**M5:** Returned for Revision (2026-08-08) — cause-precedence looseness for missing closed-arm properties; snapshot wording risk. Revised (same date): deterministic closed-member vs semantic causes; snapshot reuses existing nested immutability. Pending re-review / Accept.  
 **Tracking:** [#63](https://github.com/rexescario-dev/resource-forge/issues/63)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-017 Concrete Constraint Kinds (**Accepted**) — specializes RFC-016 Constraint member / `kind` / equality / validation  
@@ -80,12 +80,13 @@ one delivery PR for tracking #63 (Accepted plan + implementation together)
 | Decision | Lock |
 | --- | --- |
 | `ConstraintKind` | Closed exclusive `"range" \| "pattern" \| "enum"`; exact equality; no aliases |
-| Unknown kind | Invalid (`unknown_constraint_kind` or collapsed into `invalid_constraint_kind` per cause table — pick **one** planning-aid code and test it consistently; prefer distinct `unknown_constraint_kind`) |
-| Bare `{ name, kind }` | Invalid for every kind (`invalid_constraint_member` / missing kind-specific props as classified) |
-| `field` | Required own property; valid `FieldName` grammar; MUST resolve against already-validated `fields` |
+| Unknown kind | Distinct `unknown_constraint_kind` (MUST NOT collapse into `invalid_constraint_kind`) |
+| Bare `{ name, kind }` / missing closed-arm keys | Always `invalid_constraint_member` (closed-member shape failure) — see cause precedence |
+| `field` | Required own property on every concrete arm; valid `FieldName` grammar; MUST resolve against already-validated `fields` |
 | `checkConstraints` signature | Internal: `checkConstraints(candidateConstraints, validatedFields)` (or equivalent) so resolve/type-match can run; MUST NOT invent a second public API |
 | Validation order | `checkFields` before `checkConstraints` inside `validateResource` (already true); pass snapshotted/validated Field list into constraint check |
-| `range` keys | Own key set exactly `{ name, kind, field, min }`, `{ name, kind, field, max }`, or `{ name, kind, field, min, max }` |
+| `range` keys (closed shapes that proceed past shape check) | Own key set exactly `{ name, kind, field, min }`, `{ name, kind, field, max }`, or `{ name, kind, field, min, max }` |
+| `range` field-only exception | Own key set exactly `{ name, kind, field }` → **not** a closed shape success; diagnose `invalid_range_bounds` (neither `min` nor `max`) after kind is recognized — see precedence |
 | `pattern` keys | Own key set exactly `{ name, kind, field, pattern }` |
 | `enum` keys | Own key set exactly `{ name, kind, field, values }` |
 | Finite numbers | `Number.isFinite` for present `min`/`max` and numeric enum values; `NaN` / `±Infinity` invalid |
@@ -93,7 +94,7 @@ one delivery PR for tracking #63 (Accepted plan + implementation together)
 | `pattern` | Non-empty string; opaque; no RegExp compile/match |
 | `enum.values` | Non-empty array; homogeneous + FieldType-compatible; duplicates invalid (exact equality); equality **order-sensitive** |
 | Multiple constraints / Field | Allowed (incl. same kind); uniqueness by `ConstraintName` only |
-| Snapshot | Freeze all declared properties for the arm; deep-freeze `values` array/elements as today for nested snapshots |
+| Snapshot | Snapshot all declared properties using the **existing** Resource snapshot immutability rules; `enum.values` MUST receive the same nested snapshot/freeze treatment already used for nested sequence state (no new recursive deep-freeze product semantic) |
 | Equality helper | Internal `constraintsEqual`: name + kind + field + kind-specific props; `enum.values` order-sensitive |
 | Projection | No Constraint contribution; invalid constraints still fail gate |
 | Public validate helpers | Still none |
@@ -104,41 +105,61 @@ one delivery PR for tracking #63 (Accepted plan + implementation together)
 
 ## Constraint shape-classification (normative for this plan)
 
-Per candidate member: require plain object; then:
+### Cause precedence (deterministic — must be tested)
+
+Apply in order per candidate member (plain object required; else `invalid_constraint_member`):
 
 1. Own key `kind` absent and own keys exactly `{ name }` → `missing_constraint_kind` (RFC-016 retained edge).
 2. Own key `kind` present but not a string / empty string → `invalid_constraint_kind`.
 3. Own key `kind` present as non-empty string not in `ConstraintKind` → `unknown_constraint_kind`.
-4. Otherwise classify by `kind` arm key set + property validation (below). Wrong key set / extras → `invalid_constraint_member`.
+4. **Closed-member shape check (key set):**
+   - `range`: own keys must be exactly one of `{ name, kind, field, min }`, `{ name, kind, field, max }`, `{ name, kind, field, min, max }`, **or** the bounds-missing diagnostic shape `{ name, kind, field }`.
+   - `pattern`: own keys must be exactly `{ name, kind, field, pattern }`.
+   - `enum`: own keys must be exactly `{ name, kind, field, values }`.
+   - Any other key set (missing `field`, missing required arm property, extras such as `spec`, `{ name, kind }` only, `{ name, kind, min }` without `field`, etc.) → **`invalid_constraint_member`**.
+5. **Semantic declaration checks** (only after the key set is one of the shapes in step 4):
+   - `range` with keys `{ name, kind, field }` → **`invalid_range_bounds`** (neither `min` nor `max`).
+   - `range` with min/max present: non-finite or `min > max` → **`invalid_range_bounds`**.
+   - `pattern` with `pattern` present but not a non-empty string → **`invalid_pattern`**.
+   - `enum` with `values` present but empty / non-array / mixed / incompatible / duplicate / non-finite number → **`invalid_enum_values`**.
+   - `field` present but not a valid `FieldName` string → **`invalid_constraint_field`**.
+   - grammar-valid `field` not in validated `fields` → **`unresolved_constraint_field`**.
+   - kind↔`FieldType` mismatch → **`constraint_field_type_mismatch`**.
+
+**Separation rule:** Absence of a required closed-arm property is always a **shape** failure (`invalid_constraint_member`), never `invalid_pattern` / `invalid_enum_values` / `missing_constraint_field`. Semantic causes apply only when the property is present (or, for `range` bounds, when the only remaining failure is “neither `min` nor `max`” on the explicit `{ name, kind, field }` shape).
 
 ### Per-kind property causes (planning aid)
 
 | Cause | When |
 | --- | --- |
-| `missing_constraint_field` | own key `field` absent on an otherwise kind-recognized candidate where classification reaches field checks |
+| `invalid_constraint_member` | Closed-member key-set failure (including missing `field` / missing `pattern` / missing `values` / extras / bare `{ name, kind }`) |
 | `invalid_constraint_field` | `field` present but not a valid `FieldName` string |
 | `unresolved_constraint_field` | grammar-valid `field` not present in validated `fields` |
 | `constraint_field_type_mismatch` | kind targets incompatible `FieldType` |
-| `invalid_range_bounds` | neither `min` nor `max`; non-finite; or `min > max` |
-| `invalid_pattern` | missing / non-string / empty `pattern` |
-| `invalid_enum_values` | missing / non-array / empty; mixed/incompatible scalars; duplicates; non-finite numbers |
+| `invalid_range_bounds` | `{ name, kind, field }` (neither bound); non-finite bound; or `min > max` |
+| `invalid_pattern` | `pattern` **present** but not a non-empty string |
+| `invalid_enum_values` | `values` **present** but empty / non-array / non-homogeneous / incompatible / duplicates / non-finite numbers |
 
-Implementations MAY fold some missing-property cases into `invalid_constraint_member` when key-set mismatch already diagnoses them, but **must** keep unresolved field, type mismatch, and kind-specific semantic failures distinct as listed when the key set is otherwise correct.
+Do **not** introduce `missing_constraint_field` as a separate cause for absent `field` — absent `field` is `invalid_constraint_member`.
 
 **Explicit boundary mappings (must be tested):**
 
 ```text
-{ name, kind: "placeholder" }                    → unknown_constraint_kind
-{ name, kind: "range" }                          → invalid_constraint_member (or missing field/bounds)
-{ name, kind: "range", field: "total", min: 0 }  → proceed (if Field total:number exists)
-{ name, kind: "range", field: "code", min: 0 }   → constraint_field_type_mismatch (string Field)
-{ name, kind: "range", field: "total" }          → invalid_range_bounds
+{ name, kind: "placeholder" }                         → unknown_constraint_kind
+{ name, kind: "range" }                               → invalid_constraint_member
+{ name, kind: "range", min: 0 }                       → invalid_constraint_member   (no field)
+{ name, kind: "range", field: "total" }               → invalid_range_bounds
+{ name, kind: "range", field: "total", min: 0 }       → proceed (if Field total:number exists)
+{ name, kind: "range", field: "code", min: 0 }        → constraint_field_type_mismatch (string Field)
 { name, kind: "range", field: "total", min: 10, max: 1 } → invalid_range_bounds
+{ name, kind: "pattern", field: "code" }              → invalid_constraint_member
 { name, kind: "pattern", field: "code", pattern: "" } → invalid_pattern
+{ name, kind: "enum", field: "status" }               → invalid_constraint_member
+{ name, kind: "enum", field: "status", values: [] }   → invalid_enum_values
 { name, kind: "enum", field: "status", values: ["a","a"] } → invalid_enum_values
-{ name, kind: "enum", field: "status", values: ["a", 1] } → invalid_enum_values
+{ name, kind: "enum", field: "status", values: ["a", 1] }  → invalid_enum_values
 { name, kind: "range", field: "total", min: 0, spec: {} } → invalid_constraint_member
-constraints: []                                  → still valid
+constraints: []                                       → still valid
 ```
 
 ---
@@ -254,13 +275,13 @@ For each implementation task after types: failing tests → implement → green 
 1. Empty `constraints` still valid
 2. Valid `range` / `pattern` / `enum` members accepted; properties preserved in snapshot
 3. Unknown kind (e.g. `"placeholder"`) → `unknown_constraint_kind` (**breaking** vs M3.13)
-4. Bare `{ name, kind: "range" }` without required props → invalid
+4. Bare `{ name, kind: "range" }` / `{ name, kind: "pattern", field }` / `{ name, kind: "enum", field }` → `invalid_constraint_member` (shape)
 5. Extra props / `spec` → `invalid_constraint_member`
-6. Missing / invalid / unresolved `field`
+6. `{ name, kind: "range", field }` → `invalid_range_bounds`; invalid / unresolved `field` when shape otherwise closed
 7. Type mismatch: `range`→string, `pattern`→number, `enum` incompatible values
-8. `range`: neither bound; non-finite; `min > max`; min-only / max-only / both valid
-9. `pattern`: empty string invalid; opaque non-empty accepted without RegExp semantics
-10. `enum`: empty values; duplicates; mixed types; order-sensitive equality (`["a","b"]` ≠ `["b","a"]`)
+8. `range`: non-finite; `min > max`; min-only / max-only / both valid
+9. `pattern`: `pattern: ""` → `invalid_pattern`; opaque non-empty accepted without RegExp semantics
+10. `enum`: `values: []` / duplicates / mixed types → `invalid_enum_values`; order-sensitive equality (`["a","b"]` ≠ `["b","a"]`)
 11. Multiple constraints on same Field (incl. same kind) valid when names differ
 12. Duplicate ConstraintName still invalid
 13. Independent namespaces retained
