@@ -582,12 +582,12 @@ Freeze widened closed members. Equality MUST include exact `optional`. Retain fr
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
+| M7 | **Approved** |
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-10-field-relation-optionality` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/43 |
-| Status | **Ready for M7** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -609,4 +609,6 @@ Freeze widened closed members. Equality MUST include exact `optional`. Retain fr
 
 ### Next Gate
 
-**M7 Code Review** on PR #43
+**None — slice complete**
+
+**M7 Approved** (2026-08-08). Faithful RFC-013 / plan realization. Closed Field `{ name, type, optional }` and Relation `{ name, target, multiplicity, optional }`; missing vs invalid optional causes; own-property + order-independent key sets; validate-before-snapshot; multiplicity×optional orthogonality; no projection contribution; no public optional validate helpers. CI green on #43.
