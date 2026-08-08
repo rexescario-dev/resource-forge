@@ -1,9 +1,9 @@
 # M3.3 Annotations — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (M5 Returned for Revision once; revised for re-review). After **Accepted**, use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-006. Reuse M2 metadata key/value validators and M3.1/M3.2 Resource / projection surfaces. Do **not** implement annotation vocabulary, reserved annotation catalogs, schema members, or cross-source merge/precedence.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-006. Reuse M2 metadata key/value validators and M3.1/M3.2 Resource / projection surfaces. Do **not** implement annotation vocabulary, reserved annotation catalogs, schema members, or cross-source merge/precedence.
 
-**Status:** Draft  
-**M5:** Returned for Revision (2026-08-08) — blockers below addressed in this revision; awaiting re-review Accept  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; prior return addressed; wording refinements on validate vs snapshot and empty `createResource` applied  
 **Tracking:** [#10](https://github.com/rexescario-dev/resource-forge/issues/10)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted) — M3.3+ was blocked on RFC-006  
 **Source RFC:** RFC-006 Annotations (**Accepted**) — fills RFC-005 deferred annotations slot  
@@ -75,8 +75,8 @@ These freeze the M3.3 implementation surface. They MUST NOT invent product seman
 | `Annotations` | type | Implementation representation: `ReadonlyArray<MetadataEntry>` (unordered semantically) |
 | `emptyAnnotations` | const | Canonical empty annotations snapshot |
 | `Resource` | type | `annotations: Annotations` (no `metadata` property) |
-| `validateResource` | function | Validates identity, empty schema collections, and annotation container **without** establishing snapshot-by-value from mutable caller aliases |
-| `createResource` | function | Constructs minimal Resource with **empty** snapshotted annotations |
+| `validateResource` | function | Validates identity, empty schema collections, and annotation container. `Resource.annotations` is an already-snapshotted `Annotations`; `validateResource` validates that authoritative snapshot and does not establish snapshot-by-value from caller-owned mutable aliases. |
+| `createResource` | function | Constructs minimal Resource with the canonical `emptyAnnotations` snapshot; it does not construct a mutable intermediate annotation container |
 | `projectResourceMetadata` | function | Projects identity + direct annotation entries |
 | `ResourceValidationError` | type | Includes annotation failure detail (see below) |
 | `ResourceProjectionError` | type | Unchanged codes; annotation failures surface as `invalid_resource` |
@@ -270,14 +270,14 @@ For each task: write failing tests → implement → green → commit.
 **Files:**
 - Create/implement: `packages/core/src/resource/annotations.ts` (**internal** helpers)
 - Update: `empty-annotations.ts` → empty snapshotted array
-- Update: `create.ts` — empty path uses snapshot construction boundary
+- Update: `create.ts` — `createResource` uses the canonical `emptyAnnotations` snapshot; it does not construct a mutable intermediate annotation container
 - Add: internal/test-only non-empty Resource fixture seam
-- Wire: `validate.ts` to **validate** annotation rules (no silent normalize-from-alias as the construction path)
+- Wire: `validate.ts` to **validate** the Resource’s already-snapshotted annotations (no silent normalize-from-alias as the construction path)
 - Update: existing tests that assumed `readonlyTag`
 
 - [ ] **Step 1: Internal snapshot helper** — deep snapshot covering entry/key containers and nested `JsonValue` graph; empty + non-empty
 - [ ] **Step 2: Internal non-empty fixture seam** — constructs Resource with snapshotted annotations; not barrel-exported
-- [ ] **Step 3: `validateResource` integrates annotation validity** using the three `AnnotationValidationError` causes; reuse `validateMetadataKey` (`rf` → framework kind)
+- [ ] **Step 3: `validateResource` integrates annotation validity** using the three `AnnotationValidationError` causes; reuse `validateMetadataKey` (`rf` → framework kind); validates authoritative snapshots only
 - [ ] **Step 4: Green construction / snapshot-by-value / validate tests**
 - [ ] **Step 5: Commit** `feat(core): Resource annotation snapshots and validation (RFC-006)`
 
@@ -346,4 +346,4 @@ For each task: write failing tests → implement → green → commit.
 
 ## Gate
 
-**Status remains Draft** until M5 Plan Review Accepts. Implementation (M6) is blocked until then.
+**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #10. Do not invent vocabulary, cross-source merge, or a public annotation builder.
