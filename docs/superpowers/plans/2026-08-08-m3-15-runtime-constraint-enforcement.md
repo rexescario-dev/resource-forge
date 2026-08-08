@@ -365,7 +365,7 @@ For each implementation task: failing tests for that slice → implement that sl
 | M8 | **N/A** |
 | M9 | **Complete** |
 | Branch | `feat/m3-15-runtime-constraint-enforcement` |
-| PR | TBD |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/68 |
 | Status | **Ready for merge** |
 
 ### Shipped
