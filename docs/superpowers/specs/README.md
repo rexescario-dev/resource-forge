@@ -14,3 +14,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-005 — Resource model](2026-08-07-rfc-005-resource-model-design.md) | Accepted |
 | [RFC-006 — Annotations](2026-08-08-rfc-006-annotations-design.md) | Accepted |
 | [RFC-007 — Resource Fields](2026-08-08-rfc-007-resource-fields-design.md) | Accepted |
+| [RFC-008 — Resource Relations](2026-08-08-rfc-008-resource-relations-design.md) | Accepted |
