@@ -80,9 +80,10 @@ describe('M3.4 / M3.6 public exports', () => {
   });
 });
 
-describe('M3.5 public exports', () => {
-  it('does not export validateRelations or internal relation helpers', () => {
+describe('M3.5 / M3.7 public exports', () => {
+  it('does not export validateRelations, validateRelationTarget, or internal helpers', () => {
     expect('validateRelations' in core).toBe(false);
+    expect('validateRelationTarget' in core).toBe(false);
     expect('validateRelationName' in core).toBe(false);
     expect('snapshotRelations' in core).toBe(false);
     expect('relationsEqual' in core).toBe(false);

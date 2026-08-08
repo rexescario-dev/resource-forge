@@ -201,8 +201,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author' },
-      { name: 'lineItems' },
+      { name: 'author', target: { namespace: 'crm', name: 'User' } },
+      { name: 'lineItems', target: { namespace: 'crm', name: 'LineItem' } },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -233,7 +233,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithRelationsForTests(
       identity.value,
-      [{ name: 'author' }],
+      [{ name: 'author', target: { namespace: 'crm', name: 'User' } }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -254,7 +254,10 @@ describe('projectResourceMetadata', () => {
       identity: { namespace: 'crm', name: 'Order' },
       schema: {
         fields: [],
-        relations: [{ name: 'author' }, { name: 'author' }],
+        relations: [
+          { name: 'author', target: { namespace: 'crm', name: 'User' } },
+          { name: 'author', target: { namespace: 'crm', name: 'Account' } },
+        ],
         operations: [],
       },
       annotations: emptyAnnotations,
@@ -264,5 +267,20 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.code).toBe('invalid_resource');
     if (projected.error.code !== 'invalid_resource') return;
     expect(projected.error.cause.code).toBe('invalid_schema');
+  });
+
+  it('fails for name-only relations as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Order' },
+      schema: {
+        fields: [],
+        relations: [{ name: 'author' } as never],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
   });
 });

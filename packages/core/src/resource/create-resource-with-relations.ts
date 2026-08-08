@@ -15,10 +15,11 @@ import { validateResource } from './validate.js';
  * Internal / test-only seam: validate candidates, then snapshot, then Resource gate.
  * NOT exported from package barrels.
  *
- * Validates candidate relation (and optional field) member shape, names, and
- * uniqueness before constructing the snapshot; successful construction freezes
- * ordered Relations `{ name }` and Fields `{ name, type }` and then passes the
- * Resource through `validateResource`.
+ * Validates candidate relation (and optional field) member shape, names,
+ * uniqueness, and declarative targets (RFC-001 user context) before constructing
+ * the snapshot; successful construction freezes ordered Relations
+ * `{ name, target }` and Fields `{ name, type }` and then passes the Resource
+ * through `validateResource`.
  */
 export function createResourceWithRelationsForTests(
   identity: ResourceIdentity,

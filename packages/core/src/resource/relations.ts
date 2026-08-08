@@ -1,3 +1,5 @@
+import { resourceIdentitiesEqual } from '../identity/equal.js';
+import { validateResourceIdentity } from '../identity/validate.js';
 import { err, ok, type Result } from '../result.js';
 import type {
   Relation,
@@ -24,9 +26,25 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function hasExactOwnKeys(
+  value: Record<string, unknown>,
+  expected: readonly string[],
+): boolean {
+  const keys = Object.keys(value);
+  if (keys.length !== expected.length) {
+    return false;
+  }
+  return expected.every((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
 /**
- * Internal: validate raw candidate members (closed shape, names, uniqueness)
- * before any `{ name }`-only materialization. MUST NOT strip unknown properties.
+ * Internal: validate raw candidate members (closed shape, names, uniqueness,
+ * declarative target) before any `{ name, target }` materialization.
+ * MUST NOT strip unknown properties or invent a default target.
+ *
+ * Target structural keys `{ namespace, name }` are the closed Relation boundary;
+ * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
+ * for identity semantics (no second identity validity definition).
  */
 export function checkRelations(
   candidate: readonly unknown[],
@@ -44,8 +62,7 @@ export function checkRelations(
       return err({ code: 'invalid_relation_member', index });
     }
 
-    const keys = Object.keys(member);
-    if (keys.length !== 1 || keys[0] !== 'name') {
+    if (!hasExactOwnKeys(member, ['name', 'target'])) {
       return err({ code: 'invalid_relation_member', index });
     }
 
@@ -74,8 +91,32 @@ export function checkRelations(
         name: nameResult.value,
       });
     }
+
+    const rawTarget = member.target;
+    if (!isPlainObject(rawTarget) || !hasExactOwnKeys(rawTarget, ['namespace', 'name'])) {
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    const namespace = rawTarget.namespace;
+    const targetName = rawTarget.name;
+    if (typeof namespace !== 'string' || typeof targetName !== 'string') {
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    const targetResult = validateResourceIdentity(
+      { namespace, name: targetName },
+      { kind: 'user' },
+    );
+    if (!targetResult.ok) {
+      return err({
+        code: 'invalid_relation_target',
+        index,
+        cause: targetResult.error,
+      });
+    }
+
     seen.add(nameResult.value);
-    accepted.push({ name: nameResult.value });
+    accepted.push({ name: nameResult.value, target: targetResult.value });
   }
 
   return ok(accepted);
@@ -89,7 +130,15 @@ export function snapshotRelations(
   relations: readonly Relation[],
 ): ReadonlyArray<Relation> {
   return Object.freeze(
-    relations.map((relation) => Object.freeze({ name: relation.name })),
+    relations.map((relation) =>
+      Object.freeze({
+        name: relation.name,
+        target: Object.freeze({
+          namespace: relation.target.namespace,
+          name: relation.target.name,
+        }),
+      }),
+    ),
   );
 }
 
@@ -103,6 +152,9 @@ export function relationsEqual(
   }
   for (let i = 0; i < left.length; i += 1) {
     if (left[i]!.name !== right[i]!.name) {
+      return false;
+    }
+    if (!resourceIdentitiesEqual(left[i]!.target, right[i]!.target)) {
       return false;
     }
   }
