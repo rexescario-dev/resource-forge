@@ -24,3 +24,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-015 — Relation Nullability](2026-08-08-rfc-015-relation-nullability-design.md) | Accepted — [#51](https://github.com/rexescario-dev/resource-forge/issues/51) |
 | [RFC-016 — Constraints](2026-08-08-rfc-016-constraints-design.md) | Accepted — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
 | [RFC-017 — Concrete Constraint Kinds](2026-08-08-rfc-017-concrete-constraint-kinds-design.md) | Accepted — [#61](https://github.com/rexescario-dev/resource-forge/issues/61) |
+| [RFC-018 — Runtime Constraint Enforcement](2026-08-08-rfc-018-runtime-constraint-enforcement-design.md) | Accepted — [#66](https://github.com/rexescario-dev/resource-forge/issues/66) |

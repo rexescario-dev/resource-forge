@@ -64,11 +64,13 @@ export type {
   AnnotationValidationError,
   Annotations,
   Constraint,
+  ConstraintEnforcementError,
   ConstraintKind,
   ConstraintName,
   ConstraintValidationError,
   Field,
   FieldName,
+  FieldRuntimeValue,
   FieldType,
   FieldValidationError,
   Operation,
@@ -84,6 +86,7 @@ export type {
   ResourceValidationError,
 } from './resource/index.js';
 export {
+  checkConstraintValues,
   createEmptyResourceSchema,
   createResource,
   emptyAnnotations,

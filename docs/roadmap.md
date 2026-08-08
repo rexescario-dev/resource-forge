@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1–M3.14 ✅; further slices deferred until runtime constraint enforcement / operation kind-signature-execution / direction-join / vocabulary RFCs |
+| M3 | Resource model | In progress — M3.1–M3.15 ✅; further slices deferred until uniqueness-cross-member / operation kind-signature-execution / direction-join / vocabulary RFCs |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -41,7 +41,8 @@ M3 gate RFCs:
 | RFC-015 | Relation Nullability (required association-reference `nullable: boolean` on Relation) | Accepted — [#51](https://github.com/rexescario-dev/resource-forge/issues/51) |
 | RFC-016 | Constraints (required ordered `constraints` + closed `{ name, kind }` framework) | Accepted — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
 | RFC-017 | Concrete Constraint Kinds (closed `range` \| `pattern` \| `enum`; Field-targeted; declaration-time only) | Accepted — [#61](https://github.com/rexescario-dev/resource-forge/issues/61) |
-| Later | Runtime constraint enforcement; uniqueness / cross-member; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
+| RFC-018 | Runtime Constraint Enforcement (field-value map; inclusive `range`; ECMAScript `pattern`; `enum` membership; optional/nullable gates) | Accepted — [#66](https://github.com/rexescario-dev/resource-forge/issues/66) |
+| Later | Uniqueness / cross-member; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
@@ -124,6 +125,7 @@ Suggested implementation slices (see M3 implementation plan):
 - **M3.12** — Relation Nullability per RFC-015 (required association-reference `nullable: boolean` on Relation) ✅ — [#53](https://github.com/rexescario-dev/resource-forge/issues/53)
 - **M3.13** — Constraints framework per RFC-016 (required ordered `constraints` + closed `{ name, kind }`) ✅ — [#58](https://github.com/rexescario-dev/resource-forge/issues/58)
 - **M3.14** — Concrete Constraint Kinds per RFC-017 (closed `range` \| `pattern` \| `enum`; Field-targeted; declaration-time only) ✅ — [#63](https://github.com/rexescario-dev/resource-forge/issues/63)
+- **M3.15** — Runtime Constraint Enforcement per RFC-018 (field-value map; inclusive `range`; ECMAScript `pattern`; `enum` membership; optional/nullable gates) ✅ — [#67](https://github.com/rexescario-dev/resource-forge/issues/67)
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 

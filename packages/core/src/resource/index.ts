@@ -2,11 +2,13 @@ export type {
   AnnotationValidationError,
   Annotations,
   Constraint,
+  ConstraintEnforcementError,
   ConstraintKind,
   ConstraintName,
   ConstraintValidationError,
   Field,
   FieldName,
+  FieldRuntimeValue,
   FieldType,
   FieldValidationError,
   Operation,
@@ -24,5 +26,6 @@ export type {
 export { emptyAnnotations } from './empty-annotations.js';
 export { createEmptyResourceSchema } from './schema.js';
 export { createResource } from './create.js';
+export { checkConstraintValues } from './constraint-values.js';
 export { projectResourceMetadata } from './project.js';
 export { validateResource } from './validate.js';
