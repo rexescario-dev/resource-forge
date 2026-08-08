@@ -64,6 +64,7 @@ export type {
   EmptyAnnotations,
   EmptySchemaCollection,
   Resource,
+  ResourceProjectionError,
   ResourceSchema,
   ResourceValidationError,
 } from './resource/index.js';
@@ -71,5 +72,6 @@ export {
   createEmptyResourceSchema,
   createResource,
   emptyAnnotations,
+  projectResourceMetadata,
   validateResource,
 } from './resource/index.js';
