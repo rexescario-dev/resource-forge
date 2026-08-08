@@ -17,3 +17,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-008 — Resource Relations](2026-08-08-rfc-008-resource-relations-design.md) | Accepted |
 | [RFC-009 — Resource Field Types](2026-08-08-rfc-009-resource-field-types-design.md) | Accepted |
 | [RFC-010 — Relation Association Semantics](2026-08-08-rfc-010-relation-association-semantics-design.md) | Accepted |
+| [RFC-011 — Relation Multiplicity](2026-08-08-rfc-011-relation-multiplicity-design.md) | Accepted — [#31](https://github.com/rexescario-dev/resource-forge/issues/31) |
