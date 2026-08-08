@@ -1,7 +1,8 @@
 # RFC-015: Relation Nullability
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; required association-reference `nullable: boolean` on Relation only; closed `{ name, target, multiplicity, optional, nullable }`; exact boolean / no default / no dual-shape; association-reference nullability declaration constraints only; orthogonal to RFC-013 `optional` and RFC-011 `multiplicity`; `many + nullable` valid without collection/runtime/wire semantics; Fields remain RFC-014; runtime/wire/persistence/direction deferred; partial supersession of RFC-013 Relation floor only  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#51](https://github.com/rexescario-dev/resource-forge/issues/51)  
 **Depends on:** RFC-005 (Resource Model), RFC-006 (Annotations — projection boundary), RFC-008 (Resource Relations — collection semantics retained), RFC-010 (Relation Association Semantics — `target` retained), RFC-011 (Relation Multiplicity — `multiplicity` retained and orthogonal), RFC-012 (Resource Operations — unchanged), RFC-013 (Field/Relation Optionality — `optional` retained; Relation shape partially superseded), RFC-014 (Field Nullability — Field floor retained unchanged)  
@@ -46,7 +47,7 @@ The widened Relation floor is normative only **after this RFC is Accepted and th
 3. Require exact boolean membership for `nullable`: only `true` / `false`; no coerce, normalize, string/number/`null` stand-ins, or omit-as-default.
 4. Lock association-reference nullability semantics as declaration constraints only: `nullable: true` → association reference may be null; `nullable: false` → association reference must be non-null.
 5. Keep `nullable` fully orthogonal to RFC-013 `optional` and RFC-011 `multiplicity` (all `optional` × `multiplicity` × `nullable` combinations valid); none implies another. Accept `many + nullable` as a valid declaration **without** defining its runtime/wire representation or null-element semantics.
-6. Redefine Relation value equality to include `nullable` (name + target + multiplicity + optional + nullable). Collection uniqueness remains **by name only** (RFC-008).
+6. Redefine Relation value equality to include `nullable` (name + target + multiplicity + optional + nullable). This supersedes the RFC-013 Relation equality definition **only after Accept + implementation of this floor** (see §3); until then RFC-013 Relation equality remains authoritative. Collection uniqueness remains **by name only** (RFC-008).
 7. Place nullability/shape validity in Resource validity via schema (`checkRelations`); validate-before-snapshot; no silent repair; **Missing `nullable`** and **present-but-invalid `nullable`** are distinct conceptual validation causes; neither is repaired or defaulted.
 8. Introduce a **breaking contract change once Accepted and implemented** relative to the M3.11 Relation declaration shape; no dual-shape compatibility period.
 9. Leave Fields unchanged at RFC-014; leave RFC-013 `optional` semantics, RFC-011 multiplicity meanings, RFC-010 `target`, RFC-012 Operations, and Field/Relation projection non-participation unchanged; supersede only the RFC-013 Relation member floor and related Relation equality / closed-member text as specified in §3.
@@ -69,7 +70,7 @@ This RFC does not define:
 12. Field / Relation → `ResourceMetadata` projection or any change to RFC-006 / RFC-007 / RFC-008 projection participation rules
 13. Dual-shape transitional validity (omit-`nullable` still accepted)
 14. Concrete TypeScript APIs, modules, package layout, or error code enums (conceptual separation only; extra members may be diagnosed as Invalid relation member **or equivalent structural cause**)
-15. Resource-wide equality, builders, mutation APIs, serialization, adapters, or reverse projection
+15. Resource-wide equality, builders, mutation APIs, serialization, host adapters, or reverse projection
 
 ## 2. Terminology
 
@@ -362,7 +363,7 @@ RFC-013             optional: boolean on Field and Relation
         │
 RFC-014             nullable: boolean on Field (value nullability)
         │
-RFC-015             nullable: boolean on Relation   ← this RFC (Draft)
+RFC-015             nullable: boolean on Relation   ← this RFC (Accepted)
                     (association-reference nullability)
         │
 Later               constraints
