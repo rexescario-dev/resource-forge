@@ -1,6 +1,6 @@
 # Code Review Prompt
 
-Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M7** · Conventions: [prompt-library.md](../conventions/prompt-library.md)
+Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M7** · Reporting: [reporting-conventions.md](../conventions/reporting-conventions.md)
 
 ## Purpose
 
@@ -43,8 +43,8 @@ Authoritative inputs (same dual model as M6):
 10. **No silent rewrite / no fix-during-review.** Reviewers MUST NOT modify implementation code as part of review. Any required implementation changes belong in M6 after a Return decision. Do not push “fixup commits” that redefine the change into acceptance without an explicit Return.
 11. **No speculative redesign.** Do not Reject solely for an alternative design that also satisfies the Accepted spec and plan. Optional non-blocking observations MUST NOT affect the merge decision.
 12. **Decide explicitly.** Outcome MUST be one of:
- - **Approved for merge** — No merge blockers; record brief rationale. Merging/approval actions follow human/project norms (this prompt does not grant merge authority by itself).
- - **Returned for Revision** — Every required change MUST identify the violated criterion (plan conformance, spec conformance, verification, scope, correctness, regression risk, etc.). Hand back to M6 (or M4/M2 if plan/spec gaps).
+    - **Approved for merge** — No merge blockers; record brief rationale. Merging/approval actions follow human/project norms (this prompt does not grant merge authority by itself).
+    - **Returned for Revision** — Every required change MUST identify the violated criterion (plan conformance, spec conformance, verification, scope, correctness, regression risk, etc.). Hand back to M6 (or M4/M2 if plan/spec gaps).
 13. **Stop.** Do not start broad refactoring (M8) or documentation campaigns (M9) as part of “review.” Optional follow-on M8/M9 happens after approval when appropriate.
 
 ### Review checklist *(non-exhaustive)*
@@ -115,8 +115,8 @@ Review summary: <brief>
 
 Blocking findings:
 1. Criterion: <e.g. plan conformance | verification | scope | correctness>
- Issue: <what is wrong>
- Required change: <what M6 (or M4/M2) must do>
+   Issue: <what is wrong>
+   Required change: <what M6 (or M4/M2) must do>
 
 2. …
 
@@ -126,9 +126,11 @@ Non-blocking observations (optional):
 Gate: Return to M6 (or earlier). Do not merge. Reviewer MUST NOT modify implementation code.
 ```
 
+After recording the outcome template, emit a [Slice Completion Report](../conventions/reporting-conventions.md). On Approve, Status **Ready for merge** (or **Ready for M8** if refactoring is next); on Return, Status reflects return to M6 and Next Gate **M6**.
+
 ## Gate
 
-**Implementation approved for merge (or returned for revision)** — Explicit Approve or Return exists. On Approve, the change set may merge under project norms. On Return, do not merge. The Accepted specification remains authoritative for product semantics; the Accepted plan remains authoritative for authorized scope.
+**Implementation approved for merge (or returned for revision)** — Explicit Approve or Return exists, with a Slice Completion Report (§2.11). On Approve, the change set may merge under project norms. On Return, do not merge. The Accepted specification remains authoritative for product semantics; the Accepted plan remains authoritative for authorized scope.
 
 ## Non-goals
 

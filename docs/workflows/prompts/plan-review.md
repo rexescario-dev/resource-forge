@@ -1,6 +1,6 @@
 # Plan Review Prompt
 
-Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M5** · Conventions: [prompt-library.md](../conventions/prompt-library.md)
+Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M5** · Reporting: [reporting-conventions.md](../conventions/reporting-conventions.md)
 
 ## Purpose
 
@@ -36,8 +36,8 @@ Review a Draft implementation plan produced by M4 and decide **Accepted** or **R
 10. **No speculative replan.** Do not reject a plan merely because another sequencing could also work. Return only when the proposed plan violates executability, the Accepted specification, or review criteria.
 11. **Evaluate risks narrowly.** Risks may cover execution, dependency, or scheduling concerns only. Risks MUST NOT be used to reopen Accepted design decisions.
 12. **Decide explicitly.** Outcome MUST be one of:
- - **Accepted** — No plan blockers; set plan Status to **Accepted** (or instruct the author to); record brief rationale. **M6 may begin only after this.**
- - **Returned for Revision** — Keep Status **Draft**. Every required change MUST identify the violated review criterion (executability, sequencing, traceability, TDD, hidden redesign, coverage, etc.). Do not silently rewrite the plan into acceptance.
+    - **Accepted** — No plan blockers; set plan Status to **Accepted** (or instruct the author to); record brief rationale. **M6 may begin only after this.**
+    - **Returned for Revision** — Keep Status **Draft**. Every required change MUST identify the violated review criterion (executability, sequencing, traceability, TDD, hidden redesign, coverage, etc.). Do not silently rewrite the plan into acceptance.
 13. **Stop.** Do not implement. Hand Accepted plans to **Implementation (M6)**; hand returns back to **Implementation Planning (M4)** (or to M2/M3 if design gaps). Recording Accept in the plan (and issue) does **not** require a separate merge PR—continue on the issue’s single PR after Accept (process spec §2.8).
 
 ### Review checklist *(non-exhaustive)*
@@ -91,12 +91,14 @@ Review summary: <brief>
 
 Blocking findings:
 1. Criterion: <e.g. sequencing | traceability | coverage | hidden redesign | TDD>
- Issue: <what is wrong>
- Required change: <what M4 (or M2/M3) must do>
+   Issue: <what is wrong>
+   Required change: <what M4 (or M2/M3) must do>
 
 2. …
 Gate: Return to M4 (or M2/M3 if design gap). M6 MUST NOT begin.
 ```
+
+On Accept, SHOULD emit a [Slice Completion Report](../conventions/reporting-conventions.md) with Status **Ready for M6** (Validation may be mostly N/A).
 
 ## Gate
 

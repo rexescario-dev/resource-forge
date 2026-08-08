@@ -125,6 +125,23 @@ Workflow validation (M10) MUST verify at least:
 5. No orphan workflow assets exist outside the approved layout and naming.
 6. A developer can execute the full workflow without inventing additional instructions.
 
+### 2.11 Slice completion reporting *(normative)*
+
+At the completion of **M6, M7, M8, M9**, and at **final slice acceptance** (merge/closeout summary), agents MUST produce a concise **Slice Completion Report** using the standard tabular format.
+
+The report MUST include:
+
+1. An identity / **gate** table (slice, tracking, per-gate results, branch, PR, overall Status)
+2. **Shipped** (delivered intent)
+3. **Validation** (explicit mechanical checks — not prose-only “tests green”)
+4. **Next Gate** (exactly one next gate, or none if the slice is complete)
+
+Vocabulary: use **Gate**, not Phase. Split M4 and M5 when both apply. Status and Next Gate describe overall position; they MUST NOT replace stage Accept/Return/Approved outcome templates.
+
+Authoritative template: [reporting-conventions.md](../conventions/reporting-conventions.md).
+
+M5 Plan Review SHOULD emit the same report when Accepting a plan (Status: Ready for M6).
+
 ---
 
 ## 3. Prompt / asset rules *(normative)*
@@ -140,6 +157,7 @@ All workflow assets MUST:
 7. Live under the installed workflow documentation tree (conventionally `docs/workflows/`).
 8. Treat **approved specifications and approved implementation plans as authoritative inputs** and MUST NOT redefine accepted decisions.
 9. **SHOULD** reference governing specifications rather than restating them.
+10. **MUST** require a [Slice Completion Report](../conventions/reporting-conventions.md) at M6–M9 handoffs and final acceptance summaries (§2.11).
 
 Workflow prompts are invoked **alongside** agent skills; they do not replace those skills.
 

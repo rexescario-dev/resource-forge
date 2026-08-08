@@ -9,6 +9,7 @@ This directory holds a **published** engineering workflow for AI agents and huma
 1. Read the [process specification](specs/agent-workflow-design.md) for stages, gates, and invariants.
 2. Follow [prompt-library conventions](conventions/prompt-library.md) when invoking or extending prompts.
 3. Open the stage prompt that matches the work you are doing (table below).
+4. At M6–M9 handoffs (and final acceptance), emit a [Slice Completion Report](conventions/reporting-conventions.md).
 
 ## Stage → prompt map
 
@@ -38,4 +39,4 @@ docs/workflows/
     …
 ```
 
-Operational installer state (if present) lives in repository-root `workflow.yaml`, outside this tree.
+Operational installer state (if present) lives in repository-root `workflow.yaml`, outside this tree. When `workflow.providers` is set, agents MUST honor those capability providers (see [prompt-library conventions](conventions/prompt-library.md) §12).

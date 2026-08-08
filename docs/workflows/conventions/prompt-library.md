@@ -17,6 +17,8 @@ These conventions apply to workflow assets under `docs/workflows/` (README, spec
 9. **Scope discipline.** Produce only the work owned by the active stage/issue. Do not invent sibling prompts for future stages without an authorized change.
 10. **Traceability.** Downstream assets SHOULD reference the Accepted artifact(s) from which they were produced.
 11. **Delivery packaging.** Prefer one pull request per tracking issue for a delivery slice, including Accepted plan and implementation when both apply.
+12. **Capability providers.** When the workflow needs an issue tracker, source control, or pull requests, read repository-root `workflow.yaml` → `workflow.providers` and use the configured provider. Tool/MCP availability is never provider policy. If the configured provider is missing or unavailable, stop or degrade explicitly — do not silently fall back to another integration.
+13. **Slice Completion Report.** At M6–M9 handoffs and final acceptance summaries, produce a [Slice Completion Report](reporting-conventions.md) (gate table, Shipped, Validation, Next Gate). Use **Gate**, not Phase. Do not replace the Validation table with prose-only “tests green.”
 
 ## Suggested prompt skeleton
 
