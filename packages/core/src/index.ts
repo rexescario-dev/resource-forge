@@ -63,6 +63,9 @@ export { composeResourceMetadata } from './extension/index.js';
 export type {
   AnnotationValidationError,
   Annotations,
+  Constraint,
+  ConstraintName,
+  ConstraintValidationError,
   Field,
   FieldName,
   FieldType,

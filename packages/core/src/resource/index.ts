@@ -1,6 +1,9 @@
 export type {
   AnnotationValidationError,
   Annotations,
+  Constraint,
+  ConstraintName,
+  ConstraintValidationError,
   Field,
   FieldName,
   FieldType,

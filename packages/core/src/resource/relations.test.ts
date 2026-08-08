@@ -823,6 +823,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         fields: [],
         relations: [],
         operations: [{ name: 'create' }],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -844,6 +845,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         fields: [],
         relations: [],
         operations: [{ name: 'create', kind: 'command' } as never],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });

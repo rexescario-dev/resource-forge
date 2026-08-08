@@ -10,6 +10,8 @@ import {
   validateResource,
 } from '../index.js';
 import type {
+  Constraint,
+  ConstraintValidationError,
   Field,
   FieldValidationError,
   Relation,
@@ -137,5 +139,22 @@ describe('M3.9 public exports', () => {
     expect('operationsEqual' in core).toBe(false);
     expect('createResourceWithOperationsForTests' in core).toBe(false);
     expect('EmptySchemaCollection' in core).toBe(false);
+  });
+});
+
+describe('M3.13 public exports', () => {
+  it('exposes Constraint contracts without exporting constraint validate helpers', () => {
+    const constraint: Constraint = { name: 'nonNegativeTotal', kind: 'placeholder' };
+    const error: ConstraintValidationError = {
+      code: 'missing_constraint_kind',
+      index: 0,
+    };
+    expect(constraint.kind).toBe('placeholder');
+    expect(error.code).toBe('missing_constraint_kind');
+    expect('validateConstraints' in core).toBe(false);
+    expect('validateConstraintName' in core).toBe(false);
+    expect('snapshotConstraints' in core).toBe(false);
+    expect('constraintsEqual' in core).toBe(false);
+    expect('createResourceWithConstraintsForTests' in core).toBe(false);
   });
 });
