@@ -44,7 +44,7 @@ Field                                      Relation
 6. Redefine equality to include `optional` (Field: name + type + optional; Relation: name + target + multiplicity + optional). Collection uniqueness remains **by name only** (RFC-007 / RFC-008).
 7. Place optionality/shape validity in Resource validity via schema (`checkFields` / `checkRelations`); validate-before-snapshot; no silent repair; **Missing `optional`** and **present-but-invalid `optional`** are distinct conceptual validation causes; neither is repaired or defaulted.
 8. Introduce a **breaking contract change** relative to the M3.6 / M3.8 declaration shapes; no dual-shape compatibility period.
-9. Leave RFC-007 / RFC-008 collection rules, RFC-009 `type`, RFC-010 / RFC-001 `target`, RFC-011 `multiplicity` meanings, RFC-012 Operations, and Field/Relation projection non-participation unchanged except the member-floor supersessions in §3.
+9. Leave RFC-007 / RFC-008 collection rules, RFC-009 `type`, RFC-010 / RFC-001 `target`, RFC-011 `multiplicity` meanings, RFC-012 Operations, and Field/Relation projection non-participation unchanged; only the Field/Relation member floors and related equality/closed-member text are superseded as specified in §3.
 
 ### 1.2 Non-goals
 
@@ -127,6 +127,8 @@ optional ::= true | false
 - **No normalization or defaults:** omitting `optional` is invalid; implementations MUST NOT invent `false` or `true`.
 - **Not nullability:** `optional` does not mean the value may be `null`.
 - **Not multiplicity:** `optional` MUST NOT affect or reinterpret `multiplicity`.
+
+In this RFC, “present” and “absent” refer only to the **Field/Relation declaration within the Resource schema**; they do not refer to instance, payload, or persisted data.
 
 ### 4.1 Explicit non-meanings
 
@@ -260,7 +262,7 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 
 | Cause | When |
 | --- | --- |
-| Invalid field member | Field is not structurally an object with the required three members, or contains extra members, or is otherwise malformed in a way not attributable to name / type / optional-specific causes |
+| Invalid field member | Field is not structurally an object, or is malformed in a way not attributable to a name / type / optional-specific cause |
 | Invalid field name | `name` fails `FieldName` grammar (RFC-007) |
 | Duplicate field name | repeated `FieldName` in the sequence (RFC-007) |
 | Missing field type / Invalid field type | per RFC-009 |
@@ -271,7 +273,7 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 
 | Cause | When |
 | --- | --- |
-| Invalid relation member | Relation is not structurally an object with the required four members, or contains extra members, or is otherwise malformed in a way not attributable to name / target / multiplicity / optional-specific causes |
+| Invalid relation member | Relation is not structurally an object, or is malformed in a way not attributable to a name / target / multiplicity / optional-specific cause |
 | Invalid relation name | `name` fails `RelationName` grammar (RFC-008) |
 | Duplicate relation name | repeated `RelationName` in the sequence (RFC-008) |
 | Invalid relation target | per RFC-010 / RFC-001 `user` context |
@@ -281,7 +283,8 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 
 ```text
 missing optional              → Missing field/relation optional
-present but invalid value     → Invalid field/relation optional
+optional exists but wrong type → Invalid field/relation optional
+other structural failure      → Invalid field/relation member
 ```
 
 **Missing `optional`** and **present-but-invalid `optional`** are distinct conceptual validation causes; neither is repaired or defaulted.
