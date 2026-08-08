@@ -540,7 +540,7 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M9 | N/A |
 | Branch | `feat/m3-13-constraints` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/59 |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -563,6 +563,6 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ### Next Gate
 
-**Merge** (then closeout as Slice complete)
+**None — slice complete**
 
-**M7 Approved** (2026-08-08). Faithful RFC-016 / plan realization. Required ordered `constraints`; closed `{ name, kind }`; open non-empty `kind`; missing vs invalid collection/member causes; shape-classification boundaries preserved; validate-before-snapshot; independent namespaces; no projection contribution; no public constraint validate helpers; Field/Relation/Operation floors unchanged. CI green on #59.
+**M7 Approved** (2026-08-08). Faithful RFC-016 / plan realization. Required ordered `constraints`; closed `{ name, kind }`; open non-empty `kind`; missing vs invalid collection/member causes; shape-classification boundaries preserved; validate-before-snapshot; independent namespaces; no projection contribution; no public constraint validate helpers; Field/Relation/Operation floors unchanged. CI green on #59; merge completed as `main` @ `292f28a` (#59).
