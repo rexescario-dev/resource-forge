@@ -1,6 +1,6 @@
 # Documentation Execution Prompt
 
-Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M9** · Conventions: [prompt-library.md](../conventions/prompt-library.md)
+Governing contract: [Process Specification: Standardized Agent Workflows](../specs/agent-workflow-design.md) · Stage **M9** · Reporting: [reporting-conventions.md](../conventions/reporting-conventions.md)
 
 ## Purpose
 
@@ -33,28 +33,28 @@ Also required:
 1. **Identify what shipped.** Cite Accepted specification, Accepted plan (if any), PR/merge refs, and M7/M8 outcomes. Document only what is true.
 2. **Declare documentation scope.** List exact paths that may be edited. Do not wander the entire markdown tree.
 3. **Inventory needed updates within scope.** Typical targets (only if in scope and used by the project):
- - Spec/plan **Status** fields and tracking links
- - `roadmap.md` / current-focus streams
- - Specs/plans indexes or READMEs
- - Changelog or release notes **only if those artifacts exist as project conventions**
- - Architecture/process diagrams referenced by the work
- - Glossary / terminology consistency with Accepted specs
- - Cross-links between related RFCs, plans, and prompts
+   - Spec/plan **Status** fields and tracking links
+   - `roadmap.md` / current-focus streams
+   - Specs/plans indexes or READMEs
+   - Changelog or release notes **only if those artifacts exist as project conventions**
+   - Architecture/process diagrams referenced by the work
+   - Glossary / terminology consistency with Accepted specs
+   - Cross-links between related RFCs, plans, and prompts
 4. **Separate editorial vs content updates.** Track them distinctly:
- - **Editorial:** spelling, formatting, broken links, heading hierarchy
- - **Content:** status, roadmap, architecture references, indexes, changelog entries
+   - **Editorial:** spelling, formatting, broken links, heading hierarchy
+   - **Content:** status, roadmap, architecture references, indexes, changelog entries
 5. **Require traceability.** For each documentation change, state which implementation or process artifact caused it (spec Status, plan completion, merge, new prompt file, etc.).
 6. **Describe shipped or approved reality.** Avoid future-tense “will support…” claims unless documenting planned work in roadmap (or equivalent planning) artifacts.
 7. **Update for consistency, not redesign.** Prefer references over restating contracts. MUST NOT invent new product semantics or “fix” the design in docs.
 8. **Terminology pass.** Use terms as defined in Accepted specs/glossary. Resolve drift; do not introduce synonyms for the same concept without definition.
 9. **No implementation via docs.** Documentation edits MUST NOT require implementation changes. If documentation exposes a product inconsistency, route back to M2–M7 rather than silently changing code or contracts.
 10. **Editorial verification** (documentation’s “tests”). Check and record:
- - Broken internal links
- - Heading hierarchy
- - Duplicate / contradictory sections
- - Outdated references
- - Status consistency (Draft vs Accepted vs merged reality)
- - Terminology consistency
+    - Broken internal links
+    - Heading hierarchy
+    - Duplicate / contradictory sections
+    - Outdated references
+    - Status consistency (Draft vs Accepted vs merged reality)
+    - Terminology consistency
 11. **Stop.** Do not implement code, refactor, or reopen M2–M6. Hand off prompt-library / process-framework validation to **M10** when that is the active work.
 
 ### Checklist
@@ -112,9 +112,11 @@ Verification:
 Gate: Documentation complete. Code/behavior/contracts unchanged by this stage.
 ```
 
+Also emit a [Slice Completion Report](../conventions/reporting-conventions.md) (Status often **Slice complete** or **Ready for M10** when validating the workflow itself).
+
 ## Gate
 
-**Documentation complete** — Declared doc surfaces reflect shipped or policy-approved work, Status/links/terminology are consistent with Accepted artifacts, editorial verification is recorded, and no product semantics or implementation were changed via documentation.
+**Documentation complete** — Declared doc surfaces reflect shipped or policy-approved work, Status/links/terminology are consistent with Accepted artifacts, editorial verification is recorded, a Slice Completion Report is produced (§2.11), and no product semantics or implementation were changed via documentation.
 
 ## Non-goals
 
@@ -124,5 +126,5 @@ Gate: Documentation complete. Code/behavior/contracts unchanged by this stage.
 - Redesigning Accepted specifications or plans under the guise of “clarification”
 - Inventing changelog/release artifacts the project does not use
 - Silently changing code or contracts when docs reveal inconsistency
-- M10 workflow-framework validation unless this issue is the M10 validation slice
+- M10 workflow-framework validation unless this issue is W1-10
 - Tool-specific UI instructions
