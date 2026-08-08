@@ -563,7 +563,7 @@ describe('RFC-013 relation optionality', () => {
         optional: false,
       }],
       emptyAnnotations,
-      [{ name: 'author', type: 'string', optional: false }],
+      [{ name: 'author', type: 'string', optional: false, nullable: false }],
     );
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
