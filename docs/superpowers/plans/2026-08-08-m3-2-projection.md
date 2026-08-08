@@ -1,8 +1,10 @@
 # M3.2 Projection — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft — Ready for M5 Plan Review** until M5 Accept. After Accept, REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M3.1 `Resource` / `validateResource` and M2.2 `createResourceMetadata` — do not invent parallel metadata or outcome models. Do **not** implement annotation vocabulary or schema members. Do **not** fabricate or mock an `invalid_metadata` scenario.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-005. Reuse M3.1 `Resource` / `validateResource` and M2.2 `createResourceMetadata` — do not invent parallel metadata or outcome models. Do **not** implement annotation vocabulary or schema members. Do **not** fabricate or mock an `invalid_metadata` scenario.
 
-**Status:** Draft — Ready for M5 Plan Review  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review; no blockers; editorial note on §7 checklist timing applied  
+
 **Tracking:** [#6](https://github.com/rexescario-dev/resource-forge/issues/6)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-005 Resource Model (Accepted) §§3, 4.3; depends on RFC-001 / RFC-002 / M3.1  
@@ -393,7 +395,7 @@ Full suite: `pnpm --filter @resource-forge/core test`.
 
 ## Completion criteria (M3.2)
 
-- [ ] Parent plan §7 Projection checklist is green
+- [ ] Parent plan §7 Projection checklist is green after M6 verification
 - [ ] Public exports match the locked surface above
 - [ ] Empty `entries` floor only — no metadata vocabulary
 - [ ] No `composeResourceMetadata` requirement in the public contract
@@ -413,14 +415,14 @@ Full suite: `pnpm --filter @resource-forge/core test`.
 
 ## Gate
 
-**Status: Draft — Ready for M5 Plan Review.** Do not implement until Status is **Accepted**.
+**M5 Accepted.** Proceed to **M6 — TDD implementation**.
 
 Lifecycle:
 
 ```text
 Draft — Ready for M5 Plan Review
   ↓
-M5 Plan Review → Accepted
+M5 Plan Review → Accepted ✅
   ↓
 M6 TDD Implementation
   ↓
