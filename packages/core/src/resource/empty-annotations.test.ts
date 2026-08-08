@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { emptyAnnotations } from './empty-annotations.js';
 
 describe('emptyAnnotations', () => {
-  it('is the empty annotations unit', () => {
-    expect(emptyAnnotations).toEqual({ readonlyTag: 'EmptyAnnotations' });
+  it('is the zero-entry annotations snapshot', () => {
+    expect(emptyAnnotations).toEqual([]);
+    expect(emptyAnnotations).toHaveLength(0);
   });
 
   it('is frozen', () => {

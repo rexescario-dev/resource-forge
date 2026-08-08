@@ -1,5 +1,3 @@
-import type { EmptyAnnotations } from './types.js';
+import type { Annotations } from './types.js';
 
-export const emptyAnnotations: EmptyAnnotations = Object.freeze({
-  readonlyTag: 'EmptyAnnotations',
-});
+export const emptyAnnotations: Annotations = Object.freeze([]);

@@ -260,10 +260,10 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/index.ts` — export `Annotations`; stop exporting `EmptyAnnotations`
 - Create: `packages/core/src/resource/annotations.test.ts` (and/or extend `validate.test.ts`) with failing expectations
 
-- [ ] **Step 1: Widen types** — `Annotations`, `AnnotationValidationError`, update `Resource` / `ResourceValidationError`; **remove** public `EmptyAnnotations`
-- [ ] **Step 2: Write failing tests** for empty snapshot shape, invalid key/value/duplicate via `validateResource`, and public-export expectations (`EmptyAnnotations` absent)
-- [ ] **Step 3: Run tests — expect FAIL**
-- [ ] **Step 4: Commit** `test(core): add failing M3.3 annotation contract tests`
+- [x] **Step 1: Widen types** — `Annotations`, `AnnotationValidationError`, update `Resource` / `ResourceValidationError`; **remove** public `EmptyAnnotations`
+- [x] **Step 2: Write failing tests** for empty snapshot shape, invalid key/value/duplicate via `validateResource`, and public-export expectations (`EmptyAnnotations` absent)
+- [x] **Step 3: Run tests — expect FAIL**
+- [x] **Step 4: Commit** `test(core): add failing M3.3 annotation contract tests`
 
 ### Task 2: Snapshot construction + validation integration
 
@@ -275,11 +275,11 @@ For each task: write failing tests → implement → green → commit.
 - Wire: `validate.ts` to **validate** the Resource’s already-snapshotted annotations (no silent normalize-from-alias as the construction path)
 - Update: existing tests that assumed `readonlyTag`
 
-- [ ] **Step 1: Internal snapshot helper** — deep snapshot covering entry/key containers and nested `JsonValue` graph; empty + non-empty
-- [ ] **Step 2: Internal non-empty fixture seam** — constructs Resource with snapshotted annotations; not barrel-exported
-- [ ] **Step 3: `validateResource` integrates annotation validity** using the three `AnnotationValidationError` causes; reuse `validateMetadataKey` (`rf` → framework kind); validates authoritative snapshots only
-- [ ] **Step 4: Green construction / snapshot-by-value / validate tests**
-- [ ] **Step 5: Commit** `feat(core): Resource annotation snapshots and validation (RFC-006)`
+- [x] **Step 1: Internal snapshot helper** — deep snapshot covering entry/key containers and nested `JsonValue` graph; empty + non-empty
+- [x] **Step 2: Internal non-empty fixture seam** — constructs Resource with snapshotted annotations; not barrel-exported
+- [x] **Step 3: `validateResource` integrates annotation validity** using the three `AnnotationValidationError` causes; reuse `validateMetadataKey` (`rf` → framework kind); validates authoritative snapshots only
+- [x] **Step 4: Green construction / snapshot-by-value / validate tests**
+- [x] **Step 5: Commit** `feat(core): Resource annotation snapshots and validation (RFC-006)`
 
 ### Task 3: Direct annotation projection
 
@@ -287,10 +287,10 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.ts`
 - Modify: `packages/core/src/resource/project.test.ts`
 
-- [ ] **Step 1: Failing tests** for non-empty direct projection (via internal fixture) + order-insensitive `resourceMetadataEqual` + purity + empty regression
-- [ ] **Step 2: Implement** `createResourceMetadata(identity, [...validated.annotations])` — no sort, no compose, no registry
-- [ ] **Step 3: Green tests**
-- [ ] **Step 4: Commit** `feat(core): project annotations into ResourceMetadata entries`
+- [x] **Step 1: Failing tests** for non-empty direct projection (via internal fixture) + order-insensitive `resourceMetadataEqual` + purity + empty regression
+- [x] **Step 2: Implement** `createResourceMetadata(identity, [...validated.annotations])` — no sort, no compose, no registry
+- [x] **Step 3: Green tests**
+- [x] **Step 4: Commit** `feat(core): project annotations into ResourceMetadata entries`
 
 ### Task 4: Exports, roadmap, parent-plan note
 
@@ -299,10 +299,10 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `docs/roadmap.md` — mark M3.3 **implementation** complete only after M6 verification is green
 - Optionally note in parent M3 plan that M3.3 code is complete (only after green)
 
-- [ ] **Step 1: Export smoke** — `Annotations` / `emptyAnnotations` / projection with entries; confirm no `EmptyAnnotations` / no `validateAnnotations`
-- [ ] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
-- [ ] **Step 3: Docs status updates only after verification**
-- [ ] **Step 4: Commit** `docs: record M3.3 annotations slice complete`
+- [x] **Step 1: Export smoke** — `Annotations` / `emptyAnnotations` / projection with entries; confirm no `EmptyAnnotations` / no `validateAnnotations`
+- [x] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
+- [x] **Step 3: Docs status updates only after verification**
+- [x] **Step 4: Commit** `docs: record M3.3 annotations slice complete`
 
 ---
 
