@@ -1,5 +1,6 @@
 export type {
-  EmptyAnnotations,
+  AnnotationValidationError,
+  Annotations,
   EmptySchemaCollection,
   Resource,
   ResourceProjectionError,

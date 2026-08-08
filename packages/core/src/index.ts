@@ -61,7 +61,8 @@ export type {
 export { composeResourceMetadata } from './extension/index.js';
 
 export type {
-  EmptyAnnotations,
+  AnnotationValidationError,
+  Annotations,
   EmptySchemaCollection,
   Resource,
   ResourceProjectionError,

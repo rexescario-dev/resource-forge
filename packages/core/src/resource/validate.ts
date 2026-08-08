@@ -3,9 +3,9 @@ import {
   type ResourceIdentity,
 } from '../identity/index.js';
 import { err, ok, type Result } from '../result.js';
-import { emptyAnnotations } from './empty-annotations.js';
+import { checkAnnotations } from './annotations.js';
 import type {
-  EmptyAnnotations,
+  Annotations,
   Resource,
   ResourceSchema,
   ResourceValidationError,
@@ -23,17 +23,10 @@ function isValidEmptySchema(schema: ResourceSchema): boolean {
   );
 }
 
-function isEmptyAnnotations(value: EmptyAnnotations): boolean {
-  if (value.readonlyTag !== 'EmptyAnnotations') {
-    return false;
-  }
-  return Object.keys(value).length === 1;
-}
-
 export function validateResource(candidate: {
   identity: ResourceIdentity;
   schema: ResourceSchema;
-  annotations: EmptyAnnotations;
+  annotations: Annotations;
 }): Result<Resource, ResourceValidationError> {
   const kind =
     candidate.identity.namespace === 'rf' ? 'framework' : 'user';
@@ -46,8 +39,12 @@ export function validateResource(candidate: {
     return err({ code: 'invalid_schema' });
   }
 
-  if (!isEmptyAnnotations(candidate.annotations)) {
-    return err({ code: 'invalid_annotations' });
+  const annotationsResult = checkAnnotations(candidate.annotations);
+  if (!annotationsResult.ok) {
+    return err({
+      code: 'invalid_annotations',
+      cause: annotationsResult.error,
+    });
   }
 
   return ok({
@@ -57,6 +54,7 @@ export function validateResource(candidate: {
       relations: candidate.schema.relations,
       operations: candidate.schema.operations,
     },
-    annotations: emptyAnnotations,
+    // Authoritative snapshot already established at construction; do not re-snapshot here.
+    annotations: candidate.annotations,
   });
 }
