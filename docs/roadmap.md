@@ -40,7 +40,8 @@ M3 gate RFCs:
 | RFC-014 | Field Nullability (required `nullable: boolean` on Field) | Accepted — [#46](https://github.com/rexescario-dev/resource-forge/issues/46) |
 | RFC-015 | Relation Nullability (required association-reference `nullable: boolean` on Relation) | Accepted — [#51](https://github.com/rexescario-dev/resource-forge/issues/51) |
 | RFC-016 | Constraints (required ordered `constraints` + closed `{ name, kind }` framework) | Accepted — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
-| Later | Concrete constraint kinds / payloads / enforcement; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
+| RFC-017 | Concrete Constraint Kinds (closed `range` \| `pattern` \| `enum`; Field-targeted; declaration-time only) | Draft — [#61](https://github.com/rexescario-dev/resource-forge/issues/61) |
+| Later | Runtime constraint enforcement; uniqueness / cross-member; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
