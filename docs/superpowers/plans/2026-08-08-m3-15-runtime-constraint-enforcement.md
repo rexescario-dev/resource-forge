@@ -366,7 +366,7 @@ For each implementation task: failing tests for that slice → implement that sl
 | M9 | **Complete** |
 | Branch | `feat/m3-15-runtime-constraint-enforcement` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/68 |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -389,7 +389,9 @@ For each implementation task: failing tests for that slice → implement that sl
 
 ### Next Gate
 
-**None — ready for merge** (M7 Approved; M8 N/A; M9 Complete; M10 workflow assets Accepted for this closeout). Merge PR / close [#67](https://github.com/rexescario-dev/resource-forge/issues/67) / [#66](https://github.com/rexescario-dev/resource-forge/issues/66) per human norms; then mark SCR **Slice complete**.
+**None — slice complete**
+
+**Merged** (2026-08-08). Delivery PR [#68](https://github.com/rexescario-dev/resource-forge/pull/68) MERGED as `main` @ `9c01904`; tracking [#67](https://github.com/rexescario-dev/resource-forge/issues/67) and RFC [#66](https://github.com/rexescario-dev/resource-forge/issues/66) CLOSED.
 
 ### M7 Code Review
 
