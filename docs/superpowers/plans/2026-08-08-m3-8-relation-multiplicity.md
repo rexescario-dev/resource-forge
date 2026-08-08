@@ -585,12 +585,12 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | M4 | Plan **Accepted** (Draft reviewed) |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | **Ready for M7** |
-| M8 | Pending |
-| M9 | Pending (roadmap updated with verification) |
+| M7 | **Approved for merge** |
+| M8 | N/A |
+| M9 | Roadmap already updated in delivery PR |
 | Branch | `feat/m3-8-relation-multiplicity` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/34 |
-| Status | **Ready for M7** |
+| Status | **Complete** |
 
 ### Shipped
 
@@ -609,14 +609,45 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
-| CI | Pending PR checks |
+| CI | **Passed** (https://github.com/rexescario-dev/resource-forge/actions/runs/31242353929/job/93065322981) |
 
 ### Next Gate
 
-**M7 Code Review** on [#34](https://github.com/rexescario-dev/resource-forge/pull/34)
+None — slice complete
+
+---
+
+## M7 review record
+
+```text
+Decision: Approved for merge
+Subject: https://github.com/rexescario-dev/resource-forge/pull/34 (merged as 914146b)
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-011-relation-multiplicity-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-08-m3-8-relation-multiplicity.md
+
+Plan tasks reviewed:
+- Task 1 types + failing multiplicity tests: ✓
+- Task 2 validate-before-snapshot + checkRelations/snapshot/equality: ✓
+- Task 3 projection non-participation + field coexistence: ✓
+- Task 4 exports + roadmap: ✓
+
+Verification evidence:
+- pnpm --filter @resource-forge/core test → 144 passed (local on main @ 914146b)
+- pnpm --filter @resource-forge/core typecheck → Passed
+- CI ci → pass (actions/runs/31242353929)
+
+Review summary: Faithful RFC-011 / plan realization. Closed Relation { name, target, multiplicity }; closed "one"|"many"; missing_relation_multiplicity vs invalid_relation_multiplicity; validate then freeze; no dual-shape/defaulting; no Relation→metadata; helpers not barrel-exported. Scope limited to @resource-forge/core.
+
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- None material for this slice.
+
+Gate: Already merged. M8 N/A. Slice complete.
+```
 
 ---
 
 ## Gate
 
-**M6 complete.** Ready for **M7 Code Review** on [#33](https://github.com/rexescario-dev/resource-forge/issues/33) / [#34](https://github.com/rexescario-dev/resource-forge/pull/34).
+**M7 Approved.** Slice M3.8 complete on [#33](https://github.com/rexescario-dev/resource-forge/issues/33) / [#34](https://github.com/rexescario-dev/resource-forge/pull/34).
