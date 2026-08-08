@@ -502,9 +502,26 @@ describe('projectResourceMetadata', () => {
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
-    const resource = createResourceWithConstraintsForTests(identity.value, [
-      { name: 'nonNegativeTotal', kind: 'placeholder' },
-    ]);
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'nonNegativeTotal',
+          kind: 'range',
+          field: 'total',
+          min: 0,
+        },
+      ],
+      emptyAnnotations,
+      [
+        {
+          name: 'total',
+          type: 'number',
+          optional: false,
+          nullable: false,
+        },
+      ],
+    );
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
 

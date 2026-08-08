@@ -49,12 +49,13 @@ export function createResourceWithConstraintsForTests(
     return err({ code: 'invalid_schema', cause: checkedOperations.error });
   }
 
-  const checkedConstraints = checkConstraints(candidateConstraints);
+  const fields = snapshotFields(checkedFields.value) as ReadonlyArray<Field>;
+
+  const checkedConstraints = checkConstraints(candidateConstraints, fields);
   if (!checkedConstraints.ok) {
     return err({ code: 'invalid_schema', cause: checkedConstraints.error });
   }
 
-  const fields = snapshotFields(checkedFields.value) as ReadonlyArray<Field>;
   const relations = snapshotRelations(
     checkedRelations.value,
   ) as ReadonlyArray<Relation>;

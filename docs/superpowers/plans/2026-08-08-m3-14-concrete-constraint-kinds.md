@@ -1,9 +1,9 @@
 # M3.14 Concrete Constraint Kinds — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** until M5 Accepts. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-017. Reuse M3.1–M3.13 Resource / schema / field / relation / operation / annotation / projection / constraint-framework surfaces. Do **not** implement runtime enforcement, inclusive/exclusive `range` evaluation, pattern dialect/matching, uniqueness, cross-member constraints, Relation targeting, Field-local constraint slots, `spec` bags, registries, wire/persistence, or public `validateConstraints` / `validateResourceSchema`.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD; do not invent semantics beyond RFC-017. Reuse M3.1–M3.13 Resource / schema / field / relation / operation / annotation / projection / constraint-framework surfaces. Do **not** implement runtime enforcement, inclusive/exclusive `range` evaluation, pattern dialect/matching, uniqueness, cross-member constraints, Relation targeting, Field-local constraint slots, `spec` bags, registries, wire/persistence, or public `validateConstraints` / `validateResourceSchema`.
 
-**Status:** Draft  
-**M5:** Returned for Revision (2026-08-08) — cause-precedence looseness for missing closed-arm properties; snapshot wording risk. Revised (same date): deterministic closed-member vs semantic causes; snapshot reuses existing nested immutability. Pending re-review / Accept.  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-08) — Plan Review after return revision; no plan blockers. Deterministic closed-member vs semantic cause precedence locked; snapshot reuses existing nested immutability; TDD coverage sufficient; runtime enforcement excluded; one PR for #63. M6 authorized; task checkboxes remain open until execution.  
 **Tracking:** [#63](https://github.com/rexescario-dev/resource-forge/issues/63)  
 **Parent plan:** `docs/superpowers/plans/2026-08-07-m3-implementation-plan.md` (Accepted)  
 **Source RFC:** RFC-017 Concrete Constraint Kinds (**Accepted**) — specializes RFC-016 Constraint member / `kind` / equality / validation  
@@ -298,36 +298,36 @@ For each implementation task after types: failing tests → implement → green 
 
 **Files:** `types.ts`, `constraints.test.ts`, barrels
 
-- [ ] **Step 1:** Introduce `ConstraintKind` and discriminated `Constraint`; widen `ConstraintValidationError`
-- [ ] **Step 2:** Add failing tests for unknown kind / bare framework shapes / valid discriminated shapes (types-level + runtime via seams)
-- [ ] **Step 3:** Export `ConstraintKind` from public barrels
-- [ ] **Step 4:** Commit
+- [x] **Step 1:** Introduce `ConstraintKind` and discriminated `Constraint`; widen `ConstraintValidationError`
+- [x] **Step 2:** Add failing tests for unknown kind / bare framework shapes / valid discriminated shapes (types-level + runtime via seams)
+- [x] **Step 3:** Export `ConstraintKind` from public barrels
+- [x] **Step 4:** Commit
 
 ### Task 2: Specialize `checkConstraints` + snapshot/equality
 
 **Files:** `constraints.ts`, `constraints.test.ts`, `validate.ts`, fixture seam
 
-- [ ] **Step 1:** Change internal `checkConstraints` to accept validated Fields; implement kind discrimination, resolve/type-match, kind rules, finite numbers
-- [ ] **Step 2:** Update `snapshotConstraints` / `constraintsEqual` for discriminated members (order-sensitive `values`)
-- [ ] **Step 3:** Wire `validateResource` to pass validated fields into `checkConstraints`
-- [ ] **Step 4:** Update `createResourceWithConstraintsForTests` (and any fixtures using open kinds) to supply compatible Fields + concrete shapes
-- [ ] **Step 5:** Green suite for Task 2 coverage; commit
+- [x] **Step 1:** Change internal `checkConstraints` to accept validated Fields; implement kind discrimination, resolve/type-match, kind rules, finite numbers
+- [x] **Step 2:** Update `snapshotConstraints` / `constraintsEqual` for discriminated members (order-sensitive `values`)
+- [x] **Step 3:** Wire `validateResource` to pass validated fields into `checkConstraints`
+- [x] **Step 4:** Update `createResourceWithConstraintsForTests` (and any fixtures using open kinds) to supply compatible Fields + concrete shapes
+- [x] **Step 5:** Green suite for Task 2 coverage; commit
 
 ### Task 3: Integration + projection + export regressions
 
 **Files:** `validate.test.ts`, `project.test.ts`, `exports.test.ts`, other retargeted fixtures
 
-- [ ] **Step 1:** Integration tests for empty / valid multi-kind / breaking open-kind via `validateResource`
-- [ ] **Step 2:** Projection non-participation with concrete constraints; invalid → `invalid_resource`
-- [ ] **Step 3:** Export smoke; Field/Relation/Operation floors unchanged
-- [ ] **Step 4:** Commit
+- [x] **Step 1:** Integration tests for empty / valid multi-kind / breaking open-kind via `validateResource`
+- [x] **Step 2:** Projection non-participation with concrete constraints; invalid → `invalid_resource`
+- [x] **Step 3:** Export smoke; Field/Relation/Operation floors unchanged
+- [x] **Step 4:** Commit
 
 ### Task 4: Docs hygiene (final delivery commit only)
 
 **Files:** `docs/roadmap.md`, this plan’s Slice Completion Report
 
-- [ ] **Step 1:** After M6+ gates, mark M3.14 ✅ on roadmap; fill SCR
-- [ ] **Step 2:** Commit on the delivery PR
+- [x] **Step 1:** After M6+ gates, mark M3.14 ✅ on roadmap; fill SCR
+- [x] **Step 2:** Commit on the delivery PR
 
 ---
 
@@ -362,30 +362,35 @@ For each implementation task after types: failing tests → implement → green 
 | --- | --- |
 | Slice | M3.14 Concrete Constraint Kinds |
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/63 |
-| M4 | Plan **Draft** (pending M5) |
-| M5 | Pending |
-| M6 | Pending |
-| M7 | Pending |
+| M4 | Plan **Accepted** |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | **Approved** |
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-14-concrete-constraint-kinds` |
-| PR | TBD |
-| Status | **Draft plan** |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/64 |
+| Status | **Ready for merge** |
 
 ### Shipped
 
-_(filled at M6)_
+- Closed exclusive `ConstraintKind = "range" | "pattern" | "enum"` with kind-discriminated Constraint members
+- Required `field: FieldName` with resolve + type-match against validated Fields
+- Practical `range` / `pattern` / `enum` declaration rules (finite numbers; opaque pattern; order-sensitive enum values)
+- Deterministic cause precedence (closed-member vs semantic)
+- Breaking unknown-kind rejection vs M3.13 open-kind floor
+- Projection non-participation retained; no public `validateConstraints`; no runtime enforcement
 
 ### Validation
 
 | Check | Result |
 | --- | --- |
-| Tests | Pending |
-| Typecheck | Pending |
-| Lint | Pending |
-| Build | Pending |
-| Package validation | Pending |
+| Tests | **Passed** (per-file vitest: constraints 15, exports 7, project 22, validate 6, fields 19, relations 28, operations 9, schema 1; tinypool teardown noise only) |
+| Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
 
 ### Next Gate
 
-**M5 Plan Review** — do not begin M6 until this plan is **Accepted**.
+**None pending before merge** — M7 Approved. Merge #64 when ready; close #63 on merge.

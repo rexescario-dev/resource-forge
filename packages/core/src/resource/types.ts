@@ -151,11 +151,30 @@ export type OperationValidationError =
 /** Constraint identity string conforming to RFC-016 grammar. */
 export type ConstraintName = string;
 
-/** Closed Constraint member (RFC-016 framework floor). */
-export type Constraint = {
-  readonly name: ConstraintName;
-  readonly kind: string;
-};
+/** Closed exclusive constraint kind vocabulary (RFC-017). */
+export type ConstraintKind = 'range' | 'pattern' | 'enum';
+
+/** Kind-discriminated closed Constraint member (RFC-017). */
+export type Constraint =
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'range';
+      readonly field: FieldName;
+      readonly min?: number;
+      readonly max?: number;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'pattern';
+      readonly field: FieldName;
+      readonly pattern: string;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'enum';
+      readonly field: FieldName;
+      readonly values: ReadonlyArray<string | number | boolean>;
+    };
 
 export type ConstraintValidationError =
   | { readonly code: 'missing_constraints' }
@@ -176,7 +195,32 @@ export type ConstraintValidationError =
       readonly index: number;
       readonly kind: unknown;
     }
-  | { readonly code: 'invalid_constraint_member'; readonly index: number };
+  | {
+      readonly code: 'unknown_constraint_kind';
+      readonly index: number;
+      readonly kind: string;
+    }
+  | { readonly code: 'invalid_constraint_member'; readonly index: number }
+  | {
+      readonly code: 'invalid_constraint_field';
+      readonly index: number;
+      readonly field: unknown;
+    }
+  | {
+      readonly code: 'unresolved_constraint_field';
+      readonly index: number;
+      readonly field: string;
+    }
+  | {
+      readonly code: 'constraint_field_type_mismatch';
+      readonly index: number;
+      readonly field: string;
+      readonly expected: FieldType;
+      readonly actual: FieldType;
+    }
+  | { readonly code: 'invalid_range_bounds'; readonly index: number }
+  | { readonly code: 'invalid_pattern'; readonly index: number }
+  | { readonly code: 'invalid_enum_values'; readonly index: number };
 
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;

@@ -71,8 +71,11 @@ export function validateResource(candidate: {
     return err({ code: 'invalid_schema', cause: operationsResult.error });
   }
 
-  // Delegate to the single Constraint-validation implementation (RFC-016 / M3.13 plan).
-  const constraintsResult = checkConstraints(schemaRecord.constraints);
+  // Delegate to the single Constraint-validation implementation (RFC-017 / M3.14 plan).
+  const constraintsResult = checkConstraints(
+    schemaRecord.constraints,
+    fieldsResult.value,
+  );
   if (!constraintsResult.ok) {
     return err({ code: 'invalid_schema', cause: constraintsResult.error });
   }
