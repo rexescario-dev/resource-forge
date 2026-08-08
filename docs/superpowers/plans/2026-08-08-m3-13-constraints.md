@@ -388,19 +388,19 @@ For each implementation task after types: write the relevant failing assertions 
 - Modify: fixture-bearing tests (`validate` / `project` / `fields` / `relations` / `operations` / exports) as needed
 - Modify barrels as needed for type exports
 
-- [ ] **Step 1: Widen types** — apply the planning-aid `Constraint` / `ConstraintValidationError` unions; `ResourceSchema.constraints: ReadonlyArray<Constraint>`; widen `invalid_schema.cause`
+- [x] **Step 1: Widen types** — apply the planning-aid `Constraint` / `ConstraintValidationError` unions; `ResourceSchema.constraints: ReadonlyArray<Constraint>`; widen `invalid_schema.cause`
 
 #### 1A — Fixture migration (prerequisite; not the breaking regression)
 
-- [ ] **Step 2A: Update compile-time / intended-valid fixtures** to include `constraints: []` (or valid members) wherever they represent schemas that should remain **valid** after M3.13. Keep Field/Relation/Operation member floors unchanged.
+- [x] **Step 2A: Update compile-time / intended-valid fixtures** to include `constraints: []` (or valid members) wherever they represent schemas that should remain **valid** after M3.13. Keep Field/Relation/Operation member floors unchanged.
 
 #### 1B — Deliberate omit / non-sequence breaking regressions
 
-- [ ] **Step 2B: Add explicit tests** that omit `constraints` or supply a non-sequence and assert `missing_constraints` / `invalid_constraints_collection`. Deliberate invalid shapes MUST exercise **runtime validation** via existing seams / `unknown` boundaries (not TypeScript-only failures).
+- [x] **Step 2B: Add explicit tests** that omit `constraints` or supply a non-sequence and assert `missing_constraints` / `invalid_constraints_collection`. Deliberate invalid shapes MUST exercise **runtime validation** via existing seams / `unknown` boundaries (not TypeScript-only failures).
 
 #### 1C — New invalid / kind / equality / uniqueness / namespace tests
 
-- [ ] **Step 2C: Add new RFC-016 tests** that initially fail until Task 2 implements validation:
+- [x] **Step 2C: Add new RFC-016 tests** that initially fail until Task 2 implements validation:
 
 ```ts
 it('accepts ordered non-empty constraints and preserves order + kind', () => {
@@ -424,8 +424,8 @@ it('constraintsEqual is false when only kind or only order differs', () => { /* 
 it('allows Field/Relation/Operation/Constraint to share the same name string', () => { /* … */ });
 ```
 
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL from Task 1B/1C (and type errors where `constraints` is required by types but validation not yet widened). Fixture migration alone MUST NOT be treated as proving the breaking contract.
-- [ ] **Step 4: Commit** `test(core): add failing M3.13 Constraints contract tests`
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL from Task 1B/1C (and type errors where `constraints` is required by types but validation not yet widened). Fixture migration alone MUST NOT be treated as proving the breaking contract.
+- [x] **Step 4: Commit** `test(core): add failing M3.13 Constraints contract tests`
 
 ### Task 2: Validate-before-snapshot + validation integration
 
@@ -436,11 +436,11 @@ it('allows Field/Relation/Operation/Constraint to share the same name string', (
 - Modify: `packages/core/src/resource/schema.ts` / create fixtures for empty `constraints: []`
 - Update: field/relation/operation fixtures as needed
 
-- [ ] **Step 1: Internal helpers** — `validateConstraintName`; **`checkConstraints` as the single Constraint-validation implementation** (classification table + uniqueness + kind rules); `snapshotConstraints` accepts only already-validated Constraints; `constraintsEqual` order-sensitive / name+kind. MUST NOT strip extras, invent `kind`, or default omit-to-empty.
-- [ ] **Step 2: Internal fixture** — `createResourceWithConstraintsForTests` calls `checkConstraints` before snapshot; then `validateResource`; not barrel-exported
-- [ ] **Step 3: `validateResource`** — require `constraints` presence/sequence (collection causes); **delegate** member validation to `checkConstraints` (MUST NOT duplicate); retain field/relation/operation checks; snapshot constraints like other collections
-- [ ] **Step 4: Green** Task 1B/1C acceptance + rejection + classification + equality/uniqueness/namespace causes
-- [ ] **Step 5: Commit** `feat(core): require ResourceSchema.constraints sequence (RFC-016)`
+- [x] **Step 1: Internal helpers** — `validateConstraintName`; **`checkConstraints` as the single Constraint-validation implementation** (classification table + uniqueness + kind rules); `snapshotConstraints` accepts only already-validated Constraints; `constraintsEqual` order-sensitive / name+kind. MUST NOT strip extras, invent `kind`, or default omit-to-empty.
+- [x] **Step 2: Internal fixture** — `createResourceWithConstraintsForTests` calls `checkConstraints` before snapshot; then `validateResource`; not barrel-exported
+- [x] **Step 3: `validateResource`** — require `constraints` presence/sequence (collection causes); **delegate** member validation to `checkConstraints` (MUST NOT duplicate); retain field/relation/operation checks; snapshot constraints like other collections
+- [x] **Step 4: Green** Task 1B/1C acceptance + rejection + classification + equality/uniqueness/namespace causes
+- [x] **Step 5: Commit** `feat(core): require ResourceSchema.constraints sequence (RFC-016)`
 
 ### Task 3: Projection non-participation + coexistence regressions
 
@@ -448,10 +448,10 @@ it('allows Field/Relation/Operation/Constraint to share the same name string', (
 - Modify: `packages/core/src/resource/project.test.ts`
 - Prefer **no** modification to `packages/core/src/resource/project.ts`
 
-- [ ] **Step 1: Ensure projection tests** use schemas with `constraints`; assert zero constraint-derived entries; invalid constraints → `invalid_resource`; purity
-- [ ] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])` with **no** `project.ts` production change (preferred)
-- [ ] **Step 3: Full suite green including fields / relations / operations / annotations**
-- [ ] **Step 4: Commit** `test(core): constraints do not contribute to metadata projection`
+- [x] **Step 1: Ensure projection tests** use schemas with `constraints`; assert zero constraint-derived entries; invalid constraints → `invalid_resource`; purity
+- [x] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])` with **no** `project.ts` production change (preferred)
+- [x] **Step 3: Full suite green including fields / relations / operations / annotations**
+- [x] **Step 4: Commit** `test(core): constraints do not contribute to metadata projection`
 
 ### Task 4: Exports + final delivery hygiene
 
@@ -461,10 +461,10 @@ it('allows Field/Relation/Operation/Constraint to share the same name string', (
 
 Task checkboxes in this document are completed during **M6 execution**. M5 acceptance records only Status **Accepted** (plus M5 rationale) — it does not complete Task 1–4 checkboxes.
 
-- [ ] **Step 1: Export smoke** — Constraint types as locked; confirm no `validateConstraints`
-- [ ] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
-- [ ] **Step 3: Update `docs/roadmap.md` only after M6+ gates** — record M3.13 ✅; clear “RFC-016 Accepted / delivery pending” wording as appropriate
-- [ ] **Step 4: Final delivery commit** `docs: record M3.13 constraints framework slice complete`
+- [x] **Step 1: Export smoke** — Constraint types as locked; confirm no `validateConstraints`
+- [x] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
+- [x] **Step 3: Update `docs/roadmap.md` only after M6+ gates** — record M3.13 ✅; clear “RFC-016 Accepted / delivery pending” wording as appropriate
+- [x] **Step 4: Final delivery commit** `docs: record M3.13 constraints framework slice complete`
 
 ---
 
@@ -523,3 +523,44 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 ## Gate
 
 **M5 Accepted.** M6 implementation may begin under this plan and tracking issue #58. Do not invent kind semantics, payloads, enforcement, Field/Relation attachment, dual-shape omit-as-empty, or a public constraints builder. `checkConstraints` remains the single Constraint-validation implementation. Task checkboxes remain open until M6 execution.
+
+---
+
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.13 Constraints Framework |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/58 |
+| M4 | Plan **Accepted** |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | Pending |
+| M8 | N/A |
+| M9 | N/A |
+| Branch | `feat/m3-13-constraints` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/59 |
+| Status | **Ready for M7** |
+
+### Shipped
+
+- Required ordered `ResourceSchema.constraints` of closed `{ name, kind }` members
+- Open non-empty `kind` (exact equality; no reserved vocabulary); empty sequence valid; omit/non-sequence invalid; no dual-shape
+- Distinct collection causes (`missing_constraints` / `invalid_constraints_collection`) and member causes (missing/invalid kind, invalid name/member, duplicates)
+- `checkConstraints` as single validation path; validate-before-snapshot; equality name+kind; uniqueness by name; independent namespaces
+- No Constraint → metadata contribution; invalid constraints still fail projection gate
+- No public `validateConstraints`; Field/Relation/Operation floors unchanged
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | **Passed** (per-file vitest: constraints 13, project 22, relations 28, fields 19, operations 9, validate 6, exports 7, schema 1, annotations 6; `tsc --noEmit` exit 0) |
+| Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
+
+### Next Gate
+
+**M7 — Code Review**
