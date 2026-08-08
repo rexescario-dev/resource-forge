@@ -6,35 +6,71 @@ import { relationsEqual } from './relations.js';
 import { createEmptyResourceSchema } from './schema.js';
 import { validateResource } from './validate.js';
 
-describe('RFC-008 relations', () => {
-  it('accepts valid ordered non-empty relations and preserves order', () => {
+const customer = { namespace: 'crm', name: 'Customer' } as const;
+const lineItem = { namespace: 'crm', name: 'LineItem' } as const;
+const user = { namespace: 'crm', name: 'User' } as const;
+
+describe('RFC-010 associated relations', () => {
+  it('accepts closed associated Relations and preserves order + targets', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author' },
-      { name: 'lineItems' },
+      { name: 'customer', target: { ...customer } },
+      { name: 'lineItems', target: { ...lineItem } },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
 
     expect(resource.value.schema.relations.map((r) => r.name)).toEqual([
-      'author',
+      'customer',
       'lineItems',
+    ]);
+    expect(resource.value.schema.relations.map((r) => r.target)).toEqual([
+      customer,
+      lineItem,
     ]);
     expect(
       relationsEqual(resource.value.schema.relations, [
-        { name: 'author' },
-        { name: 'lineItems' },
+        { name: 'customer', target: customer },
+        { name: 'lineItems', target: lineItem },
       ]),
     ).toBe(true);
     expect(
       relationsEqual(resource.value.schema.relations, [
-        { name: 'lineItems' },
-        { name: 'author' },
+        { name: 'lineItems', target: lineItem },
+        { name: 'customer', target: customer },
       ]),
     ).toBe(false);
+  });
+
+  it('allows self-target', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'parent', target: { namespace: 'crm', name: 'Order' } },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+    expect(resource.value.schema.relations[0]?.target).toEqual({
+      namespace: 'crm',
+      name: 'Order',
+    });
+  });
+
+  it('allows the same target under different RelationNames', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'author', target: { ...user } },
+      { name: 'editor', target: { ...user } },
+    ]);
+    expect(resource.ok).toBe(true);
   });
 
   it('accepts grammar-valid names such as userID (regex is sole constraint)', () => {
@@ -43,9 +79,83 @@ describe('RFC-008 relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'userID' },
+      { name: 'userID', target: { ...user } },
     ]);
     expect(resource.ok).toBe(true);
+  });
+
+  it('rejects name-only Relations as invalid_relation_member (breaking)', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'author' },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error.code).toBe('invalid_schema');
+      if (resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('invalid_relation_member');
+      }
+    }
+  });
+
+  it('rejects string targets without parsing', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'customer', target: 'crm/Customer' },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error.code).toBe('invalid_schema');
+      if (resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('invalid_relation_member');
+      }
+    }
+  });
+
+  it('rejects rf targets under user context as invalid_relation_target', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'meta', target: { namespace: 'rf', name: 'Resource' } },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error.code).toBe('invalid_schema');
+      if (resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('invalid_relation_target');
+        if (resource.error.cause?.code === 'invalid_relation_target') {
+          expect(resource.error.cause.cause.code).toBe('reserved_namespace');
+        }
+      }
+    }
+  });
+
+  it('rejects invalid identity grammar as invalid_relation_target', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      { name: 'customer', target: { namespace: 'CRM', name: 'Customer' } },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error.code).toBe('invalid_schema');
+      if (resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('invalid_relation_target');
+        if (resource.error.cause?.code === 'invalid_relation_target') {
+          expect(resource.error.cause.cause.code).toBe('invalid_namespace');
+        }
+      }
+    }
   });
 
   it('rejects invalid RelationName', () => {
@@ -55,7 +165,7 @@ describe('RFC-008 relations', () => {
 
     for (const name of ['Author', 'line-items', '']) {
       const resource = createResourceWithRelationsForTests(identity.value, [
-        { name },
+        { name, target: { ...customer } },
       ]);
       expect(resource.ok).toBe(false);
       if (!resource.ok) {
@@ -73,8 +183,8 @@ describe('RFC-008 relations', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithRelationsForTests(identity.value, [
-      { name: 'author' },
-      { name: 'author' },
+      { name: 'author', target: { ...user } },
+      { name: 'author', target: { namespace: 'crm', name: 'Account' } },
     ]);
     expect(resource.ok).toBe(false);
     if (!resource.ok) {
@@ -85,12 +195,16 @@ describe('RFC-008 relations', () => {
     }
   });
 
-  it('rejects extra properties without silently stripping to a valid Relation', () => {
+  it('rejects extra Relation members without silently stripping', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
-    const candidate = { name: 'author', target: 'User' };
+    const candidate = {
+      name: 'customer',
+      target: { ...customer },
+      cardinality: 'many',
+    };
     const resource = createResourceWithRelationsForTests(identity.value, [
       candidate,
     ]);
@@ -106,7 +220,7 @@ describe('RFC-008 relations', () => {
       identity: identity.value,
       schema: {
         fields: [],
-        relations: [candidate as { name: string }],
+        relations: [candidate as never],
         operations: [],
       },
       annotations: emptyAnnotations,
@@ -120,6 +234,21 @@ describe('RFC-008 relations', () => {
     }
   });
 
+  it('treats Relations equal only when name and target match', () => {
+    expect(
+      relationsEqual(
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'B' } }],
+      ),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
+        [{ name: 'a', target: { namespace: 'crm', name: 'A' } }],
+      ),
+    ).toBe(true);
+  });
+
   it('allows Field and Relation to share the same name string', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
@@ -127,7 +256,7 @@ describe('RFC-008 relations', () => {
 
     const resource = createResourceWithRelationsForTests(
       identity.value,
-      [{ name: 'author' }],
+      [{ name: 'author', target: { ...user } }],
       emptyAnnotations,
       [{ name: 'author', type: 'string' }],
     );
@@ -144,19 +273,30 @@ describe('RFC-008 relations', () => {
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
-    const candidate = { name: 'author' };
-    const list: object[] = [candidate, { name: 'lineItems' }];
+    const target = { namespace: 'crm', name: 'User' };
+    const candidate = { name: 'author', target };
+    const list: object[] = [
+      candidate,
+      { name: 'lineItems', target: { ...lineItem } },
+    ];
     const resource = createResourceWithRelationsForTests(identity.value, list);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
 
     candidate.name = 'mutated';
-    list.push({ name: 'extra' });
+    target.name = 'Mutated';
+    list.push({ name: 'extra', target: { ...customer } });
 
     expect(resource.value.schema.relations.map((r) => r.name)).toEqual([
       'author',
       'lineItems',
     ]);
+    expect(resource.value.schema.relations[0]?.target).toEqual(user);
+    expect(Object.isFrozen(resource.value.schema.relations)).toBe(true);
+    expect(Object.isFrozen(resource.value.schema.relations[0])).toBe(true);
+    expect(Object.isFrozen(resource.value.schema.relations[0]?.target)).toBe(
+      true,
+    );
   });
 
   it('rejects non-empty operations without a relation cause', () => {

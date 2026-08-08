@@ -46,9 +46,10 @@ export type FieldValidationError =
 /** Validated relation identity string (RFC-008). */
 export type RelationName = string;
 
-/** Closed name-only Relation member (RFC-008). */
+/** Closed associated Relation member (RFC-010; amends RFC-008 §3.2). */
 export type Relation = {
   readonly name: RelationName;
+  readonly target: ResourceIdentity;
 };
 
 export type RelationValidationError =
@@ -65,6 +66,11 @@ export type RelationValidationError =
   | {
       readonly code: 'invalid_relation_member';
       readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_target';
+      readonly index: number;
+      readonly cause: IdentityValidationError;
     };
 
 export type ResourceSchema = {

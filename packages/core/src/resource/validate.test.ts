@@ -69,7 +69,10 @@ describe('validateResource', () => {
       identity: identity.value,
       schema: {
         fields: [],
-        relations: [{ name: 'author' }, { name: 'lineItems' }],
+        relations: [
+          { name: 'author', target: { namespace: 'crm', name: 'User' } },
+          { name: 'lineItems', target: { namespace: 'crm', name: 'LineItem' } },
+        ],
         operations: [],
       },
       annotations: emptyAnnotations,
@@ -79,6 +82,10 @@ describe('validateResource', () => {
     expect(result.value.schema.relations.map((r) => r.name)).toEqual([
       'author',
       'lineItems',
+    ]);
+    expect(result.value.schema.relations.map((r) => r.target)).toEqual([
+      { namespace: 'crm', name: 'User' },
+      { namespace: 'crm', name: 'LineItem' },
     ]);
   });
 
