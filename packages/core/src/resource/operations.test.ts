@@ -145,6 +145,7 @@ describe('RFC-012 resource operations', () => {
         fields: [],
         relations: [],
         operations: [{ name: 'create', kind: 'command' } as never],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });

@@ -8,6 +8,7 @@ import {
   validateResourceMetadata,
 } from '../metadata/index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
+import { createResourceWithConstraintsForTests } from './create-resource-with-constraints.js';
 import { createResourceWithFieldsForTests } from './create-resource-with-fields.js';
 import { createResourceWithOperationsForTests } from './create-resource-with-operations.js';
 import { createResourceWithRelationsForTests } from './create-resource-with-relations.js';
@@ -169,6 +170,7 @@ describe('projectResourceMetadata', () => {
         ],
         relations: [],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -186,6 +188,7 @@ describe('projectResourceMetadata', () => {
         fields: [{ name: 'id' } as { name: string; type: 'string' }],
         relations: [],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -203,6 +206,7 @@ describe('projectResourceMetadata', () => {
         fields: [{ name: 'id', type: 'string' } as never],
         relations: [],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -224,6 +228,7 @@ describe('projectResourceMetadata', () => {
         ],
         relations: [],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -332,6 +337,7 @@ describe('projectResourceMetadata', () => {
           },
         ],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -356,6 +362,7 @@ describe('projectResourceMetadata', () => {
           } as never,
         ],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -380,6 +387,7 @@ describe('projectResourceMetadata', () => {
           } as never,
         ],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -401,6 +409,7 @@ describe('projectResourceMetadata', () => {
           } as never,
         ],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -477,6 +486,7 @@ describe('projectResourceMetadata', () => {
           { name: 'create' },
           { name: 'create' },
         ],
+        constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -485,5 +495,43 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.code).toBe('invalid_resource');
     if (projected.error.code !== 'invalid_resource') return;
     expect(projected.error.cause.code).toBe('invalid_schema');
+  });
+
+  it('does not contribute constraints to projected metadata', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(identity.value, [
+      { name: 'nonNegativeTotal', kind: 'placeholder' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+    expect(projected.value.entries).toEqual([]);
+  });
+
+  it('fails for invalid constraints as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Order' },
+      schema: {
+        fields: [],
+        relations: [],
+        operations: [],
+        constraints: [{ name: 'a' }],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause).toEqual({
+      code: 'invalid_schema',
+      cause: { code: 'missing_constraint_kind', index: 0 },
+    });
   });
 });

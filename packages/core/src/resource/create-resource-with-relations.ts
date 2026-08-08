@@ -5,6 +5,7 @@ import { checkFields, snapshotFields } from './fields.js';
 import { checkRelations, snapshotRelations } from './relations.js';
 import type {
   Annotations,
+  Constraint,
   Operation,
   Resource,
   ResourceValidationError,
@@ -49,6 +50,7 @@ export function createResourceWithRelationsForTests(
       fields,
       relations,
       operations: Object.freeze([]) as ReadonlyArray<Operation>,
+      constraints: Object.freeze([]) as ReadonlyArray<Constraint>,
     },
     annotations,
   });

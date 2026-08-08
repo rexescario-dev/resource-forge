@@ -148,10 +148,41 @@ export type OperationValidationError =
       readonly index: number;
     };
 
+/** Constraint identity string conforming to RFC-016 grammar. */
+export type ConstraintName = string;
+
+/** Closed Constraint member (RFC-016 framework floor). */
+export type Constraint = {
+  readonly name: ConstraintName;
+  readonly kind: string;
+};
+
+export type ConstraintValidationError =
+  | { readonly code: 'missing_constraints' }
+  | { readonly code: 'invalid_constraints_collection' }
+  | {
+      readonly code: 'invalid_constraint_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'duplicate_constraint_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | { readonly code: 'missing_constraint_kind'; readonly index: number }
+  | {
+      readonly code: 'invalid_constraint_kind';
+      readonly index: number;
+      readonly kind: unknown;
+    }
+  | { readonly code: 'invalid_constraint_member'; readonly index: number };
+
 export type ResourceSchema = {
   readonly fields: ReadonlyArray<Field>;
   readonly relations: ReadonlyArray<Relation>;
   readonly operations: ReadonlyArray<Operation>;
+  readonly constraints: ReadonlyArray<Constraint>;
 };
 
 /** Implementation representation of RFC-006 Annotations (unordered semantically). */
@@ -190,7 +221,8 @@ export type ResourceValidationError =
       readonly cause?:
         | FieldValidationError
         | RelationValidationError
-        | OperationValidationError;
+        | OperationValidationError
+        | ConstraintValidationError;
     }
   | {
       readonly code: 'invalid_annotations';

@@ -51,6 +51,7 @@ describe('validateResource', () => {
         ],
         relations: [],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });
@@ -86,6 +87,7 @@ describe('validateResource', () => {
           },
         ],
         operations: [],
+      constraints: [],
       },
       annotations: emptyAnnotations,
     });

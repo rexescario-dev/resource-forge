@@ -1,5 +1,9 @@
 import type { ResourceIdentity } from '../identity/types.js';
 import { err, type Result } from '../result.js';
+import {
+  checkConstraints,
+  snapshotConstraints,
+} from './constraints.js';
 import { emptyAnnotations } from './empty-annotations.js';
 import { checkFields, snapshotFields } from './fields.js';
 import { checkOperations, snapshotOperations } from './operations.js';
@@ -16,17 +20,19 @@ import type {
 import { validateResource } from './validate.js';
 
 /**
- * Internal / test-only seam: checkOperations (and optional field/relation checks)
- * before snapshot, then Resource gate. NOT exported from package barrels.
+ * Internal / test-only seam: checkConstraints (and optional field/relation/
+ * operation checks) before snapshot, then Resource gate. NOT exported from
+ * package barrels.
  *
- * Reuses the same `checkOperations` implementation as `validateResource`.
+ * Reuses the same `checkConstraints` implementation as `validateResource`.
  */
-export function createResourceWithOperationsForTests(
+export function createResourceWithConstraintsForTests(
   identity: ResourceIdentity,
-  candidateOperations: readonly object[],
+  candidateConstraints: readonly object[],
   annotations: Annotations = emptyAnnotations,
   candidateFields: readonly object[] = [],
   candidateRelations: readonly object[] = [],
+  candidateOperations: readonly object[] = [],
 ): Result<Resource, ResourceValidationError> {
   const checkedFields = checkFields(candidateFields);
   if (!checkedFields.ok) {
@@ -43,6 +49,11 @@ export function createResourceWithOperationsForTests(
     return err({ code: 'invalid_schema', cause: checkedOperations.error });
   }
 
+  const checkedConstraints = checkConstraints(candidateConstraints);
+  if (!checkedConstraints.ok) {
+    return err({ code: 'invalid_schema', cause: checkedConstraints.error });
+  }
+
   const fields = snapshotFields(checkedFields.value) as ReadonlyArray<Field>;
   const relations = snapshotRelations(
     checkedRelations.value,
@@ -50,6 +61,9 @@ export function createResourceWithOperationsForTests(
   const operations = snapshotOperations(
     checkedOperations.value,
   ) as ReadonlyArray<Operation>;
+  const constraints = snapshotConstraints(
+    checkedConstraints.value,
+  ) as ReadonlyArray<Constraint>;
 
   return validateResource({
     identity,
@@ -57,7 +71,7 @@ export function createResourceWithOperationsForTests(
       fields,
       relations,
       operations,
-      constraints: Object.freeze([]) as ReadonlyArray<Constraint>,
+      constraints,
     },
     annotations,
   });

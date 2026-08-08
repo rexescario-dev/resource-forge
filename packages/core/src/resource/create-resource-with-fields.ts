@@ -4,6 +4,7 @@ import { emptyAnnotations } from './empty-annotations.js';
 import { checkFields, snapshotFields } from './fields.js';
 import type {
   Annotations,
+  Constraint,
   Operation,
   Relation,
   Resource,
@@ -39,6 +40,7 @@ export function createResourceWithFieldsForTests(
       fields,
       relations: Object.freeze([]) as ReadonlyArray<Relation>,
       operations: Object.freeze([]) as ReadonlyArray<Operation>,
+      constraints: Object.freeze([]) as ReadonlyArray<Constraint>,
     },
     annotations,
   });
