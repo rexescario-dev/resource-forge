@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1 ✅; M3.2 ✅; M3.3 Annotations ✅; next M3.4+ blocked on schema RFCs |
+| M3 | Resource model | In progress — M3.1 ✅; M3.2 ✅; M3.3 Annotations ✅; RFC-007 Fields Accepted; next M3.4 plan/impl ([#15](https://github.com/rexescario-dev/resource-forge/issues/15)) |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -30,7 +30,8 @@ M3 gate RFCs:
 | --- | --- | --- |
 | RFC-005 | Resource model | Accepted |
 | RFC-006 | Annotations | Accepted — [#8](https://github.com/rexescario-dev/resource-forge/issues/8) |
-| RFC-007+ | Resource Fields / Relations / Operations; annotation vocabulary; richer projection | Planned |
+| RFC-007 | Resource Fields (member + ordered `fields` sequence) | Accepted — [#13](https://github.com/rexescario-dev/resource-forge/issues/13) |
+| RFC-008+ | Field types / constraints; Relations / Operations; annotation vocabulary; richer projection | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
@@ -93,16 +94,17 @@ M2 defines the language of Resource Forge. It is gated by RFC-001–RFC-004.
 
 ## M3 — Resource model
 
-**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) ✅; [M3.2](superpowers/plans/2026-08-08-m3-2-projection.md) ✅; [RFC-006](superpowers/specs/2026-08-08-rfc-006-annotations-design.md) Accepted; [M3.3 annotations](superpowers/plans/2026-08-08-m3-3-annotations.md) Accepted (implementation complete — [#10](https://github.com/rexescario-dev/resource-forge/issues/10)). Next: M3.4+ blocked on Resource Fields / Relations / Operations RFCs (and vocabulary RFCs as needed).
+**Status:** In progress — [M3 implementation plan](superpowers/plans/2026-08-07-m3-implementation-plan.md) Accepted; [M3.1](superpowers/plans/2026-08-07-m3-1-resource-contracts.md) ✅; [M3.2](superpowers/plans/2026-08-08-m3-2-projection.md) ✅; [RFC-006](superpowers/specs/2026-08-08-rfc-006-annotations-design.md) Accepted; [M3.3 annotations](superpowers/plans/2026-08-08-m3-3-annotations.md) Accepted (implementation complete — [#10](https://github.com/rexescario-dev/resource-forge/issues/10)); [RFC-007](superpowers/specs/2026-08-08-rfc-007-resource-fields-design.md) Accepted ([#13](https://github.com/rexescario-dev/resource-forge/issues/13)). Next: [M3.4 Fields](https://github.com/rexescario-dev/resource-forge/issues/15) plan → Accept → implement.
 
-RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. RFC-006 defines the annotation container, validation, and direct projection participation. Named annotation vocabulary and schema member vocabulary remain later RFCs.
+RFC-005 defines the authoritative Resource aggregate (`identity`, `schema`, `annotations`) and one-way projection to `ResourceMetadata`. RFC-006 defines the annotation container, validation, and direct projection participation. RFC-007 defines name-only Field members and the ordered `fields` sequence (no types; no field→metadata projection). Named annotation vocabulary, field types, and relations/operations remain later RFCs.
 
 Suggested implementation slices (see M3 implementation plan):
 
 - **M3.1** — Resource / ResourceSchema contracts, minimal construction, validation ✅
 - **M3.2** — `projectResourceMetadata` (RFC-005 floor only) ✅
 - **M3.3** — Annotations per RFC-006 (container + validation + direct projection) ✅
-- **M3.4+** — deferred until Resource Fields / Relations / Operations RFCs (and vocabulary RFCs as needed)
+- **M3.4** — Fields per RFC-007 (member + ordered sequence + validation) — [#15](https://github.com/rexescario-dev/resource-forge/issues/15)
+- **M3.5+** — deferred until field-type / Relations / Operations RFCs (and vocabulary RFCs as needed)
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
