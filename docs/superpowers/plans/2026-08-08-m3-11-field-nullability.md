@@ -547,12 +547,12 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
+| M7 | **Approved** |
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-11-field-nullability` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/49 |
-| Status | **Ready for M7** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -567,13 +567,14 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 | Check | Result |
 | --- | --- |
-| Tests | **Passed** (per-file vitest run of `@resource-forge/core`) |
-| Typecheck | Pending |
+| Tests | **Passed** (per-file vitest; CI `ci` SUCCESS on #49) |
+| Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
 
 ### Next Gate
 
-**M7 — Code Review**
+**None — slice complete**
 
+**M7 Approved** (2026-08-08, post-merge formal review of `main` @ `cb88a18`). Faithful RFC-014 / plan realization. Closed Field `{ name, type, optional, nullable }`; missing vs invalid nullable causes; own-property + order-independent key sets; validate-before-snapshot; optional×nullable orthogonality; Relations unchanged; no projection contribution; no public nullable validate helpers. CI green on #49; merge already completed under project norms before this formal M7 record.
