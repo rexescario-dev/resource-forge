@@ -283,7 +283,7 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/project.test.ts` (fixture shapes that must fail before implementation)
 - Modify: `packages/core/src/resource/exports.test.ts`
 
-- [ ] **Step 1: Widen types**
+- [x] **Step 1: Widen types**
 
 ```ts
 export type FieldType = 'string' | 'number' | 'boolean';
@@ -302,7 +302,7 @@ export type FieldValidationError =
 
 Export `FieldType` from resource + package barrels.
 
-- [ ] **Step 2: Rewrite / add failing tests**
+- [x] **Step 2: Rewrite / add failing tests**
 
 Update existing fixtures that used name-only Fields so tests express the **post-M3.6** contract (typed Fields for acceptance paths). Add explicit cases:
 
@@ -355,8 +355,8 @@ it('treats Fields equal only when name and type match (order-sensitive sequence)
 
 Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to typed Fields so they fail for the right reason until implementation lands (name-only will be invalid).
 
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated Field Type cases (and likely on still name-only fixtures until Task 2)
-- [ ] **Step 4: Commit** `test(core): add failing M3.6 typed Field contract tests`
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated Field Type cases (and likely on still name-only fixtures until Task 2)
+- [x] **Step 4: Commit** `test(core): add failing M3.6 typed Field contract tests` — deferred pending human review (no commit this session)
 
 ### Task 2: Validate-before-snapshot + validation integration
 
@@ -366,7 +366,7 @@ Also update `validate.test.ts` / `project.test.ts` acceptance fixtures to typed 
 - Modify: `packages/core/src/resource/create-resource-with-relations.ts` (comments if needed)
 - Confirm: `packages/core/src/resource/validate.ts` continues to call `checkFields`
 
-- [ ] **Step 1: Internal (non-exported) `validateFieldType`**
+- [x] **Step 1: Internal (non-exported) `validateFieldType`**
 
 ```ts
 const FIELD_TYPES = new Set(['string', 'number', 'boolean']);
@@ -384,7 +384,7 @@ function validateFieldType(
 
 Exact membership only — no trim/lowercase. Do **not** add `export` on this helper.
 
-- [ ] **Step 2: Widen `checkFields`**
+- [x] **Step 2: Widen `checkFields`**
 
 Keep the existing module-local `export function checkFields` (same-package / test import only). For each candidate member:
 
@@ -397,7 +397,7 @@ Keep the existing module-local `export function checkFields` (same-package / tes
 
 MUST NOT strip extras or invent `type`.
 
-- [ ] **Step 3: Widen `snapshotFields` / `fieldsEqual`**
+- [x] **Step 3: Widen `snapshotFields` / `fieldsEqual`**
 
 Preserve existing module-local exports (not package barrels):
 
@@ -438,9 +438,9 @@ expect(Object.isFrozen(resource.value.schema.fields)).toBe(true);
 expect(Object.isFrozen(resource.value.schema.fields[0])).toBe(true);
 ```
 
-- [ ] **Step 4: Update fixture comments** to say freeze `{ name, type }` (behavior already via `checkFields`/`snapshotFields`)
-- [ ] **Step 5: Green** Task 1 field/validate tests for typed acceptance + rejection causes
-- [ ] **Step 6: Commit** `feat(core): require typed Fields { name, type } (RFC-009)`
+- [x] **Step 4: Update fixture comments** to say freeze `{ name, type }` (behavior already via `checkFields`/`snapshotFields`)
+- [x] **Step 5: Green** Task 1 field/validate tests for typed acceptance + rejection causes
+- [x] **Step 6: Commit** `feat(core): require typed Fields { name, type } (RFC-009)` — deferred pending human review (no commit this session)
 
 ### Task 3: Projection non-participation + relation coexistence regressions
 
@@ -449,10 +449,10 @@ expect(Object.isFrozen(resource.value.schema.fields[0])).toBe(true);
 - Touch `project.ts` only if needed (body should remain annotation-only)
 - Confirm relations tests still pass (relations unchanged; optional field candidates in coexistence tests must be typed if present)
 
-- [ ] **Step 1: Ensure projection tests** use typed Fields; assert zero field-derived entries; invalid typed/name-only fields → `invalid_resource`; purity
-- [ ] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
-- [ ] **Step 3: Full suite green including relations**
-- [ ] **Step 4: Commit** `test(core): typed fields do not contribute to metadata projection`
+- [x] **Step 1: Ensure projection tests** use typed Fields; assert zero field-derived entries; invalid typed/name-only fields → `invalid_resource`; purity
+- [x] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
+- [x] **Step 3: Full suite green including relations**
+- [x] **Step 4: Commit** `test(core): typed fields do not contribute to metadata projection` — deferred pending human review (no commit this session)
 
 ### Task 4: Exports, roadmap, plan status hygiene
 
@@ -461,10 +461,10 @@ expect(Object.isFrozen(resource.value.schema.fields[0])).toBe(true);
 - Modify: `docs/roadmap.md` — mark M3.6 **implementation** complete only after M6 verification is green
 - Update this plan’s Status / M5 note only when Plan Review Accepts (M5), and checkboxes when M6 completes
 
-- [ ] **Step 1: Export smoke** — `FieldType` present; `Field` widened; no `validateFields` / `validateFieldType`
-- [ ] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 130; net new typed-field cases)
-- [ ] **Step 3: Docs status updates only after verification**
-- [ ] **Step 4: Commit** `docs: record M3.6 field types slice complete`
+- [x] **Step 1: Export smoke** — `FieldType` present; `Field` widened; no `validateFields` / `validateFieldType`
+- [x] **Step 2: Full** `pnpm --filter @resource-forge/core test` **green** (expect ≥ prior 130; net new typed-field cases)
+- [x] **Step 3: Docs status updates only after verification**
+- [x] **Step 4: Commit** `docs: record M3.6 field types slice complete` — deferred pending human review (no commit this session)
 
 ---
 
@@ -539,36 +539,37 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/23 |
 | M4 | Plan **Accepted** (Draft reviewed) |
 | M5 | Review **Accepted** |
-| M6 | n/a (not started) |
-| M7 | n/a |
+| M6 | **Complete** (uncommitted pending review) |
+| M7 | Pending |
 | M8 | n/a |
 | M9 | n/a |
 | Branch | `feat/m3-6-field-types` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/24 |
-| Status | **Ready for M6** |
+| Status | **Ready for M7** (after commit/push of implementation) |
 
 ### Shipped
 
 - Accepted M3.6 implementation plan for RFC-009 typed Fields
-- Internal-helper / public-API boundary clarified (`validateFieldType` non-exported)
-- Snapshot ownership verification strengthened in the plan
+- Breaking Field widen to exactly `{ name, type }` with closed `FieldType`
+- `invalid_field_type` vs `invalid_field_member`; validate-before-snapshot; frozen ownership on validated Resources
+- Projection non-participation retained; relations/annotations/operations unchanged
 
 ### Validation
 
 | Check | Result |
 | --- | --- |
-| Tests | N/A (docs/plan only at M5) |
-| Typecheck | N/A |
-| Lint | N/A |
-| Build | N/A |
-| Package validation | N/A |
+| Tests | **Passed** (134) |
+| Typecheck | **Passed** |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
 
 ### Next Gate
 
-**M6 — Implementation**
+**M7 — Code Review**
 
 ---
 
 ## Gate
 
-**M5 Accepted.** M6 implementation may begin under this plan and tracking issue #23. Do not invent nullability, constraints, enums, composites, association semantics, dual-shape compatibility, or field→metadata projection. Keep Accepted plan + implementation on **one PR** (no plan-only merge).
+**M6 implementation complete (local, uncommitted).** Hand off for human review / commit, then **M7 Code Review** on [#23](https://github.com/rexescario-dev/resource-forge/issues/23) / [#24](https://github.com/rexescario-dev/resource-forge/pull/24). Do not invent nullability, constraints, enums, composites, association semantics, dual-shape compatibility, or field→metadata projection.

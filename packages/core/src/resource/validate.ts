@@ -4,8 +4,8 @@ import {
 } from '../identity/index.js';
 import { err, ok, type Result } from '../result.js';
 import { checkAnnotations } from './annotations.js';
-import { checkFields } from './fields.js';
-import { checkRelations } from './relations.js';
+import { checkFields, snapshotFields } from './fields.js';
+import { checkRelations, snapshotRelations } from './relations.js';
 import type {
   Annotations,
   EmptySchemaCollection,
@@ -65,11 +65,12 @@ export function validateResource(candidate: {
   return ok({
     identity: identityResult.value,
     schema: {
-      fields: fieldsResult.value,
-      relations: relationsResult.value,
+      // Freeze validated members so Resource ownership does not alias caller arrays/objects.
+      fields: snapshotFields(fieldsResult.value),
+      relations: snapshotRelations(relationsResult.value),
       operations: schema.operations,
     },
-    // Authoritative snapshot already established at construction; do not re-snapshot here.
+    // Authoritative annotations snapshot already established at construction; do not re-snapshot here.
     annotations: candidate.annotations,
   });
 }

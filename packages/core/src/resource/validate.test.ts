@@ -45,7 +45,10 @@ describe('validateResource', () => {
     const result = validateResource({
       identity: identity.value,
       schema: {
-        fields: [{ name: 'id' }, { name: 'email' }],
+        fields: [
+          { name: 'id', type: 'string' },
+          { name: 'email', type: 'string' },
+        ],
         relations: [],
         operations: [],
       },

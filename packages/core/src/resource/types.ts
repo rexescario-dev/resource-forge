@@ -13,9 +13,13 @@ export type EmptySchemaCollection = readonly [];
 /** Validated field identity string (RFC-007). */
 export type FieldName = string;
 
-/** Closed name-only Field member (RFC-007). */
+/** Closed FieldType vocabulary (RFC-009). */
+export type FieldType = 'string' | 'number' | 'boolean';
+
+/** Closed typed Field member (RFC-009; amends RFC-007 §3.2). */
 export type Field = {
   readonly name: FieldName;
+  readonly type: FieldType;
 };
 
 export type FieldValidationError =
@@ -32,6 +36,11 @@ export type FieldValidationError =
   | {
       readonly code: 'invalid_field_member';
       readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_field_type';
+      readonly index: number;
+      readonly type: unknown;
     };
 
 /** Validated relation identity string (RFC-008). */
