@@ -535,12 +535,12 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
+| M7 | **Approved** |
 | M8 | N/A |
 | M9 | N/A |
 | Branch | `feat/m3-13-constraints` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/59 |
-| Status | **Ready for M7** |
+| Status | **Ready for merge** |
 
 ### Shipped
 
@@ -555,7 +555,7 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 | Check | Result |
 | --- | --- |
-| Tests | **Passed** (per-file vitest: constraints 13, project 22, relations 28, fields 19, operations 9, validate 6, exports 7, schema 1, annotations 6; `tsc --noEmit` exit 0) |
+| Tests | **Passed** (per-file vitest; CI `ci` SUCCESS on #59; constraints 13 on recheck) |
 | Typecheck | **Passed** (`tsc --noEmit` in `@resource-forge/core`) |
 | Lint | Skipped |
 | Build | Skipped |
@@ -563,4 +563,6 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ### Next Gate
 
-**M7 — Code Review**
+**Merge** (then closeout as Slice complete)
+
+**M7 Approved** (2026-08-08). Faithful RFC-016 / plan realization. Required ordered `constraints`; closed `{ name, kind }`; open non-empty `kind`; missing vs invalid collection/member causes; shape-classification boundaries preserved; validate-before-snapshot; independent namespaces; no projection contribution; no public constraint validate helpers; Field/Relation/Operation floors unchanged. CI green on #59.
