@@ -551,12 +551,12 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | M4 | Plan **Accepted** (Draft reviewed) |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | **Ready for M7** |
-| M8 | Pending |
-| M9 | Pending (roadmap updated with verification) |
+| M7 | **Approved for merge** |
+| M8 | N/A |
+| M9 | Roadmap already updated in delivery PR |
 | Branch | `feat/m3-7-relation-association` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/29 |
-| Status | **Ready for M7** |
+| Status | **Complete** |
 
 ### Shipped
 
@@ -575,14 +575,45 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
-| CI | Pending PR checks |
+| CI | **Passed** (https://github.com/rexescario-dev/resource-forge/actions/runs/31240240648/job/93059877975) |
 
 ### Next Gate
 
-**M7 Code Review** on [#29](https://github.com/rexescario-dev/resource-forge/pull/29)
+None — slice complete
+
+---
+
+## M7 review record
+
+```text
+Decision: Approved for merge
+Subject: https://github.com/rexescario-dev/resource-forge/pull/29 (merged as dd60ad2)
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-010-relation-association-semantics-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-08-m3-7-relation-association.md
+
+Plan tasks reviewed:
+- Task 1 types + failing association tests: ✓
+- Task 2 validate-before-snapshot + checkRelations/snapshot/equality: ✓
+- Task 3 projection non-participation + field coexistence: ✓
+- Task 4 exports + roadmap: ✓
+
+Verification evidence:
+- pnpm --filter @resource-forge/core test → 142 passed (local on main @ dd60ad2)
+- pnpm --filter @resource-forge/core typecheck → Passed
+- CI ci → pass (actions/runs/31240240648)
+
+Review summary: Faithful RFC-010 / plan realization. Closed Relation { name, target }; declarative target via validateResourceIdentity(..., { kind: 'user' }); name-only rejected; invalid_relation_target vs invalid_relation_member; validate then freeze; no dual-shape; no Relation→metadata; helpers not barrel-exported. RFC-001 remains identity authority for targets. Scope limited to @resource-forge/core.
+
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- None material for this slice.
+
+Gate: Already merged. M8 N/A. Slice complete.
+```
 
 ---
 
 ## Gate
 
-**M6 complete.** Ready for **M7 Code Review** on [#28](https://github.com/rexescario-dev/resource-forge/issues/28) / [#29](https://github.com/rexescario-dev/resource-forge/pull/29).
+**M7 Approved.** Slice M3.7 complete on [#28](https://github.com/rexescario-dev/resource-forge/issues/28) / [#29](https://github.com/rexescario-dev/resource-forge/pull/29).
