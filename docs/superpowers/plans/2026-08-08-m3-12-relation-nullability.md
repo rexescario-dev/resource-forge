@@ -603,7 +603,7 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 | M9 | N/A |
 | Branch | `feat/m3-12-relation-nullability` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/54 |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -626,6 +626,6 @@ Task checkboxes in this document are completed during **M6 execution**. M5 accep
 
 ### Next Gate
 
-**Merge** (then closeout as Slice complete)
+**None — slice complete**
 
-**M7 Approved** (2026-08-08). Faithful RFC-015 / plan realization. Closed Relation `{ name, target, multiplicity, optional, nullable }`; association-reference nullability only; missing vs invalid nullable causes; own-property + order-independent key sets; validate-before-snapshot; optional×multiplicity×nullable orthogonality; Fields unchanged; no projection contribution; no public nullable validate helpers. CI green on #54.
+**M7 Approved** (2026-08-08). Faithful RFC-015 / plan realization. Closed Relation `{ name, target, multiplicity, optional, nullable }`; association-reference nullability only; missing vs invalid nullable causes; own-property + order-independent key sets; validate-before-snapshot; optional×multiplicity×nullable orthogonality; Fields unchanged; no projection contribution; no public nullable validate helpers. CI green on #54; merge completed as `main` @ `a96bb9f` (#54).
