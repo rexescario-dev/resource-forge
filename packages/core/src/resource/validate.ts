@@ -4,23 +4,17 @@ import {
 } from '../identity/index.js';
 import { err, ok, type Result } from '../result.js';
 import { checkAnnotations } from './annotations.js';
+import { checkFields } from './fields.js';
 import type {
   Annotations,
+  EmptySchemaCollection,
   Resource,
   ResourceSchema,
   ResourceValidationError,
 } from './types.js';
 
-function isEmptySchemaCollection(value: unknown): value is readonly [] {
+function isEmptySchemaCollection(value: unknown): value is EmptySchemaCollection {
   return Array.isArray(value) && value.length === 0;
-}
-
-function isValidEmptySchema(schema: ResourceSchema): boolean {
-  return (
-    isEmptySchemaCollection(schema.fields) &&
-    isEmptySchemaCollection(schema.relations) &&
-    isEmptySchemaCollection(schema.operations)
-  );
 }
 
 export function validateResource(candidate: {
@@ -35,8 +29,24 @@ export function validateResource(candidate: {
     return err({ code: 'invalid_identity', cause: identityResult.error });
   }
 
-  if (!candidate.schema || !isValidEmptySchema(candidate.schema)) {
+  const schema = candidate.schema;
+  if (!schema || typeof schema !== 'object') {
     return err({ code: 'invalid_schema' });
+  }
+
+  if (
+    !Array.isArray(schema.fields) ||
+    !('relations' in schema) ||
+    !('operations' in schema) ||
+    !isEmptySchemaCollection(schema.relations) ||
+    !isEmptySchemaCollection(schema.operations)
+  ) {
+    return err({ code: 'invalid_schema' });
+  }
+
+  const fieldsResult = checkFields(schema.fields);
+  if (!fieldsResult.ok) {
+    return err({ code: 'invalid_schema', cause: fieldsResult.error });
   }
 
   const annotationsResult = checkAnnotations(candidate.annotations);
@@ -50,9 +60,9 @@ export function validateResource(candidate: {
   return ok({
     identity: identityResult.value,
     schema: {
-      fields: candidate.schema.fields,
-      relations: candidate.schema.relations,
-      operations: candidate.schema.operations,
+      fields: fieldsResult.value,
+      relations: schema.relations,
+      operations: schema.operations,
     },
     // Authoritative snapshot already established at construction; do not re-snapshot here.
     annotations: candidate.annotations,

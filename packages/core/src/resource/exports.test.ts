@@ -68,3 +68,13 @@ describe('M3.3 public exports', () => {
     expect(projected.value.entries).toHaveLength(1);
   });
 });
+
+describe('M3.4 public exports', () => {
+  it('does not export validateFields or internal field helpers', () => {
+    expect('validateFields' in core).toBe(false);
+    expect('validateFieldName' in core).toBe(false);
+    expect('snapshotFields' in core).toBe(false);
+    expect('fieldsEqual' in core).toBe(false);
+    expect('createResourceWithFieldsForTests' in core).toBe(false);
+  });
+});

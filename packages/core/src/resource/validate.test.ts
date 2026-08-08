@@ -39,22 +39,24 @@ describe('validateResource', () => {
     }
   });
 
-  it('rejects non-empty fields', () => {
+  it('accepts valid non-empty fields', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     if (!identity.ok) return;
     const result = validateResource({
       identity: identity.value,
       schema: {
-        fields: [{ name: 'x' }] as unknown as [],
+        fields: [{ name: 'id' }, { name: 'email' }],
         relations: [],
         operations: [],
       },
       annotations: emptyAnnotations,
     });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('invalid_schema');
-    }
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.schema.fields.map((f) => f.name)).toEqual([
+      'id',
+      'email',
+    ]);
   });
 
   it('rejects missing schema collection property', () => {
