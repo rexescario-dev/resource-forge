@@ -1,17 +1,20 @@
-# RFC-011: Relation Cardinality / Multiplicity
+# RFC-011: Relation Multiplicity
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; closed `{ name, target, multiplicity }` with `RelationMultiplicity = "one" | "many"`; shape-only (not bounds/optional/null); missing vs invalid multiplicity distinguished; RFC-008 collection vs `"many"` shape clarified; breaking vs M3.7 two-member Relations; no dual-shape; Operations deferred  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#31](https://github.com/rexescario-dev/resource-forge/issues/31)  
 **Depends on:** RFC-001 (Resource Identity — target representation unchanged), RFC-005 (Resource Model), RFC-006 (Annotations — projection boundary), RFC-008 (Resource Relations — collection semantics retained), RFC-010 (Relation Association Semantics — association floor; Relation shape partially superseded), RFC-007 / RFC-009 (Fields — unchanged)  
 **Followed by:** Nullability / optionality / requiredness on Relations or Fields; min/max bounds; direction / inverse; local-field handles / join mapping; cascade; loading/fetch; persistence/ORM mapping; polymorphic targets; registry-backed resolution; association→metadata projection; Resource Operations  
-**Unblocks:** M3.8 Relation multiplicity implementation planning (M4→M5), then implementation (M6), after this RFC is Accepted — not implementation by itself  
+**Unblocks:** M3.8 Relation Multiplicity implementation planning (M4→M5), then implementation (M6), after this RFC is Accepted — not implementation by itself  
 **Amends / supersedes:** RFC-010 §5 Relation member shape (and related closed-member / Relation equality text). See §3.
+
+**Normative terminology:** This RFC uses **multiplicity** as the contract term (`Relation.multiplicity`, `RelationMultiplicity`). “Cardinality” may appear in historical deferral lists or explanatory prose elsewhere in the project, but does **not** define an additional contract dimension in this RFC.
 
 ## Primary question
 
-> How many related instances does a Relation declare—without deciding optionality, nullability, bounds, direction, joins, or runtime behavior?
+> What relationship shape does a Relation declare—singular or collection—without deciding optionality, nullability, bounds, direction, joins, or runtime behavior?
 
 ## Thesis
 
@@ -30,7 +33,9 @@ Relation
 
 **RFC-008 owns the Relations collection; RFC-010 owns association target; RFC-011 owns multiplicity (relationship shape).**
 
-This RFC answers **how many** related instances a Relation declares at the shape level (`one` = singular, `many` = collection). It does not answer whether a related value may be absent, nullable, bounded, navigated, loaded, or persisted.
+The `relations` sequence is the **collection of Relation declarations** owned by RFC-008. `multiplicity: "many"` describes the **target relationship shape of an individual Relation** and does not alter the `relations` sequence itself.
+
+This RFC answers whether a Relation’s declared relationship shape is singular (`"one"`) or collection (`"many"`). It does not answer whether a related value may be absent, nullable, bounded, navigated, loaded, or persisted — and it does not declare live instance counts.
 
 ## 1. Scope
 
@@ -78,8 +83,9 @@ This RFC does not define:
 | Singular relationship | What `"one"` asserts: the Relation’s shape is to-one |
 | Collection relationship | What `"many"` asserts: the Relation’s shape is to-many |
 | Declared relationship shape | What `Relation.multiplicity` asserts; does **not** imply optionality, nullability, bounds, load behavior, or instance-count validation against data |
+| `relations` sequence | The ordered collection of Relation **declarations** owned by RFC-008 — distinct from a Relation whose `multiplicity` is `"many"` |
 
-RFC-008 terms (`RelationName`, `relations` ordered sequence, uniqueness within `relations`) and RFC-010 terms (`target`, declarative association identity) keep their existing meanings except where this RFC supersedes Relation shape and Relation equality.
+RFC-008 terms (`RelationName`, uniqueness within `relations`) and RFC-010 terms (`target`, declarative association identity) keep their existing meanings except where this RFC supersedes Relation shape and Relation equality.
 
 ## 3. Supersession / amendment of RFC-010
 
@@ -90,7 +96,7 @@ Once this RFC is **Accepted** and the corresponding implementation floor is adop
 | Relation member shape | **RFC-011** (supersedes RFC-010 §5 closed `{ name, target }`) |
 | Required `multiplicity` / `RelationMultiplicity` vocabulary | **RFC-011** |
 | Relation value equality | **RFC-011** |
-| Relation member validity (shape + multiplicity) | **RFC-011** (with RFC-008 name rules and RFC-010 / RFC-001 target rules) |
+| Relation shape / multiplicity validity | **RFC-011**, composed with RFC-008 `RelationName` validation and RFC-010 target validation |
 | Declarative `target` semantics / RFC-001 `user` context | RFC-010 (unchanged) |
 | `RelationName` grammar / equality | RFC-008 |
 | Ordered `relations` sequence; empty valid | RFC-008 |
@@ -113,6 +119,15 @@ RelationMultiplicity ::= "one" | "many"
 | --- | --- |
 | `"one"` | Singular relationship shape |
 | `"many"` | Collection relationship shape |
+
+**`"one"` does not mean exactly one existing related instance, and `"many"` does not impose any minimum or maximum instance count.**
+
+```text
+"one"  ≠  min 1, max 1
+"many" ≠  min 1, max ∞
+"many" ≠  zero-or-more   (and ≠ one-or-more)
+"one"  ≠  required to-one
+```
 
 - **Identity:** exact string membership in the set above.
 - **Case-sensitive:** `"One"` is not `"one"`; `"MANY"` is not `"many"`.
@@ -145,8 +160,8 @@ Informative closed shape (conceptual; not a prescribed module export):
 type RelationMultiplicity = 'one' | 'many';
 
 interface Relation {
-  name: string; // RelationName (RFC-008)
-  target: ResourceIdentity; // RFC-010 / RFC-001
+  name: RelationName;
+  target: ResourceIdentity;
   multiplicity: RelationMultiplicity;
 }
 ```
@@ -165,7 +180,7 @@ Relation {
 - `name` MUST be a valid `RelationName` (RFC-008).
 - `target` MUST be a valid declarative `ResourceIdentity` under RFC-010 (RFC-001 rules under the **`user`** validation context).
 - `multiplicity` MUST be a valid `RelationMultiplicity` (this RFC).
-- Missing `multiplicity` is invalid.
+- Missing `multiplicity` is invalid (**Missing relation multiplicity**).
 - Members with additional properties (including premature `optional`, `nullable`, `min`, `max`, `direction`, local-field handles, etc.) are invalid (not ignored or stripped).
 - Later RFCs may extend or amend the Relation model explicitly; such extensions do not become valid under this RFC merely because future evolution is anticipated. Unknown properties MUST NOT silently become part of Relation semantics.
 
@@ -177,7 +192,7 @@ Two Relation **values** are equal if and only if:
 2. their `target`s are equal under RFC-001 `ResourceIdentity` equality; and
 3. their `multiplicity` values are exactly equal.
 
-Changing only `multiplicity` makes two Relations unequal.
+Changing only `multiplicity` makes two Relations unequal. Equality and uniqueness remain distinct: unequal Relation values with the same `RelationName` still cannot coexist in one `relations` sequence (RFC-008 uniqueness-by-name).
 
 ### 5.2 Interaction with the `relations` sequence (RFC-008)
 
@@ -202,11 +217,17 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 
 | Cause | When |
 | --- | --- |
-| Invalid relation member | Non-object, missing required member (including missing `multiplicity`), extra member, or malformed member structure not attributable to a `RelationName`, `target` identity, or multiplicity vocabulary violation |
+| Invalid relation member | Relation is not structurally an object with the required three members, or contains extra members, or is otherwise malformed in a way not attributable to name / target / multiplicity-specific causes below |
 | Invalid relation name | `name` fails `RelationName` grammar (RFC-008) |
 | Duplicate relation name | repeated `RelationName` in the sequence (RFC-008) |
 | Invalid relation target | `target` is present but fails RFC-001 identity validation under the **`user`** validation context (RFC-010) |
+| Missing relation multiplicity | `multiplicity` is absent (structural absence of the required member) |
 | Invalid relation multiplicity | `multiplicity` is present but fails exact `RelationMultiplicity` membership (wrong type, unknown value, alias, trimmed/cased variant, etc.) |
+
+```text
+missing multiplicity          → Missing relation multiplicity
+present but invalid value     → Invalid relation multiplicity
+```
 
 - These remain Resource/schema validation failures, distinct from metadata, annotation, and field validation failures.
 - No silent dropping, normalization, coercion, or defaulting of `multiplicity`.
@@ -236,18 +257,18 @@ Concrete codes and TypeScript shapes are deferred; separation is normative:
 | Projection | Unchanged non-participation |
 | Fields / operations / annotations | Unchanged |
 
-Implementations that currently treat Relations as `{ name, target }` MUST widen the member contract only after this RFC is Accepted and an Accepted implementation plan exists.
+Implementations that currently treat Relations as `{ name, target }` MUST widen the member contract only after this RFC is Accepted and an Accepted **M3.8 Relation Multiplicity** implementation plan exists.
 
 ## 9. Design rationale
 
-- **Multiplicity after association** continues the RFC-008 → RFC-010 progression: identity → target → shape count dimension, without leaping to Operations or runtime behavior.
-- **Closed binary `one` \| `many`** is the smallest contract that distinguishes singular vs collection relationship shape; bounds and optionality are deliberately not smuggled in.
+- **Multiplicity after association** continues the RFC-008 → RFC-010 progression: identity → target → relationship shape, without leaping to Operations or runtime behavior.
+- **Closed binary `"one" \| "many"`** is the smallest contract that distinguishes singular vs collection relationship shape; bounds and optionality are deliberately not smuggled in.
 - **Required third member** keeps the Relation closed and explicit; inventing a default multiplicity would be silent repair.
 - **No optional/required / nullability** prevents coupling relationship shape to value constraints — those remain independent future RFCs.
 - **No aliases / no min-max** keeps Design Review focused and avoids accidental enum sprawl.
 - **Partial supersession of RFC-010 §5** makes the breaking widen unmistakable while retaining target and collection ownership.
 - **Equality includes `multiplicity`** so a shape change is observable; uniqueness stays name-scoped so RFC-008’s collection model is not silently rewritten.
-- **Dedicated Invalid relation multiplicity** preserves reject-don’t-repair discipline and keeps vocabulary errors separable from shape/target/name errors.
+- **Missing vs invalid multiplicity** separates structural absence from vocabulary violation; **Invalid relation multiplicity** remains dedicated for present-but-invalid values.
 
 ### Suggested progression (non-normative)
 
@@ -256,7 +277,7 @@ RFC-008  Relation identity          { name }
         │
 RFC-010  Association target         { name, target }
         │
-RFC-011  Multiplicity (this RFC)    { name, target, multiplicity: one|many }
+RFC-011  Multiplicity (this RFC)    { name, target, multiplicity: "one"|"many" }
         │
 Later    Optionality / nullability / bounds / direction / join / …
         │
@@ -271,12 +292,12 @@ Later    Resource Operations        (independent RFC)
 | RFC-005 Resource Model | Relied upon; schema member slot unchanged |
 | RFC-006 Annotations | Relied upon for projection boundary; unchanged |
 | RFC-007 / RFC-009 Fields | Unchanged; independent namespaces unchanged |
-| RFC-008 Resource Relations | Collection semantics retained |
+| RFC-008 Resource Relations | Collection semantics retained (`relations` sequence ≠ `"many"` shape) |
 | RFC-010 Relation Association | **Partially superseded** (§5 Relation shape / Relation equality); target semantics retained |
 | Later — optionality / nullability / min-max | Explicit constraint RFCs; MUST NOT be inferred from `"one"` / `"many"` |
 | Later — direction / join / cascade / load / persistence / polymorphism | Explicit association-dimension RFCs |
 | Later — Resource Operations | Empty-only until its RFC; independent of multiplicity |
-| M3.8+ multiplicity implementation | Only after this RFC is Accepted and an Accepted implementation plan exists |
+| M3.8 Relation Multiplicity | Only after this RFC is Accepted and the **M3.8 Relation Multiplicity** implementation plan is Accepted |
 
 ## 11. Document acceptance criteria (M2 → M3 Design Review)
 
@@ -284,10 +305,10 @@ This RFC may move from Draft to Accepted when Design Review finds:
 
 1. The closed Relation shape is unambiguously exactly `{ name, target, multiplicity }` with `multiplicity: RelationMultiplicity`; missing `multiplicity` and extras are invalid.
 2. `RelationMultiplicity` is unambiguously the closed set `"one" | "many"` by exact membership (case-sensitive; no trim/alias/coerce/normalize).
-3. `"one"` means singular relationship shape and `"many"` means collection relationship shape — with optional/required, nullability, min/max, direction, joins, loading, persistence, and query semantics explicitly **not** implied.
-4. Supersession of RFC-010 §5 (and related Relation equality / closed-member text) is explicit; RFC-010 target semantics and RFC-008 collection ownership remain.
+3. `"one"` means singular relationship shape and `"many"` means collection relationship shape — with optional/required, nullability, min/max, direction, joins, loading, persistence, query semantics, and live instance counts explicitly **not** implied (`"one" ≠ min1/max1`; `"many" ≠` any bound).
+4. Supersession of RFC-010 §5 (and related Relation equality / closed-member text) is explicit; RFC-010 target semantics and RFC-008 collection ownership remain; `relations` sequence vs `"many"` relationship shape are not conflated.
 5. Relation value equality (`name` **and** `target` **and** `multiplicity`) and uniqueness-by-name coexistence rules are unambiguous.
-6. Conceptual failure causes distinguish Invalid relation multiplicity from Invalid relation member / target / name / duplicate causes; no silent repair or default `multiplicity`; no required public validate API.
+6. Conceptual failure causes distinguish Missing relation multiplicity from Invalid relation multiplicity, and both from Invalid relation member / target / name / duplicate causes; no silent repair or default `multiplicity`; no required public validate API.
 7. Breaking compatibility vs M3.7 / two-member Relations is explicit; no dual-shape period.
 8. Fields, Operations, projection, and association-target rules remain explicitly deferred or unchanged as stated.
 9. No normative TypeScript API prescription beyond the conceptual Relation / `RelationMultiplicity` contracts.
@@ -316,11 +337,12 @@ This RFC may move from Draft to Accepted when Design Review finds:
 | Decision | Choice | Why |
 | --- | --- | --- |
 | Primary question | Relationship shape (singular vs collection) | Smallest delta after RFC-010 |
+| Contract term | **Multiplicity** (not a separate cardinality dimension) | Avoid bounds/instance-count ambiguity |
 | Vocabulary | Closed `"one" \| "many"` | Binary; no alias sprawl |
 | Member name | `multiplicity` | Names the dimension without implying ORM cardinality suites |
 | Required? | Yes — required third member | Closed explicit contract; no defaulting |
-| `"one"` meaning | Singular relationship shape only | No optionality/nullability smuggled |
-| `"many"` meaning | Collection relationship shape only | Same |
+| `"one"` meaning | Singular relationship shape only | Not exactly-one / not required to-one |
+| `"many"` meaning | Collection relationship shape only | Not zero-or-more / not one-or-more / no bounds |
 | Bounds / optional / null | Deferred | Separate dimensions |
 | Direction / join / load / persist | Deferred | Not relationship-shape |
 | Relation shape | Exactly `{ name, target, multiplicity }` | Closed member; breaking widen |
@@ -328,8 +350,8 @@ This RFC may move from Draft to Accepted when Design Review finds:
 | RFC-010 relationship | Partial supersession of §5 | Target retained; shape widened |
 | Equality | `name` + `target` + `multiplicity` | Shape change observable |
 | Uniqueness | By `RelationName` only | Preserve RFC-008 collection model |
-| Invalid multiplicity | Dedicated conceptual cause | Separable from shape/target errors |
-| Missing `multiplicity` | Invalid relation member | Required member absent |
+| Missing `multiplicity` | Missing relation multiplicity | Structural absence |
+| Present-but-invalid value | Invalid relation multiplicity | Vocabulary violation |
 | Projection | Unchanged | Out of scope |
 | Operations | Unchanged / empty-only | Separate independent RFC |
 
@@ -337,21 +359,21 @@ This RFC may move from Draft to Accepted when Design Review finds:
 
 ```text
 Resource {
-  identity: { namespace: crm, name: Order }
+  identity: { namespace: "crm", name: "Order" }
   schema: {
     fields: [
-      { name: total, type: number }          # RFC-009
+      { name: "total", type: "number" }          # RFC-009
     ]
     relations: [
       {
-        name: customer
-        target: { namespace: crm, name: Customer }
-        multiplicity: one
+        name: "customer"
+        target: { namespace: "crm", name: "Customer" }
+        multiplicity: "one"
       }
       {
-        name: lineItems
-        target: { namespace: crm, name: LineItem }
-        multiplicity: many
+        name: "lineItems"
+        target: { namespace: "crm", name: "LineItem" }
+        multiplicity: "many"
       }
     ]
     operations: ∅
@@ -359,22 +381,22 @@ Resource {
   annotations: ∅
 }
 
-# Valid: unique RelationNames; targets declarative; multiplicity exact one|many
+# Valid: unique RelationNames; targets declarative; multiplicity exact "one"|"many"
 # projectResourceMetadata → no Relation contribution (unchanged)
 
-# [ { name: customer, target: { namespace: crm, name: Customer } } ]
-#   → invalid (missing multiplicity; Invalid relation member)
-# [ { name: customer, target: { namespace: crm, name: Customer }, multiplicity: "one", optional: true } ]
+# [ { name: "customer", target: { namespace: "crm", name: "Customer" } } ]
+#   → invalid (Missing relation multiplicity)
+# [ { name: "customer", target: { namespace: "crm", name: "Customer" }, multiplicity: "one", optional: true } ]
 #   → invalid (extra member; Invalid relation member)
-# [ { name: customer, target: { namespace: crm, name: Customer }, multiplicity: "toOne" } ]
+# [ { name: "customer", target: { namespace: "crm", name: "Customer" }, multiplicity: "toOne" } ]
 #   → invalid (Invalid relation multiplicity; alias)
-# [ { name: customer, target: { namespace: crm, name: Customer }, multiplicity: "One" } ]
+# [ { name: "customer", target: { namespace: "crm", name: "Customer" }, multiplicity: "One" } ]
 #   → invalid (Invalid relation multiplicity; case)
-# [ { name: lineItems, target: { namespace: crm, name: LineItem }, multiplicity: "0..*" } ]
+# [ { name: "lineItems", target: { namespace: "crm", name: "LineItem" }, multiplicity: "0..*" } ]
 #   → invalid (Invalid relation multiplicity; bounds expression)
 # [
-#   { name: a, target: { namespace: crm, name: A }, multiplicity: one },
-#   { name: a, target: { namespace: crm, name: A }, multiplicity: many }
+#   { name: "a", target: { namespace: "crm", name: "A" }, multiplicity: "one" },
+#   { name: "a", target: { namespace: "crm", name: "A" }, multiplicity: "many" }
 # ]
 #   → invalid (Duplicate relation name)
 ```
@@ -384,7 +406,7 @@ Resource {
 Coding that requires Relation `multiplicity` or rejects two-member `{ name, target }` Relations under this contract begins only after:
 
 1. this RFC is Accepted;
-2. an Accepted implementation plan for the relevant M3 slice exists.
+2. an Accepted implementation plan for **M3.8 Relation Multiplicity** exists.
 
 Prefer **one pull request per tracking issue** for that delivery slice (Accepted plan + implementation together). Do not merge a plan-only PR before code for the same slice except as recovery.
 
