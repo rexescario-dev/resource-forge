@@ -111,8 +111,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithFieldsForTests(identity.value, [
-      { name: 'id', type: 'string' },
-      { name: 'email', type: 'string' },
+      { name: 'id', type: 'string', optional: false },
+      { name: 'email', type: 'string', optional: true },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -143,7 +143,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithFieldsForTests(
       identity.value,
-      [{ name: 'id', type: 'string' }],
+      [{ name: 'id', type: 'string', optional: false }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -164,8 +164,8 @@ describe('projectResourceMetadata', () => {
       identity: { namespace: 'crm', name: 'Customer' },
       schema: {
         fields: [
-          { name: 'id', type: 'string' },
-          { name: 'id', type: 'string' },
+          { name: 'id', type: 'string', optional: false },
+          { name: 'id', type: 'string', optional: true },
         ],
         relations: [],
         operations: [],
@@ -206,11 +206,13 @@ describe('projectResourceMetadata', () => {
         name: 'author',
         target: { namespace: 'crm', name: 'User' },
         multiplicity: 'one',
+        optional: false,
       },
       {
         name: 'lineItems',
         target: { namespace: 'crm', name: 'LineItem' },
         multiplicity: 'many',
+        optional: true,
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -247,6 +249,7 @@ describe('projectResourceMetadata', () => {
           name: 'author',
           target: { namespace: 'crm', name: 'User' },
           multiplicity: 'one',
+          optional: false,
         },
       ],
       annotations.value,
@@ -274,11 +277,13 @@ describe('projectResourceMetadata', () => {
             name: 'author',
             target: { namespace: 'crm', name: 'User' },
             multiplicity: 'one',
+            optional: false,
           },
           {
             name: 'author',
             target: { namespace: 'crm', name: 'Account' },
             multiplicity: 'one',
+            optional: true,
           },
         ],
         operations: [],

@@ -90,7 +90,11 @@ export function checkFields(
       });
     }
 
-    accepted.push({ name: nameResult.value, type: typeResult.value });
+    accepted.push({
+      name: nameResult.value,
+      type: typeResult.value,
+      optional: member.optional as boolean,
+    });
   }
 
   return ok(accepted);
@@ -103,7 +107,11 @@ export function checkFields(
 export function snapshotFields(fields: readonly Field[]): ReadonlyArray<Field> {
   return Object.freeze(
     fields.map((field) =>
-      Object.freeze({ name: field.name, type: field.type }),
+      Object.freeze({
+        name: field.name,
+        type: field.type,
+        optional: field.optional,
+      }),
     ),
   );
 }

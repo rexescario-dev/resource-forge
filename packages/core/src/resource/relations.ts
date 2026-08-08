@@ -146,6 +146,7 @@ export function checkRelations(
       name: nameResult.value,
       target: targetResult.value,
       multiplicity: rawMultiplicity as RelationMultiplicity,
+      optional: member.optional as boolean,
     });
   }
 
@@ -168,6 +169,7 @@ export function snapshotRelations(
           name: relation.target.name,
         }),
         multiplicity: relation.multiplicity,
+        optional: relation.optional,
       }),
     ),
   );
