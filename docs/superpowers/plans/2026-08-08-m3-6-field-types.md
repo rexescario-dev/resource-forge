@@ -539,13 +539,13 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/23 |
 | M4 | Plan **Accepted** (Draft reviewed) |
 | M5 | Review **Accepted** |
-| M6 | **Complete** (uncommitted pending review) |
-| M7 | Pending |
-| M8 | n/a |
-| M9 | n/a |
-| Branch | `feat/m3-6-field-types` |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** (roadmap + plan status in delivery PR) |
+| Branch | `feat/m3-6-field-types` (merged) |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/24 |
-| Status | **Ready for M7** (after commit/push of implementation) |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -563,13 +563,45 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Lint | Skipped |
 | Build | Skipped |
 | Package validation | Skipped |
+| CI | **Passed** (https://github.com/rexescario-dev/resource-forge/actions/runs/31239498193/job/93057958624) |
 
 ### Next Gate
 
-**M7 — Code Review**
+None — slice complete
+
+---
+
+## M7 review record
+
+```text
+Decision: Approved for merge
+Subject: https://github.com/rexescario-dev/resource-forge/pull/24 (merged as 2048fb3)
+Accepted specification: docs/superpowers/specs/2026-08-08-rfc-009-resource-field-types-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-08-m3-6-field-types.md
+
+Plan tasks reviewed:
+- Task 1 types + failing tests: ✓
+- Task 2 validate-before-snapshot + checkFields/snapshot/equality: ✓
+- Task 3 projection non-participation + relation coexistence: ✓
+- Task 4 exports + roadmap: ✓
+
+Verification evidence:
+- pnpm --filter @resource-forge/core test → 134 passed (local on main @ 2048fb3)
+- pnpm --filter @resource-forge/core typecheck → Passed
+- CI ci → pass (actions/runs/31239498193)
+
+Review summary: Faithful RFC-009 / plan realization. Closed { name, type }; exact FieldType membership; name-only rejected; invalid_field_type vs invalid_field_member; validate then freeze; no dual-shape; no field→metadata; helpers not barrel-exported; validateFieldType non-exported. Scope limited to @resource-forge/core.
+
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- validateResource now re-snapshots fields/relations after check (supports ownership freezes; slightly beyond fixture-only snapshotting, still plan-consistent).
+
+Gate: Already merged. M8 N/A. Slice complete.
+```
 
 ---
 
 ## Gate
 
-**M6 implementation complete (local, uncommitted).** Hand off for human review / commit, then **M7 Code Review** on [#23](https://github.com/rexescario-dev/resource-forge/issues/23) / [#24](https://github.com/rexescario-dev/resource-forge/pull/24). Do not invent nullability, constraints, enums, composites, association semantics, dual-shape compatibility, or field→metadata projection.
+**M7 Approved.** Slice M3.6 complete on [#23](https://github.com/rexescario-dev/resource-forge/issues/23) / [#24](https://github.com/rexescario-dev/resource-forge/pull/24).
