@@ -8,10 +8,12 @@ import {
   validateResourceMetadata,
 } from '../metadata/index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
+import { createResourceWithFieldsForTests } from './create-resource-with-fields.js';
 import { createResource } from './create.js';
 import { emptyAnnotations } from './empty-annotations.js';
 import { projectResourceMetadata } from './project.js';
 import { createEmptyResourceSchema } from './schema.js';
+import { snapshotAnnotations } from './annotations.js';
 
 describe('projectResourceMetadata', () => {
   it('projects a minimal Resource to RFC-002-valid metadata with identity agreement', () => {
@@ -99,5 +101,76 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.code).toBe('invalid_resource');
     if (projected.error.code !== 'invalid_resource') return;
     expect(projected.error.cause.code).toBe('invalid_annotations');
+  });
+
+  it('does not contribute fields to projected metadata', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithFieldsForTests(identity.value, [
+      { name: 'id' },
+      { name: 'email' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const before = structuredClone(resource.value);
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+
+    expect(projected.value.entries).toEqual([]);
+    expect(resource.value).toEqual(before);
+    expect(resource.value.schema.fields.map((f) => f.name)).toEqual([
+      'id',
+      'email',
+    ]);
+  });
+
+  it('projects annotations only when fields are also present', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const annotations = snapshotAnnotations([
+      { key: { namespace: 'docs', name: 'summary' }, value: 'A customer' },
+    ]);
+    expect(annotations.ok).toBe(true);
+    if (!annotations.ok) return;
+
+    const resource = createResourceWithFieldsForTests(
+      identity.value,
+      [{ name: 'id' }],
+      annotations.value,
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+    expect(projected.value.entries).toHaveLength(1);
+    expect(projected.value.entries[0]?.key).toEqual({
+      namespace: 'docs',
+      name: 'summary',
+    });
+  });
+
+  it('fails for invalid fields as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: {
+        fields: [{ name: 'id' }, { name: 'id' }],
+        relations: [],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
   });
 });
