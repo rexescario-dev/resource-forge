@@ -1,7 +1,8 @@
 # RFC-019: Intra-Instance Cross-Member Constraints
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; cut B intra-instance only; Approach 1 closed `distinct`/`equal` with `fields`; RFC-017 `field` invariant amended for member-local only; RFC-018 map/fail-fast extended; gate-order + continue-without-coercion normative; population uniqueness deferred; no second runtime surface / operator bag  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#70](https://github.com/rexescario-dev/resource-forge/issues/70)  
 **Depends on:** RFC-001 (Resource Identity — via Resource), RFC-005 (Resource Model — aggregate / schema), RFC-007 (Resource Fields — `FieldName` / ordered `fields`), RFC-009 (Resource Field Types — `FieldType` ∈ {string, number, boolean}), RFC-013 / RFC-014 (Field optionality / nullability — relied upon for runtime gates), RFC-016 (Constraints framework — packaging retained), RFC-017 (Concrete Constraint Kinds — specialized here for cross-member kinds), RFC-018 (Runtime Constraint Enforcement — field-value map / order / fail-fast / gates retained and extended for multi-field kinds)  
@@ -246,7 +247,7 @@ Walk target Fields in **`fields` declaration order**. For each `Fi`:
 3. If the gate result is **skip** → **skip** entire Constraint `C` (no kind evaluation; not a failure). Later Fields are not inspected for this Constraint.
 4. If the gate result is **continue** → the map entry for `Fi.name` is a present, non-null scalar of `Fi`’s declared `FieldType`; collect that scalar **without coercion** and proceed to the next `Fi`.
 
-If every `Fi` continues → proceed to kind evaluation (§7.3 / §7.4) with the ordered collected values `v1…vn`.
+If every `Fi` continues → proceed to kind evaluation (§7.4 / §7.5) with the ordered collected values `v1…vn` (using §7.3 equality).
 
 **Gate-order invariant:** Target Fields are gated strictly in the declared `fields` order. A `skip` terminates gate processing for the Constraint immediately; therefore later targeted Fields are neither gated nor diagnosed for that Constraint. This ordering is normative and is not merely an implementation optimization. Consequently, with `fields: ["optionalA", "requiredB"]`, an absent `optionalA` causes the Constraint to skip without inspecting `requiredB` — intentional under all-or-nothing skip, not an underspecified race between skip and missing-required failure.
 
@@ -384,10 +385,7 @@ Deferred concerns are listed in §1.2. This ledger records that population uniqu
 
 ## 14. Open questions for Design Review (M3)
 
-None blocking Draft. Reviewers may still challenge:
-
-1. Whether all-or-nothing skip is preferable to “skip only the absent optional Field and compare the remainder” (rejected here to keep `n >= 2` kind semantics stable and null-free).
-2. Whether homogeneous `FieldType` should be relaxed (rejected here for coherence).
+None. M3 Design Review Accepted (2026-08-08). All-or-nothing skip with normative gate-order, homogeneous `FieldType`, and deferred population uniqueness retained; no design blockers.
 
 ## 15. Suggested implementation slice (non-normative)
 

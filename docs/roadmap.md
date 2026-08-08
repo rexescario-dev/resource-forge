@@ -42,7 +42,7 @@ M3 gate RFCs:
 | RFC-016 | Constraints (required ordered `constraints` + closed `{ name, kind }` framework) | Accepted — [#56](https://github.com/rexescario-dev/resource-forge/issues/56) |
 | RFC-017 | Concrete Constraint Kinds (closed `range` \| `pattern` \| `enum`; Field-targeted; declaration-time only) | Accepted — [#61](https://github.com/rexescario-dev/resource-forge/issues/61) |
 | RFC-018 | Runtime Constraint Enforcement (field-value map; inclusive `range`; ECMAScript `pattern`; `enum` membership; optional/nullable gates) | Accepted — [#66](https://github.com/rexescario-dev/resource-forge/issues/66) |
-| RFC-019 | Intra-Instance Cross-Member Constraints (`distinct` \| `equal`; multi-field `fields`; single field-value map; population uniqueness deferred) | Draft — [#70](https://github.com/rexescario-dev/resource-forge/issues/70) |
+| RFC-019 | Intra-Instance Cross-Member Constraints (`distinct` \| `equal`; multi-field `fields`; single field-value map; population uniqueness deferred) | Accepted — [#70](https://github.com/rexescario-dev/resource-forge/issues/70) |
 | Later | Population uniqueness; operation kind / signature / execution; annotation vocabulary; richer projection; direction / joins; empty-vs-absent / null elements | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
