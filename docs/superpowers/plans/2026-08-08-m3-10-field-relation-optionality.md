@@ -366,9 +366,9 @@ For each task: write failing tests → implement → green → commit.
 - Modify: `packages/core/src/resource/operations.test.ts` (any field/relation fixtures)
 - Modify: `packages/core/src/resource/exports.test.ts`
 
-- [ ] **Step 1: Widen types** — apply the planning-aid `Field` / `Relation` / validation-error unions above (add only the four new optional causes; retain all prior causes including multiplicity)
+- [x] **Step 1: Widen types** — apply the planning-aid `Field` / `Relation` / validation-error unions above (add only the four new optional causes; retain all prior causes including multiplicity)
 
-- [ ] **Step 2: Update fixtures + add failing optional tests**
+- [x] **Step 2: Update fixtures + add failing optional tests**
 
 1. Update existing **valid** M3.6/M3.8 fixtures that omit `optional` to the new accepted closed shapes (prerequisite compatibility — these should stay green once implemented).
 2. Retarget Relation “extra member” cases that currently use `optional: true` to use e.g. `nullable: true` instead.
@@ -440,8 +440,8 @@ it('rejects three-member Relations as missing_relation_optional (breaking)', () 
 
 Also update `validate.test.ts` / `project.test.ts` / `operations.test.ts` acceptance fixtures to include `optional`. Mirror own-property / key-order missing-optional coverage for Relations as needed.
 
-- [ ] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated optional cases (and compile breaks where two-/three-member shapes were assumed)
-- [ ] **Step 4: Commit** `test(core): add failing M3.10 Field/Relation optional contract tests`
+- [x] **Step 3: Run** `pnpm --filter @resource-forge/core test` — expect FAIL on new/updated optional cases (and compile breaks where two-/three-member shapes were assumed)
+- [x] **Step 4: Commit** `test(core): add failing M3.10 Field/Relation optional contract tests`
 
 ### Task 2: Validate-before-snapshot + validation integration
 
@@ -451,7 +451,7 @@ Also update `validate.test.ts` / `project.test.ts` / `operations.test.ts` accept
 - Modify: fixture comment files as needed
 - Confirm: `packages/core/src/resource/validate.ts` continues to call `checkFields` / `checkRelations`
 
-- [ ] **Step 1: Widen `checkFields`**
+- [x] **Step 1: Widen `checkFields`**
 
 Apply the Field shape-classification table above. Recommended per-member order (planning aid; preserve reject-don’t-repair):
 
@@ -466,7 +466,7 @@ Apply the Field shape-classification table above. Recommended per-member order (
 
 Key-set comparison is order-independent; missing-optional classification applies only when the candidate's own key set is exactly `{ name, type }`. Inherited `optional` does not count. MUST NOT strip extras, invent `optional`, coerce stand-ins, or validate live instance presence.
 
-- [ ] **Step 2: Widen `checkRelations`**
+- [x] **Step 2: Widen `checkRelations`**
 
 Apply the Relation shape-classification table above. Recommended per-member order (planning aid):
 
@@ -480,13 +480,13 @@ Apply the Relation shape-classification table above. Recommended per-member orde
 
 Key-set comparison is order-independent; missing-optional classification applies only when the candidate's own key set is exactly `{ name, target, multiplicity }`. Inherited `optional` does not count. Preserve M3.8 multiplicity missing vs invalid separation. MUST NOT invent default `optional` or reinterpret `multiplicity`.
 
-- [ ] **Step 3: Widen `snapshotFields` / `snapshotRelations` / `fieldsEqual` / `relationsEqual` (module-local only)**
+- [x] **Step 3: Widen `snapshotFields` / `snapshotRelations` / `fieldsEqual` / `relationsEqual` (module-local only)**
 
 Freeze widened closed members. Equality MUST include exact `optional`. Retain freeze of Relation `target`. MUST NOT barrel-export these helpers.
 
-- [ ] **Step 4: Update fixture comments** to say freeze widened closed shapes
-- [ ] **Step 5: Green** Task 1 optional acceptance + rejection causes
-- [ ] **Step 6: Commit** `feat(core): require Field/Relation optional boolean (RFC-013)`
+- [x] **Step 4: Update fixture comments** to say freeze widened closed shapes
+- [x] **Step 5: Green** Task 1 optional acceptance + rejection causes
+- [x] **Step 6: Commit** `feat(core): require Field/Relation optional boolean (RFC-013)`
 
 ### Task 3: Projection non-participation + coexistence regressions
 
@@ -494,10 +494,10 @@ Freeze widened closed members. Equality MUST include exact `optional`. Retain fr
 - Modify: `packages/core/src/resource/project.test.ts` (finish optional fixtures if needed)
 - Touch `project.ts` only if needed (body should remain annotation-only)
 
-- [ ] **Step 1: Ensure projection tests** use widened Fields/Relations; assert zero field/relation-derived entries; invalid missing-optional members → `invalid_resource`; purity
-- [ ] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
-- [ ] **Step 3: Full suite green including operations / annotations**
-- [ ] **Step 4: Commit** `test(core): optional fields/relations do not contribute to metadata projection`
+- [x] **Step 1: Ensure projection tests** use widened Fields/Relations; assert zero field/relation-derived entries; invalid missing-optional members → `invalid_resource`; purity
+- [x] **Step 2: Confirm implementation** still `createResourceMetadata(identity, [...annotations])`
+- [x] **Step 3: Full suite green including operations / annotations**
+- [x] **Step 4: Commit** `test(core): optional fields/relations do not contribute to metadata projection`
 
 ### Task 4: Exports + final delivery hygiene
 
@@ -506,10 +506,10 @@ Freeze widened closed members. Equality MUST include exact `optional`. Retain fr
 - Modify: `docs/roadmap.md` — **only** after M6 implementation, review, refactoring, documentation, and validation gates required by the parent M3 workflow are green
 - Mark this plan’s task checkboxes complete when M6 completes (Status/M5 Accept already recorded)
 
-- [ ] **Step 1: Export smoke** — widened `Field` / `Relation` / error unions as locked; confirm no `validateOptional` / `validateFields` / `validateRelations`
-- [ ] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
-- [ ] **Step 3: Update `docs/roadmap.md` only after M6 implementation, review, refactoring, documentation, and validation gates required by the parent M3 workflow are green**
-- [ ] **Step 4: Final delivery commit** `docs: record M3.10 field/relation optionality slice complete` — this commit is the **last** delivery commit for the slice, not part of ordinary mid-implementation sequencing
+- [x] **Step 1: Export smoke** — widened `Field` / `Relation` / error unions as locked; confirm no `validateOptional` / `validateFields` / `validateRelations`
+- [x] **Step 2: Full `pnpm --filter @resource-forge/core test` green**
+- [x] **Step 3: Update `docs/roadmap.md` only after M6 implementation, review, refactoring, documentation, and validation gates required by the parent M3 workflow are green**
+- [x] **Step 4: Final delivery commit** `docs: record M3.10 field/relation optionality slice complete` — this commit is the **last** delivery commit for the slice, not part of ordinary mid-implementation sequencing
 
 ---
 
@@ -569,3 +569,44 @@ Freeze widened closed members. Equality MUST include exact `optional`. Retain fr
 ## Gate
 
 **M5 Accepted.** M6 implementation may begin under this plan and tracking issue #42. Do not invent nullability/runtime/empty-vs-absent/Operations semantics, dual-shape compatibility, or default/coerce/strip `optional`. No invalid Field or Relation may become valid through stripping, defaulting, coercion, or normalization before validation.
+
+
+---
+
+## Slice Completion Report
+
+| Field | Result |
+| --- | --- |
+| Slice | M3.10 Field/Relation Optionality |
+| Tracking | https://github.com/rexescario-dev/resource-forge/issues/42 |
+| M4 | Plan **Accepted** |
+| M5 | Review **Accepted** |
+| M6 | **Complete** |
+| M7 | Pending |
+| M8 | N/A |
+| M9 | N/A |
+| Branch | `feat/m3-10-field-relation-optionality` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/43 |
+| Status | **Ready for M7** |
+
+### Shipped
+
+- Widened `Field` to `{ name, type, optional }` and `Relation` to `{ name, target, multiplicity, optional }`
+- Distinct `missing_*_optional` / `invalid_*_optional` causes; own-property + order-independent key-set classification
+- Validate-before-snapshot; equality includes `optional`; multiplicity×optional orthogonality
+- No Field/Relation → metadata contribution; missing optional still fails projection gate
+- No public `validateOptional` / `validateFields` / `validateRelations`
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Tests | **Passed** (170 in `@resource-forge/core`) |
+| Typecheck | **Passed** |
+| Lint | Skipped |
+| Build | Skipped |
+| Package validation | Skipped |
+
+### Next Gate
+
+**M7 Code Review** on PR #43
