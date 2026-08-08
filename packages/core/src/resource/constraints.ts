@@ -15,6 +15,8 @@ const CONSTRAINT_KINDS: ReadonlySet<ConstraintKind> = new Set([
   'range',
   'pattern',
   'enum',
+  'distinct',
+  'equal',
 ]);
 
 /** Internal: sole normative ConstraintName grammar (RFC-016). */
@@ -55,6 +57,58 @@ function setsEqual(left: Set<string>, right: ReadonlyArray<string>): boolean {
 
 function isConstraintKind(value: string): value is ConstraintKind {
   return CONSTRAINT_KINDS.has(value as ConstraintKind);
+}
+
+function resolveConstraintFields(
+  index: number,
+  rawFields: unknown,
+  fieldsByName: ReadonlyMap<string, Field>,
+): Result<FieldName[], ConstraintValidationError> {
+  if (!Array.isArray(rawFields)) {
+    return err({ code: 'invalid_constraint_fields', index });
+  }
+  if (rawFields.length < 2) {
+    return err({ code: 'invalid_constraint_fields', index });
+  }
+
+  const names: FieldName[] = [];
+  const seenNames = new Set<string>();
+  let expectedType: FieldType | undefined;
+
+  for (const raw of rawFields) {
+    if (typeof raw !== 'string') {
+      return err({ code: 'invalid_constraint_fields', index });
+    }
+
+    const nameResult = validateFieldName(raw);
+    if (!nameResult.ok) {
+      return err({ code: 'invalid_constraint_fields', index });
+    }
+
+    if (seenNames.has(nameResult.value)) {
+      return err({ code: 'duplicate_constraint_field_target', index });
+    }
+    seenNames.add(nameResult.value);
+
+    const field = fieldsByName.get(nameResult.value);
+    if (field === undefined) {
+      return err({
+        code: 'unresolved_constraint_field',
+        index,
+        field: nameResult.value,
+      });
+    }
+
+    if (expectedType === undefined) {
+      expectedType = field.type;
+    } else if (field.type !== expectedType) {
+      return err({ code: 'heterogeneous_constraint_field_types', index });
+    }
+
+    names.push(nameResult.value);
+  }
+
+  return ok(names);
 }
 
 function resolveTargetField(
@@ -204,28 +258,53 @@ export function checkConstraints(
       });
     }
 
-    const rangeBoundsMissing = setsEqual(keys, ['name', 'kind', 'field']);
-    const rangeMinOnly = setsEqual(keys, ['name', 'kind', 'field', 'min']);
-    const rangeMaxOnly = setsEqual(keys, ['name', 'kind', 'field', 'max']);
-    const rangeBoth = setsEqual(keys, ['name', 'kind', 'field', 'min', 'max']);
-    const patternShape = setsEqual(keys, ['name', 'kind', 'field', 'pattern']);
-    const enumShape = setsEqual(keys, ['name', 'kind', 'field', 'values']);
+    const isCrossMember = rawKind === 'distinct' || rawKind === 'equal';
+    const hasField = Object.prototype.hasOwnProperty.call(member, 'field');
+    const hasFields = Object.prototype.hasOwnProperty.call(member, 'fields');
 
-    if (rawKind === 'range') {
-      if (
-        !rangeBoundsMissing &&
-        !rangeMinOnly &&
-        !rangeMaxOnly &&
-        !rangeBoth
-      ) {
+    if (isCrossMember) {
+      if (hasField) {
+        return err({ code: 'invalid_constraint_targeting_shape', index });
+      }
+      if (!hasFields) {
+        return err({ code: 'missing_constraint_fields', index });
+      }
+      if (!setsEqual(keys, ['name', 'kind', 'fields'])) {
         return err({ code: 'invalid_constraint_member', index });
       }
-    } else if (rawKind === 'pattern') {
-      if (!patternShape) {
+    } else {
+      if (hasFields) {
+        return err({ code: 'invalid_constraint_targeting_shape', index });
+      }
+
+      const rangeBoundsMissing = setsEqual(keys, ['name', 'kind', 'field']);
+      const rangeMinOnly = setsEqual(keys, ['name', 'kind', 'field', 'min']);
+      const rangeMaxOnly = setsEqual(keys, ['name', 'kind', 'field', 'max']);
+      const rangeBoth = setsEqual(keys, ['name', 'kind', 'field', 'min', 'max']);
+      const patternShape = setsEqual(keys, [
+        'name',
+        'kind',
+        'field',
+        'pattern',
+      ]);
+      const enumShape = setsEqual(keys, ['name', 'kind', 'field', 'values']);
+
+      if (rawKind === 'range') {
+        if (
+          !rangeBoundsMissing &&
+          !rangeMinOnly &&
+          !rangeMaxOnly &&
+          !rangeBoth
+        ) {
+          return err({ code: 'invalid_constraint_member', index });
+        }
+      } else if (rawKind === 'pattern') {
+        if (!patternShape) {
+          return err({ code: 'invalid_constraint_member', index });
+        }
+      } else if (!enumShape) {
         return err({ code: 'invalid_constraint_member', index });
       }
-    } else if (!enumShape) {
-      return err({ code: 'invalid_constraint_member', index });
     }
 
     const rawName = member.name;
@@ -254,11 +333,40 @@ export function checkConstraints(
       });
     }
 
+    if (isCrossMember) {
+      const fieldsResult = resolveConstraintFields(
+        index,
+        member.fields,
+        fieldsByName,
+      );
+      if (!fieldsResult.ok) {
+        return fieldsResult;
+      }
+
+      seen.add(nameResult.value);
+      if (rawKind === 'distinct') {
+        accepted.push({
+          name: nameResult.value,
+          kind: 'distinct',
+          fields: fieldsResult.value,
+        });
+      } else {
+        accepted.push({
+          name: nameResult.value,
+          kind: 'equal',
+          fields: fieldsResult.value,
+        });
+      }
+      continue;
+    }
+
     const fieldResult = resolveTargetField(index, member.field, fieldsByName);
     if (!fieldResult.ok) {
       return fieldResult;
     }
     const targetField = fieldResult.value;
+
+    const rangeBoundsMissing = setsEqual(keys, ['name', 'kind', 'field']);
 
     if (rawKind === 'range') {
       const typeResult = requireFieldType(index, targetField, 'number');
@@ -395,11 +503,19 @@ function snapshotConstraint(constraint: Constraint): Constraint {
     });
   }
 
+  if (constraint.kind === 'enum') {
+    return Object.freeze({
+      name: constraint.name,
+      kind: 'enum' as const,
+      field: constraint.field,
+      values: Object.freeze([...constraint.values]),
+    });
+  }
+
   return Object.freeze({
     name: constraint.name,
-    kind: 'enum' as const,
-    field: constraint.field,
-    values: Object.freeze([...constraint.values]),
+    kind: constraint.kind,
+    fields: Object.freeze([...constraint.fields]),
   });
 }
 
@@ -413,16 +529,38 @@ export function snapshotConstraints(
   return Object.freeze(constraints.map((constraint) => snapshotConstraint(constraint)));
 }
 
+function fieldNamesEqual(
+  left: ReadonlyArray<FieldName>,
+  right: ReadonlyArray<FieldName>,
+): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] !== right[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function constraintEqual(left: Constraint, right: Constraint): boolean {
-  if (
-    left.name !== right.name ||
-    left.kind !== right.kind ||
-    left.field !== right.field
-  ) {
+  if (left.name !== right.name || left.kind !== right.kind) {
     return false;
   }
 
+  if (left.kind === 'distinct' && right.kind === 'distinct') {
+    return fieldNamesEqual(left.fields, right.fields);
+  }
+
+  if (left.kind === 'equal' && right.kind === 'equal') {
+    return fieldNamesEqual(left.fields, right.fields);
+  }
+
   if (left.kind === 'range' && right.kind === 'range') {
+    if (left.field !== right.field) {
+      return false;
+    }
     const leftHasMin = Object.prototype.hasOwnProperty.call(left, 'min');
     const rightHasMin = Object.prototype.hasOwnProperty.call(right, 'min');
     const leftHasMax = Object.prototype.hasOwnProperty.call(left, 'max');
@@ -440,10 +578,13 @@ function constraintEqual(left: Constraint, right: Constraint): boolean {
   }
 
   if (left.kind === 'pattern' && right.kind === 'pattern') {
-    return left.pattern === right.pattern;
+    return left.field === right.field && left.pattern === right.pattern;
   }
 
   if (left.kind === 'enum' && right.kind === 'enum') {
+    if (left.field !== right.field) {
+      return false;
+    }
     if (left.values.length !== right.values.length) {
       return false;
     }

@@ -485,3 +485,190 @@ describe('RFC-018 checkConstraintValues — ordering / purity', () => {
     expect(resource.schema.constraints[0]).toEqual(constraintsBefore[0]);
   });
 });
+
+describe('RFC-019 checkConstraintValues — cross-member kinds', () => {
+  const primaryEmail = {
+    name: 'primaryEmail',
+    type: 'string' as const,
+    optional: false,
+    nullable: false,
+  };
+  const billingEmail = {
+    name: 'billingEmail',
+    type: 'string' as const,
+    optional: false,
+    nullable: false,
+  };
+  const optionalA = {
+    name: 'optionalA',
+    type: 'string' as const,
+    optional: true,
+    nullable: false,
+  };
+  const requiredB = {
+    name: 'requiredB',
+    type: 'string' as const,
+    optional: false,
+    nullable: false,
+  };
+  const amountA = {
+    name: 'amountA',
+    type: 'number' as const,
+    optional: false,
+    nullable: false,
+  };
+  const amountB = {
+    name: 'amountB',
+    type: 'number' as const,
+    optional: false,
+    nullable: false,
+  };
+
+  it('skips when earlier optional field is absent without diagnosing later required', () => {
+    const resource = resourceWithConstraints(
+      [
+        {
+          name: 'pairEqual',
+          kind: 'equal',
+          fields: ['optionalA', 'requiredB'],
+        },
+      ],
+      [optionalA, requiredB],
+    );
+    const result = checkConstraintValues(
+      resource,
+      mapOf([['requiredB', 'x']]),
+    );
+    expect(result).toEqual({ ok: true, value: undefined });
+  });
+
+  it('fails missing required when that field is first in fields order', () => {
+    const resource = resourceWithConstraints(
+      [
+        {
+          name: 'pairEqual',
+          kind: 'equal',
+          fields: ['requiredB', 'optionalA'],
+        },
+      ],
+      [optionalA, requiredB],
+    );
+    const result = checkConstraintValues(resource, mapOf([]));
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({
+      code: 'missing_required_field_value',
+      index: 0,
+      constraintName: 'pairEqual',
+      field: 'requiredB',
+    });
+  });
+
+  it('evaluates distinct pass/fail with fields[0] diagnostic on violation', () => {
+    const resource = resourceWithConstraints(
+      [
+        {
+          name: 'emailsDiffer',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      [primaryEmail, billingEmail],
+    );
+
+    const pass = checkConstraintValues(
+      resource,
+      mapOf([
+        ['primaryEmail', 'a@x'],
+        ['billingEmail', 'b@x'],
+      ]),
+    );
+    expect(pass.ok).toBe(true);
+
+    const fail = checkConstraintValues(
+      resource,
+      mapOf([
+        ['primaryEmail', 'a@x'],
+        ['billingEmail', 'a@x'],
+      ]),
+    );
+    expect(fail.ok).toBe(false);
+    if (fail.ok) return;
+    expect(fail.error).toEqual({
+      code: 'distinct_constraint_violated',
+      index: 0,
+      constraintName: 'emailsDiffer',
+      field: 'primaryEmail',
+    });
+  });
+
+  it('evaluates equal pass/fail including -0/0 equivalence', () => {
+    const resource = resourceWithConstraints(
+      [
+        {
+          name: 'amountsMatch',
+          kind: 'equal',
+          fields: ['amountA', 'amountB'],
+        },
+      ],
+      [amountA, amountB],
+    );
+
+    const zeroish = checkConstraintValues(
+      resource,
+      mapOf([
+        ['amountA', 0],
+        ['amountB', -0],
+      ]),
+    );
+    expect(zeroish.ok).toBe(true);
+
+    const mismatch = checkConstraintValues(
+      resource,
+      mapOf([
+        ['amountA', 1],
+        ['amountB', 2],
+      ]),
+    );
+    expect(mismatch.ok).toBe(false);
+    if (mismatch.ok) return;
+    expect(mismatch.error).toEqual({
+      code: 'equal_constraint_violated',
+      index: 0,
+      constraintName: 'amountsMatch',
+      field: 'amountA',
+    });
+  });
+
+  it('fail-fast across mixed member-local and cross-member constraints', () => {
+    const resource = resourceWithConstraints(
+      [
+        {
+          name: 'totalMin',
+          kind: 'range',
+          field: 'total',
+          min: 10,
+        },
+        {
+          name: 'emailsDiffer',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      [totalField, primaryEmail, billingEmail],
+    );
+
+    const result = checkConstraintValues(
+      resource,
+      mapOf([
+        ['total', 1],
+        ['primaryEmail', 'a@x'],
+        ['billingEmail', 'a@x'],
+      ]),
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.constraintName).toBe('totalMin');
+    expect(result.error.code).toBe('range_constraint_violated');
+  });
+});

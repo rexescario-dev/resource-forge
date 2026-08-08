@@ -593,3 +593,277 @@ describe('RFC-017 concrete constraint kinds', () => {
     expect(constraints.value.schema.constraints[0]?.name).toBe('create');
   });
 });
+
+describe('RFC-019 cross-member constraint kinds (declaration)', () => {
+  const emailA = {
+    name: 'primaryEmail',
+    type: 'string' as const,
+    optional: false,
+    nullable: false,
+  };
+  const emailB = {
+    name: 'billingEmail',
+    type: 'string' as const,
+    optional: false,
+    nullable: false,
+  };
+  const total = {
+    name: 'total',
+    type: 'number' as const,
+    optional: false,
+    nullable: false,
+  };
+
+  it('accepts distinct and equal with resolved homogeneous fields', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'emailsDiffer',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+        {
+          name: 'emailsMatch',
+          kind: 'equal',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+    expect(resource.value.schema.constraints).toEqual([
+      {
+        name: 'emailsDiffer',
+        kind: 'distinct',
+        fields: ['primaryEmail', 'billingEmail'],
+      },
+      {
+        name: 'emailsMatch',
+        kind: 'equal',
+        fields: ['primaryEmail', 'billingEmail'],
+      },
+    ]);
+    expect(
+      constraintsEqual(resource.value.schema.constraints, [
+        {
+          name: 'emailsDiffer',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+        {
+          name: 'emailsMatch',
+          kind: 'equal',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ]),
+    ).toBe(true);
+  });
+
+  it('rejects fields length < 2 as invalid_constraint_fields', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [{ name: 'solo', kind: 'distinct', fields: ['primaryEmail'] }],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_fields', index: 0 },
+      });
+    }
+  });
+
+  it('rejects duplicate field targets', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'dup',
+          kind: 'equal',
+          fields: ['primaryEmail', 'primaryEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'duplicate_constraint_field_target', index: 0 },
+      });
+    }
+  });
+
+  it('rejects unresolved fields', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'missing',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'ghost'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: {
+          code: 'unresolved_constraint_field',
+          index: 0,
+          field: 'ghost',
+        },
+      });
+    }
+  });
+
+  it('rejects heterogeneous field types', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'mixed',
+          kind: 'equal',
+          fields: ['primaryEmail', 'total'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, total],
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'heterogeneous_constraint_field_types', index: 0 },
+      });
+    }
+  });
+
+  it('rejects field on cross-member and fields on member-local', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const withField = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'bad',
+          kind: 'distinct',
+          field: 'primaryEmail',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(withField.ok).toBe(false);
+    if (!withField.ok) {
+      expect(withField.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_targeting_shape', index: 0 },
+      });
+    }
+
+    const fieldsOnLocal = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'badLocal',
+          kind: 'pattern',
+          field: 'primaryEmail',
+          pattern: 'x',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(fieldsOnLocal.ok).toBe(false);
+    if (!fieldsOnLocal.ok) {
+      expect(fieldsOnLocal.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_constraint_targeting_shape', index: 0 },
+      });
+    }
+  });
+
+  it('rejects missing fields on cross-member', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [{ name: 'noFields', kind: 'equal' }],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'missing_constraint_fields', index: 0 },
+      });
+    }
+  });
+
+  it('treats fields order as significant for equality', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithConstraintsForTests(
+      identity.value,
+      [
+        {
+          name: 'ordered',
+          kind: 'distinct',
+          fields: ['primaryEmail', 'billingEmail'],
+        },
+      ],
+      emptyAnnotations,
+      [emailA, emailB],
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+    expect(
+      constraintsEqual(resource.value.schema.constraints, [
+        {
+          name: 'ordered',
+          kind: 'distinct',
+          fields: ['billingEmail', 'primaryEmail'],
+        },
+      ]),
+    ).toBe(false);
+  });
+});

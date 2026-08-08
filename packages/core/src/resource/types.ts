@@ -151,10 +151,15 @@ export type OperationValidationError =
 /** Constraint identity string conforming to RFC-016 grammar. */
 export type ConstraintName = string;
 
-/** Closed exclusive constraint kind vocabulary (RFC-017). */
-export type ConstraintKind = 'range' | 'pattern' | 'enum';
+/** Closed exclusive constraint kind vocabulary (RFC-017 / RFC-019). */
+export type ConstraintKind =
+  | 'range'
+  | 'pattern'
+  | 'enum'
+  | 'distinct'
+  | 'equal';
 
-/** Kind-discriminated closed Constraint member (RFC-017). */
+/** Kind-discriminated closed Constraint member (RFC-017 / RFC-019). */
 export type Constraint =
   | {
       readonly name: ConstraintName;
@@ -174,6 +179,16 @@ export type Constraint =
       readonly kind: 'enum';
       readonly field: FieldName;
       readonly values: ReadonlyArray<string | number | boolean>;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'distinct';
+      readonly fields: ReadonlyArray<FieldName>;
+    }
+  | {
+      readonly name: ConstraintName;
+      readonly kind: 'equal';
+      readonly fields: ReadonlyArray<FieldName>;
     };
 
 export type ConstraintValidationError =
@@ -220,7 +235,21 @@ export type ConstraintValidationError =
     }
   | { readonly code: 'invalid_range_bounds'; readonly index: number }
   | { readonly code: 'invalid_pattern'; readonly index: number }
-  | { readonly code: 'invalid_enum_values'; readonly index: number };
+  | { readonly code: 'invalid_enum_values'; readonly index: number }
+  | { readonly code: 'missing_constraint_fields'; readonly index: number }
+  | { readonly code: 'invalid_constraint_fields'; readonly index: number }
+  | {
+      readonly code: 'duplicate_constraint_field_target';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'heterogeneous_constraint_field_types';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_constraint_targeting_shape';
+      readonly index: number;
+    };
 
 /** Runtime field value in a field-value map (RFC-018). */
 export type FieldRuntimeValue = string | number | boolean | null;
@@ -266,6 +295,18 @@ export type ConstraintEnforcementError =
     }
   | {
       readonly code: 'enum_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'distinct_constraint_violated';
+      readonly index: number;
+      readonly constraintName: ConstraintName;
+      readonly field: FieldName;
+    }
+  | {
+      readonly code: 'equal_constraint_violated';
       readonly index: number;
       readonly constraintName: ConstraintName;
       readonly field: FieldName;

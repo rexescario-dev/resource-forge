@@ -11,6 +11,7 @@ import {
 } from '../index.js';
 import type {
   Constraint,
+  ConstraintEnforcementError,
   ConstraintValidationError,
   Field,
   FieldValidationError,
@@ -181,5 +182,30 @@ describe('M3.15 public exports', () => {
 
     const enforced = core.checkConstraintValues(resource.value, new Map());
     expect(enforced).toEqual({ ok: true, value: undefined });
+  });
+});
+
+describe('M3.16 public exports', () => {
+  it('exposes distinct/equal ConstraintKind without validate helpers', () => {
+    const distinct: Constraint = {
+      name: 'emailsDiffer',
+      kind: 'distinct',
+      fields: ['primaryEmail', 'billingEmail'],
+    };
+    const equal: Constraint = {
+      name: 'passwordsMatch',
+      kind: 'equal',
+      fields: ['password', 'passwordConfirm'],
+    };
+    const enforcement: ConstraintEnforcementError = {
+      code: 'distinct_constraint_violated',
+      index: 0,
+      constraintName: 'emailsDiffer',
+      field: 'primaryEmail',
+    };
+    expect(distinct.kind).toBe('distinct');
+    expect(equal.kind).toBe('equal');
+    expect(enforcement.code).toBe('distinct_constraint_violated');
+    expect('validateConstraints' in core).toBe(false);
   });
 });
