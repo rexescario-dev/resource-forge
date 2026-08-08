@@ -1,7 +1,8 @@
 # RFC-013: Field/Relation Optionality
 
 **Date:** 2026-08-08  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-08) — Design Review; no design blockers; required `optional: boolean` on Field and Relation; closed shapes; exact boolean / no default / no dual-shape; schema-declaration presence only; orthogonal to RFC-011 multiplicity; `nullable`/runtime/persistence deferred; partial supersession of RFC-009 / RFC-011 member floors only; RFC-012 unchanged  
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)  
 **Tracking:** [#40](https://github.com/rexescario-dev/resource-forge/issues/40)  
 **Depends on:** RFC-001 (Resource Identity — Relation targets via RFC-010), RFC-005 (Resource Model), RFC-006 (Annotations — projection boundary), RFC-007 (Resource Fields — collection semantics retained), RFC-008 (Resource Relations — collection semantics retained), RFC-009 (Resource Field Types — `type` retained; Field shape partially superseded), RFC-010 (Relation Association Semantics — `target` retained), RFC-011 (Relation Multiplicity — `multiplicity` retained; Relation shape partially superseded), RFC-012 (Resource Operations — unchanged)  
@@ -400,7 +401,7 @@ This RFC may move from Draft to Accepted when Design Review finds:
 
 ## 14. Explicit deferrals
 
-Deferred concerns are listed in §1.2. This ledger does not add scope; it records that builders, serialization / wire formats, host adapters, reverse projection, and Operation optionality also remain out of scope unless a future RFC says otherwise.
+Deferred concerns are listed in §1.2. This ledger does not add scope; it records that builders, serialization / wire formats, host adapters, reverse projection, and Operation optionality remain out of scope for RFC-013 unless a future RFC explicitly defines them.
 
 ## 15. Decision record
 
