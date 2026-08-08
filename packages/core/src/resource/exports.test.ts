@@ -75,17 +75,24 @@ describe('M3.3 public exports', () => {
   });
 });
 
-describe('M3.4 / M3.6 / M3.10 public exports', () => {
-  it('exposes widened Field contracts without exporting optional validation helpers', () => {
-    const field: Field = { name: 'email', type: 'string', optional: true };
+describe('M3.4 / M3.6 / M3.10 / M3.11 public exports', () => {
+  it('exposes widened Field contracts without exporting optional/nullable validation helpers', () => {
+    const field: Field = {
+      name: 'email',
+      type: 'string',
+      optional: true,
+      nullable: false,
+    };
     const error: FieldValidationError = {
-      code: 'missing_field_optional',
+      code: 'missing_field_nullable',
       index: 0,
     };
     expect(field.optional).toBe(true);
-    expect(error.code).toBe('missing_field_optional');
+    expect(field.nullable).toBe(false);
+    expect(error.code).toBe('missing_field_nullable');
     expect('validateFields' in core).toBe(false);
     expect('validateOptional' in core).toBe(false);
+    expect('validateNullable' in core).toBe(false);
     expect('validateFieldType' in core).toBe(false);
     expect('validateFieldName' in core).toBe(false);
     expect('snapshotFields' in core).toBe(false);

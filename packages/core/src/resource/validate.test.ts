@@ -46,8 +46,8 @@ describe('validateResource', () => {
       identity: identity.value,
       schema: {
         fields: [
-          { name: 'id', type: 'string', optional: false },
-          { name: 'email', type: 'string', optional: true },
+          { name: 'id', type: 'string', optional: false, nullable: false },
+          { name: 'email', type: 'string', optional: true, nullable: false },
         ],
         relations: [],
         operations: [],

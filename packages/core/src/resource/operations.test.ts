@@ -166,7 +166,7 @@ describe('RFC-012 resource operations', () => {
       identity.value,
       [{ name: 'create' }],
       emptyAnnotations,
-      [{ name: 'create', type: 'string', optional: false }],
+      [{ name: 'create', type: 'string', optional: false, nullable: false }],
       [
         {
           name: 'create',

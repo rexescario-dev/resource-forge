@@ -14,11 +14,12 @@ export type FieldName = string;
 /** Closed FieldType vocabulary (RFC-009). */
 export type FieldType = 'string' | 'number' | 'boolean';
 
-/** Closed typed Field member (RFC-013; supersedes RFC-009 member floor). */
+/** Closed typed Field member (RFC-014; supersedes RFC-013 Field member floor). */
 export type Field = {
   readonly name: FieldName;
   readonly type: FieldType;
   readonly optional: boolean;
+  readonly nullable: boolean;
 };
 
 export type FieldValidationError =
@@ -49,6 +50,15 @@ export type FieldValidationError =
       readonly code: 'invalid_field_optional';
       readonly index: number;
       readonly optional: unknown;
+    }
+  | {
+      readonly code: 'missing_field_nullable';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_field_nullable';
+      readonly index: number;
+      readonly nullable: unknown;
     };
 
 /** Validated relation identity string (RFC-008). */

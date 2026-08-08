@@ -111,8 +111,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithFieldsForTests(identity.value, [
-      { name: 'id', type: 'string', optional: false },
-      { name: 'email', type: 'string', optional: true },
+      { name: 'id', type: 'string', optional: false, nullable: false },
+      { name: 'email', type: 'string', optional: true, nullable: false },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -143,7 +143,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithFieldsForTests(
       identity.value,
-      [{ name: 'id', type: 'string', optional: false }],
+      [{ name: 'id', type: 'string', optional: false, nullable: false }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -164,8 +164,8 @@ describe('projectResourceMetadata', () => {
       identity: { namespace: 'crm', name: 'Customer' },
       schema: {
         fields: [
-          { name: 'id', type: 'string', optional: false },
-          { name: 'id', type: 'string', optional: true },
+          { name: 'id', type: 'string', optional: false, nullable: false },
+          { name: 'id', type: 'string', optional: true, nullable: false },
         ],
         relations: [],
         operations: [],
@@ -213,6 +213,27 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.cause.code).toBe('invalid_schema');
     if (projected.error.cause.code !== 'invalid_schema') return;
     expect(projected.error.cause.cause?.code).toBe('missing_field_optional');
+  });
+
+  it('fails for three-member fields missing nullable as invalid_resource', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: {
+        fields: [
+          { name: 'id', type: 'string', optional: false } as never,
+        ],
+        relations: [],
+        operations: [],
+      },
+      annotations: emptyAnnotations,
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_schema');
+    if (projected.error.cause.code !== 'invalid_schema') return;
+    expect(projected.error.cause.cause?.code).toBe('missing_field_nullable');
   });
 
   it('does not contribute relations to projected metadata', () => {

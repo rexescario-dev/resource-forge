@@ -41,8 +41,8 @@ function hasExactOwnKeys(
 
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness, type,
- * optional) before any `{ name, type, optional }` materialization. MUST NOT strip
- * unknown properties or invent a default optional.
+ * optional, nullable) before any `{ name, type, optional, nullable }` materialization.
+ * MUST NOT strip unknown properties or invent a default optional/nullable.
  */
 export function checkFields(
   candidate: readonly unknown[],
@@ -56,6 +56,7 @@ export function checkFields(
 
   for (let index = 0; index < candidate.length; index += 1) {
     const member = candidate[index];
+    // M3.10 candidate-object acceptance only (not closed key-set classification).
     if (!isPlainObject(member)) {
       return err({ code: 'invalid_field_member', index });
     }
@@ -68,7 +69,15 @@ export function checkFields(
       return err({ code: 'invalid_field_member', index });
     }
 
-    if (!hasExactOwnKeys(member, ['name', 'type', 'optional'])) {
+    const hasNullable = Object.prototype.hasOwnProperty.call(member, 'nullable');
+    if (!hasNullable) {
+      if (hasExactOwnKeys(member, ['name', 'type', 'optional'])) {
+        return err({ code: 'missing_field_nullable', index });
+      }
+      return err({ code: 'invalid_field_member', index });
+    }
+
+    if (!hasExactOwnKeys(member, ['name', 'type', 'optional', 'nullable'])) {
       return err({ code: 'invalid_field_member', index });
     }
 
@@ -117,10 +126,20 @@ export function checkFields(
       });
     }
 
+    const rawNullable = member.nullable;
+    if (typeof rawNullable !== 'boolean') {
+      return err({
+        code: 'invalid_field_nullable',
+        index,
+        nullable: rawNullable,
+      });
+    }
+
     accepted.push({
       name: nameResult.value,
       type: typeResult.value,
       optional: rawOptional,
+      nullable: rawNullable,
     });
   }
 
@@ -129,8 +148,8 @@ export function checkFields(
 
 /**
  * Internal: freeze an ordered sequence of already-validated Fields.
- * MUST NOT accept raw candidates, discard unknown properties, invent type, or
- * invent optional.
+ * MUST NOT accept raw candidates, discard unknown properties, invent type,
+ * invent optional, or invent nullable.
  */
 export function snapshotFields(fields: readonly Field[]): ReadonlyArray<Field> {
   return Object.freeze(
@@ -139,12 +158,13 @@ export function snapshotFields(fields: readonly Field[]): ReadonlyArray<Field> {
         name: field.name,
         type: field.type,
         optional: field.optional,
+        nullable: field.nullable,
       }),
     ),
   );
 }
 
-/** Internal / test-only: order-sensitive Field sequence equality (name, type, optional). */
+/** Internal / test-only: order-sensitive Field sequence equality (name, type, optional, nullable). */
 export function fieldsEqual(
   left: readonly Field[],
   right: readonly Field[],
@@ -160,6 +180,9 @@ export function fieldsEqual(
       return false;
     }
     if (left[i]!.optional !== right[i]!.optional) {
+      return false;
+    }
+    if (left[i]!.nullable !== right[i]!.nullable) {
       return false;
     }
   }
