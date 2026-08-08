@@ -416,12 +416,12 @@ For each task: write failing tests → implement → green → commit.
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | Pending |
-| M8 | Pending |
-| M9 | Pending |
+| M7 | **Approved** |
+| M8 | N/A |
+| M9 | N/A |
 | Branch | `feat/m3-9-operations` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/39 |
-| Status | **Ready for M7** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -443,4 +443,6 @@ For each task: write failing tests → implement → green → commit.
 
 ### Next Gate
 
-**M7 — Code Review**
+**None — slice complete**
+
+**M7 Approved** (2026-08-08). Faithful RFC-012 / plan realization. Closed Operation `{ name }`; ordered unique empty-valid `operations`; `checkOperations` single validation path; validate-before-snapshot; no projection contribution; Fields/Relations unchanged; no public `validateOperations`. CI green on #39.
