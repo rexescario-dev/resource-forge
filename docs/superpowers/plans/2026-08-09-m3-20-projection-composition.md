@@ -353,7 +353,7 @@ C: (rf, label)       → "z"     // illustrative synthetic key; not an emitter a
 | M8 | **N/A** |
 | M9 | **Complete** |
 | Branch | `feat/m3-20-projection-composition` |
-| PR | _(set after open)_ |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/85 |
 | Status | **Slice complete** |
 
 ### M5 Plan Review
