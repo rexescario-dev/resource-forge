@@ -181,31 +181,31 @@ This slice does **not** design or verify a future Relation-metadata emitter.
 
 **Files:** `docs/roadmap.md`, `docs/superpowers/specs/README.md`, optionally parent M3 plan cross-links if present
 
-- [ ] **Step 1:** Confirm RFC-030 row is **Accepted** in `docs/superpowers/specs/README.md` and M3 gate table in `docs/roadmap.md`
-- [ ] **Step 2:** Confirm Relation→metadata projection is **no longer an open Later design lead** because RFC-030 is Accepted as non-contribution closure; do **not** invent Field/Operation emitter Later ordering
-- [ ] **Step 3:** Confirm M3 milestone/status prose mentions RFC-030 Accepted / M3.27 closeout intent and does not claim Relation→metadata projection remains an unresolved Later design topic
-- [ ] **Step 4:** Confirm M3.27 bullet exists (or add it) as the RFC-030 docs/verification closeout slice. Add **only** the M3.27 closeout entry required to reflect the already-Accepted RFC-030; do **not** introduce a new Later topic or reorder deferred Field/Operation emitter work. Mark ✅ only in Task 3 after SCR
-- [ ] **Step 5:** Fix any drift found (docs only; do not amend RFC-030 semantics)
+- [x] **Step 1:** Confirm RFC-030 row is **Accepted** in `docs/superpowers/specs/README.md` and M3 gate table in `docs/roadmap.md`
+- [x] **Step 2:** Confirm Relation→metadata projection is **no longer an open Later design lead** because RFC-030 is Accepted as non-contribution closure; do **not** invent Field/Operation emitter Later ordering
+- [x] **Step 3:** Confirm M3 milestone/status prose mentions RFC-030 Accepted / M3.27 closeout intent and does not claim Relation→metadata projection remains an unresolved Later design topic
+- [x] **Step 4:** Confirm M3.27 bullet exists (or add it) as the RFC-030 docs/verification closeout slice. Add **only** the M3.27 closeout entry required to reflect the already-Accepted RFC-030; do **not** introduce a new Later topic or reorder deferred Field/Operation emitter work. Mark ✅ only in Task 3 after SCR
+- [x] **Step 5:** Fix any drift found (docs only; do not amend RFC-030 semantics)
 
 ### Task 2: No-core-surface verification (Slice B)
 
 **Files:** `packages/core/**` (read-only verification — must remain untouched)
 
-- [ ] **Step 1 (primary):** Resolve and record `<base>` (normally `origin/main` → SHA). Run `git diff --name-status <base>...HEAD -- packages/core` and confirm the result is **empty**. **Any output is a slice-boundary failure and must be removed before M3.27 can be marked complete.**
-- [ ] **Step 2 (secondary):** Defense-in-depth only; does **not** relax the empty-diff requirement — confirm no Relation-metadata emitter modules/exports/keys under `packages/core` (vacuous if Step 1 is empty). Any Step 1 output remains an unconditional failure.
-- [ ] **Step 3 (secondary):** Defense-in-depth only; does **not** relax the empty-diff requirement — confirm `projectResourceMetadata`, `validateResource`, `evaluateCascadeEvent`, and `checkRelationLoadStates` are not modified by this slice (vacuous if Step 1 is empty)
-- [ ] **Step 4 (tertiary, optional):** Run `@resource-forge/core` vitest/`tsc --noEmit` as smoke that the tree remains green without product changes — not an emitter check
+- [x] **Step 1 (primary):** Resolve and record `<base>` (normally `origin/main` → SHA). Run `git diff --name-status <base>...HEAD -- packages/core` and confirm the result is **empty**. **Any output is a slice-boundary failure and must be removed before M3.27 can be marked complete.**
+- [x] **Step 2 (secondary):** Defense-in-depth only; does **not** relax the empty-diff requirement — confirm no Relation-metadata emitter modules/exports/keys under `packages/core` (vacuous if Step 1 is empty). Any Step 1 output remains an unconditional failure.
+- [x] **Step 3 (secondary):** Defense-in-depth only; does **not** relax the empty-diff requirement — confirm `projectResourceMetadata`, `validateResource`, `evaluateCascadeEvent`, and `checkRelationLoadStates` are not modified by this slice (vacuous if Step 1 is empty)
+- [x] **Step 4 (tertiary, optional):** Run `@resource-forge/core` vitest/`tsc --noEmit` as smoke that the tree remains green without product changes — not an emitter check
 
 ### Task 3: Slice Completion Report (Slice C)
 
 **Files:** this plan (SCR section), `docs/roadmap.md` (M3.27 ✅ only after SCR)
 
-- [ ] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes including:
+- [x] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes including:
   - `Verification base: <commit SHA>`
   - `Command: git diff --name-status <base>...HEAD -- packages/core`
   - `Result: empty`
-- [ ] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.27 ✅ on roadmap
-- [ ] **Step 3:** Leave Next Gate **None** for this slice; do **not** open Field/Operation emitter work from this closeout unless a separate tracking issue / M2 is explicitly started
+- [x] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.27 ✅ on roadmap
+- [x] **Step 3:** Leave Next Gate **None** for this slice; do **not** open Field/Operation emitter work from this closeout unless a separate tracking issue / M2 is explicitly started
 
 ---
 
@@ -248,30 +248,13 @@ This slice does **not** design or verify a future Relation-metadata emitter.
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/102 |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** |
-| M6 | Pending |
-| M7 | Pending |
-| M8 | Pending |
-| M9 | Pending |
-| Branch | TBD |
-| PR | TBD |
-| Status | **Ready for M6 — Implementation** |
-
-### Shipped
-
-_(filled at M6+)_
-
-### Validation
-
-| Check | Result |
-| --- | --- |
-| Verification base | TBD at M6 |
-| Command | `git diff --name-status <base>...HEAD -- packages/core` |
-| `packages/core` delivery diff | TBD (must be **empty**) |
-| Docs consistency | TBD |
-| Tests | Optional smoke |
-| Lint | Skipped unless needed |
-| Build | Skipped unless needed |
-| Relation emitter | **Not implemented** (out of scope) |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
+| Branch | `feat/m3-27-relation-metadata-projection` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/103 |
+| Status | **Slice complete** |
 
 ### M5 Plan Review
 
@@ -289,6 +272,64 @@ Gate: Proceed to M6. No implementation activity before this Accept.
 Authority: Plan governs sequencing/execution; specification governs product semantics.
 ```
 
+### Shipped
+
+- Accepted M3.27 plan as governing execution artifact for RFC-030 docs/verification closeout
+- Roadmap / specs index confirm RFC-030 Accepted; Relation→metadata Later design gap closed as non-contribution
+- Delivery diff has **no** `packages/core` changes
+- `projectResourceMetadata` remains annotations-only; `validateResource` / `evaluateCascadeEvent` / `checkRelationLoadStates` untouched
+- No Relation emitter, reserved keys, descriptor shapes, or Field/Operation Later reorder
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Verification base | `5503d7018e87220de2cadab8916cc803a674d96a` (`origin/main` at execution start) |
+| Command | `git diff --name-status 5503d70...HEAD -- packages/core` |
+| `packages/core` delivery diff | **Empty** |
+| Docs consistency | **Passed** (RFC-030 Accepted; M3.27 closeout; no invented Field/Operation Later ordering) |
+| Tests | Optional smoke: vitest 355 passed + `tsc --noEmit` clean |
+| Lint | Skipped |
+| Build | Skipped |
+| Relation emitter | **Not implemented** (out of scope) |
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-27-relation-metadata-projection (#102) / https://github.com/rexescario-dev/resource-forge/pull/103
+Accepted plan: docs/superpowers/plans/2026-08-10-m3-27-relation-metadata-projection.md
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-030-relation-metadata-projection-design.md
+
+Review summary: Docs/verification-only delivery matches Accepted plan Tasks 1–3. No packages/core product changes; no Relation emitter manufactured; RFC-023–RFC-029 closed. Relation→metadata Later design gap closed as non-contribution; Field/Operation emitters not reordered.
+
+Findings: None (no merge blockers)
+Gate: Proceed to M8/M9 as applicable.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Reason: No product code in this slice; no behavior-preserving refactor applicable.
+```
+
+### M9 Documentation
+
+```text
+Decision: Accepted
+Scope: docs/roadmap.md; docs/superpowers/specs/README.md; RFC-030 Status Accepted; plan SCR; M3.27 ✅
+Summary: Relation→metadata projection closed as docs/verification non-contribution slice; no new Later emitter ordering invented.
+```
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: installed docs/workflows assets (no prompt edits this slice)
+Summary: M2–M10 prompts remain coherent for docs-only closeout; no workflow asset changes required for M3.27.
+```
+
 ### Next Gate
 
-**M6 — Implementation**
+**None — slice complete**
