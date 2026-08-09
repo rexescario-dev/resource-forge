@@ -375,12 +375,12 @@ Also:
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
 | M6 | **Complete** |
-| M7 | — |
-| M8 | — |
-| M9 | — |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
 | Branch | `feat/m3-24-loading-fetch` |
 | PR | https://github.com/rexescario-dev/resource-forge/pull/97 |
-| Status | **Ready for M7** |
+| Status | **Slice complete** |
 
 ### M5 Plan Review
 
@@ -415,6 +415,43 @@ Authority: Plan governs sequencing/execution; specification governs product sema
 | Build | Skipped |
 | Package validation | Skipped |
 
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-24-loading-fetch (#96) / https://github.com/rexescario-dev/resource-forge/pull/97
+Accepted plan: docs/superpowers/plans/2026-08-09-m3-24-loading-fetch-semantics.md
+Accepted specification: docs/superpowers/specs/2026-08-09-rfc-027-loading-fetch-semantics-design.md
+
+Review summary: Implementation matches Accepted plan Tasks 1–4. Declaration widen + exact legacy fetch precedence + checkRelationLoadStates algorithm match RFC-027 locks; loaded values opaque; validateResource / checkRelationValueStates / evaluateCascadeEvent untouched. Verification green (vitest 355 + tsc; CI ci SUCCESS).
+
+Findings: None (no merge blockers)
+Gate: Proceed to M8/M9 as applicable.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Reason: No worthwhile behavior-preserving refactor beyond the focused fetch declaration + load-states modules delivered under TDD.
+```
+
+### M9 Documentation
+
+```text
+Decision: Accepted
+Scope: docs/roadmap.md; docs/superpowers/specs/README.md; RFC-027 Status Accepted; plan SCR
+Summary: Roadmap lists RFC-027 Accepted and M3.24 ✅; Later follow-ons are persistence/traversal/Relation projection; SCR Slice complete.
+```
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: installed docs/workflows assets (no prompt edits this slice)
+Summary: M2–M10 prompts remain coherent for this delivery; no workflow asset changes required for M3.24 closeout.
+```
+
 ### Next Gate
 
-**M7 Code Review**
+**None — slice complete**
