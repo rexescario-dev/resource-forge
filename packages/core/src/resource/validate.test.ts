@@ -80,6 +80,7 @@ describe('validateResource', () => {
             direction: 'outbound',
             onDelete: 'none',
             onUpdate: 'none',
+            fetch: 'eager',
           },
           {
             name: 'lineItems',
@@ -90,6 +91,7 @@ describe('validateResource', () => {
             direction: 'outbound',
             onDelete: 'none',
             onUpdate: 'none',
+            fetch: 'eager',
           },
         ],
         operations: [],

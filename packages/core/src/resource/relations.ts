@@ -4,6 +4,7 @@ import { err, ok, type Result } from '../result.js';
 import { validateFieldName } from './fields.js';
 import type {
   CascadePolicy,
+  FetchPolicy,
   FieldName,
   Relation,
   RelationDirection,
@@ -22,6 +23,7 @@ const CASCADE_POLICIES = new Set<CascadePolicy>([
   'restrict',
   'setNull',
 ]);
+const FETCH_POLICIES = new Set<FetchPolicy>(['eager', 'lazy']);
 
 const BASE_RELATION_KEYS = [
   'name',
@@ -32,6 +34,7 @@ const BASE_RELATION_KEYS = [
   'direction',
   'onDelete',
   'onUpdate',
+  'fetch',
 ] as const;
 
 const LEGACY_RFC024_BASE_KEYS = [
@@ -41,6 +44,18 @@ const LEGACY_RFC024_BASE_KEYS = [
   'optional',
   'nullable',
   'direction',
+] as const;
+
+/** Post–RFC-026 eight-member base (cascade present, fetch absent). */
+const LEGACY_RFC026_BASE_KEYS = [
+  'name',
+  'target',
+  'multiplicity',
+  'optional',
+  'nullable',
+  'direction',
+  'onDelete',
+  'onUpdate',
 ] as const;
 
 /** Internal: sole normative RelationName grammar (RFC-008). */
@@ -87,9 +102,9 @@ function grammarNamePayload(candidate: unknown): string {
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness,
  * declarative target, multiplicity, optional, nullable, direction, onDelete,
- * onUpdate, optional inverse/join) before Relation materialization.
+ * onUpdate, fetch, optional inverse/join) before Relation materialization.
  * MUST NOT strip unknown properties or invent a default multiplicity/optional/
- * nullable/direction/onDelete/onUpdate/inverse/join.
+ * nullable/direction/onDelete/onUpdate/fetch/inverse/join.
  *
  * Target structural keys `{ namespace, name }` are the closed Relation boundary;
  * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
@@ -174,6 +189,14 @@ export function checkRelations(
         hasExactOwnKeys(member, [...LEGACY_RFC024_BASE_KEYS, 'onDelete'])
       ) {
         return err({ code: 'missing_relation_on_update', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    const hasFetch = Object.prototype.hasOwnProperty.call(member, 'fetch');
+    if (!hasFetch) {
+      if (hasExactOwnKeys(member, [...LEGACY_RFC026_BASE_KEYS])) {
+        return err({ code: 'missing_relation_fetch', index });
       }
       return err({ code: 'invalid_relation_member', index });
     }
@@ -297,6 +320,18 @@ export function checkRelations(
       });
     }
 
+    const rawFetch = member.fetch;
+    if (
+      typeof rawFetch !== 'string' ||
+      !FETCH_POLICIES.has(rawFetch as FetchPolicy)
+    ) {
+      return err({
+        code: 'invalid_relation_fetch',
+        index,
+        fetch: rawFetch,
+      });
+    }
+
     if (
       (rawOnDelete === 'setNull' || rawOnUpdate === 'setNull') &&
       rawNullable === false
@@ -374,6 +409,7 @@ export function checkRelations(
       direction: rawDirection as RelationDirection,
       onDelete: rawOnDelete as CascadePolicy,
       onUpdate: rawOnUpdate as CascadePolicy,
+      fetch: rawFetch as FetchPolicy,
       ...(inverse !== undefined ? { inverse } : {}),
       ...(join !== undefined ? { join } : {}),
     };
@@ -386,7 +422,7 @@ export function checkRelations(
 /**
  * Internal: freeze an ordered sequence of already-validated Relations.
  * MUST NOT accept raw candidates, discard unknown properties, invent optional,
- * nullable, direction, onDelete, onUpdate, inverse, or join.
+ * nullable, direction, onDelete, onUpdate, fetch, inverse, or join.
  */
 export function snapshotRelations(
   relations: readonly Relation[],
@@ -402,6 +438,7 @@ export function snapshotRelations(
         direction: RelationDirection;
         onDelete: CascadePolicy;
         onUpdate: CascadePolicy;
+        fetch: FetchPolicy;
         inverse?: RelationName;
         join?: RelationJoin;
       } = {
@@ -416,6 +453,7 @@ export function snapshotRelations(
         direction: relation.direction,
         onDelete: relation.onDelete,
         onUpdate: relation.onUpdate,
+        fetch: relation.fetch,
       };
       if (relation.inverse !== undefined) {
         snapshot.inverse = relation.inverse;
@@ -434,7 +472,7 @@ export function snapshotRelations(
 /**
  * Internal / test-only: order-sensitive Relation sequence equality
  * (name, target, multiplicity, optional, nullable, direction, onDelete,
- * onUpdate, inverse, join).
+ * onUpdate, fetch, inverse, join).
  */
 export function relationsEqual(
   left: readonly Relation[],
@@ -468,6 +506,9 @@ export function relationsEqual(
       return false;
     }
     if (l.onUpdate !== r.onUpdate) {
+      return false;
+    }
+    if (l.fetch !== r.fetch) {
       return false;
     }
     if (l.inverse !== r.inverse) {

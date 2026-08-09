@@ -283,6 +283,7 @@ describe('RFC-021 resource operations', () => {
           direction: 'outbound',
           onDelete: 'none',
           onUpdate: 'none',
+          fetch: 'eager',
         },
       ],
     );

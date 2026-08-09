@@ -76,6 +76,9 @@ export type CascadePolicy = 'none' | 'cascade' | 'restrict' | 'setNull';
 /** Declared owning Resource event for cascade evaluation (RFC-026). */
 export type CascadeEvent = 'delete' | 'update';
 
+/** Closed Relation fetch policy (RFC-027). */
+export type FetchPolicy = 'eager' | 'lazy';
+
 /** Closed join-field binding identity (RFC-024). */
 export type RelationJoin = {
   readonly local: FieldName;
@@ -83,8 +86,8 @@ export type RelationJoin = {
 };
 
 /**
- * Closed associated Relation member (RFC-026; widens RFC-024).
- * Required `direction`, `onDelete`, `onUpdate`; optional `inverse` / `join` only when present.
+ * Closed associated Relation member (RFC-027; widens RFC-026).
+ * Required `direction`, `onDelete`, `onUpdate`, `fetch`; optional `inverse` / `join` only when present.
  */
 export type Relation = {
   readonly name: RelationName;
@@ -97,6 +100,7 @@ export type Relation = {
   readonly join?: RelationJoin;
   readonly onDelete: CascadePolicy;
   readonly onUpdate: CascadePolicy;
+  readonly fetch: FetchPolicy;
 };
 
 export type RelationValidationError =
@@ -200,6 +204,15 @@ export type RelationValidationError =
   | {
       readonly code: 'invalid_cascade_set_null_requires_nullable';
       readonly index: number;
+    }
+  | {
+      readonly code: 'missing_relation_fetch';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_fetch';
+      readonly index: number;
+      readonly fetch: unknown;
     };
 
 /** Contract-level cascade evaluation effects (RFC-026). */
@@ -226,6 +239,24 @@ export type CascadeEvaluationError =
       readonly code: 'cascade_relation_value_shape_mismatch';
       readonly relation: RelationName;
       readonly multiplicity: RelationMultiplicity;
+    };
+
+/**
+ * Load-state map entry after a claimed completed owning Resource load (RFC-027).
+ * `not-loaded` is a loading state — never a RFC-025 value state.
+ */
+export type RelationLoadStateEntry =
+  | { readonly status: 'not-loaded' }
+  | { readonly status: 'loaded'; readonly value: RelationRuntimeValue };
+
+export type RelationLoadStateError =
+  | {
+      readonly code: 'missing_relation_load_state';
+      readonly relation: RelationName;
+    }
+  | {
+      readonly code: 'eager_relation_not_loaded';
+      readonly relation: RelationName;
     };
 
 /** Multi-Resource Relation cross-ref failure (RFC-024 §7.2). */

@@ -63,6 +63,7 @@ function baseRelation(
     direction: 'outbound',
     onDelete: 'none',
     onUpdate: 'none',
+    fetch: 'eager',
     ...overrides,
   };
 }
@@ -73,6 +74,7 @@ describe('RFC-026 evaluateCascadeEvent', () => {
       baseRelation({
         onDelete: 'none',
         onUpdate: 'none',
+        fetch: 'eager',
         multiplicity: 'many',
       }),
     ]);
@@ -105,6 +107,7 @@ describe('RFC-026 evaluateCascadeEvent', () => {
         name: 'items',
         onDelete: 'restrict',
         onUpdate: 'restrict',
+        fetch: 'eager',
         multiplicity: 'many',
         optional: false,
         nullable: false,
@@ -258,6 +261,7 @@ describe('RFC-026 evaluateCascadeEvent', () => {
       baseRelation({
         onDelete: 'setNull',
         onUpdate: 'setNull',
+        fetch: 'eager',
         optional: false,
         nullable: true,
       }),
@@ -425,6 +429,7 @@ describe('RFC-026 evaluateCascadeEvent', () => {
       baseRelation({
         onDelete: 'none',
         onUpdate: 'restrict',
+        fetch: 'eager',
         optional: false,
       }),
     ]);
