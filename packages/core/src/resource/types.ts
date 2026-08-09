@@ -428,6 +428,62 @@ export type ConstraintValidationError =
 /** Runtime field value in a field-value map (RFC-018). */
 export type FieldRuntimeValue = string | number | boolean | null;
 
+/**
+ * Opaque non-null non-array association placeholder for value-state checks (RFC-025).
+ * Not a wire, ORM, Resource, or ResourceIdentity type.
+ */
+export type RelationSingularAssociation = {
+  readonly __rfRelationSingularAssociation?: never;
+};
+
+/**
+ * Opaque non-null collection element placeholder for value-state checks (RFC-025).
+ * Not a wire, ORM, Resource, or ResourceIdentity type.
+ */
+export type RelationAssociationElement = {
+  readonly __rfRelationAssociationElement?: never;
+};
+
+/**
+ * Conceptual Relation instance value for value-state checks (RFC-025; not wire).
+ * - `null` = association-level null
+ * - singular placeholder = present non-null for multiplicity `"one"`
+ * - readonly array = present non-null collection for multiplicity `"many"`
+ */
+export type RelationRuntimeValue =
+  | null
+  | RelationSingularAssociation
+  | ReadonlyArray<RelationAssociationElement | null>;
+
+/** Field value-state check failure (RFC-025); distinct from declaration / constraint errors. */
+export type FieldValueStateError =
+  | { readonly code: 'forbidden_absent_field'; readonly field: FieldName }
+  | { readonly code: 'forbidden_null_field'; readonly field: FieldName };
+
+/** Relation value-state check failure (RFC-025); distinct from declaration / constraint errors. */
+export type RelationValueStateError =
+  | {
+      readonly code: 'forbidden_absent_relation';
+      readonly relation: RelationName;
+    }
+  | {
+      readonly code: 'forbidden_null_relation';
+      readonly relation: RelationName;
+    }
+  | {
+      readonly code: 'relation_value_shape_mismatch';
+      readonly relation: RelationName;
+      readonly multiplicity: RelationMultiplicity;
+    }
+  | {
+      readonly code: 'forbidden_null_relation_element';
+      readonly relation: RelationName;
+      readonly index: number;
+    };
+
+/** Umbrella value-state error (RFC-025). */
+export type ValueStateError = FieldValueStateError | RelationValueStateError;
+
 /** Runtime constraint enforcement failure (RFC-018); distinct from declaration errors. */
 export type ConstraintEnforcementError =
   | {
