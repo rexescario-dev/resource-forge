@@ -281,6 +281,8 @@ describe('RFC-021 resource operations', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ],
     );

@@ -1,6 +1,10 @@
 export type {
   AnnotationValidationError,
   Annotations,
+  CascadeEffects,
+  CascadeEvaluationError,
+  CascadeEvent,
+  CascadePolicy,
   Constraint,
   ConstraintEnforcementError,
   ConstraintKind,
@@ -56,4 +60,5 @@ export { invokeOperation } from './invoke-operation.js';
 export { projectResourceMetadata } from './project.js';
 export { checkRelationCrossRefs } from './relation-cross-refs.js';
 export { checkRelationValueStates } from './relation-value-states.js';
+export { evaluateCascadeEvent } from './cascade.js';
 export { validateResource } from './validate.js';

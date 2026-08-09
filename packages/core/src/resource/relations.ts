@@ -3,6 +3,7 @@ import { validateResourceIdentity } from '../identity/validate.js';
 import { err, ok, type Result } from '../result.js';
 import { validateFieldName } from './fields.js';
 import type {
+  CascadePolicy,
   FieldName,
   Relation,
   RelationDirection,
@@ -15,8 +16,25 @@ import type {
 const RELATION_NAME_PATTERN = /^[a-z][a-zA-Z0-9]*$/;
 const RELATION_MULTIPLICITIES = new Set<RelationMultiplicity>(['one', 'many']);
 const RELATION_DIRECTIONS = new Set<RelationDirection>(['outbound', 'inbound']);
+const CASCADE_POLICIES = new Set<CascadePolicy>([
+  'none',
+  'cascade',
+  'restrict',
+  'setNull',
+]);
 
 const BASE_RELATION_KEYS = [
+  'name',
+  'target',
+  'multiplicity',
+  'optional',
+  'nullable',
+  'direction',
+  'onDelete',
+  'onUpdate',
+] as const;
+
+const LEGACY_RFC024_BASE_KEYS = [
   'name',
   'target',
   'multiplicity',
@@ -68,10 +86,10 @@ function grammarNamePayload(candidate: unknown): string {
 
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness,
- * declarative target, multiplicity, optional, nullable, direction, optional
- * inverse/join) before Relation materialization.
+ * declarative target, multiplicity, optional, nullable, direction, onDelete,
+ * onUpdate, optional inverse/join) before Relation materialization.
  * MUST NOT strip unknown properties or invent a default multiplicity/optional/
- * nullable/direction/inverse/join.
+ * nullable/direction/onDelete/onUpdate/inverse/join.
  *
  * Target structural keys `{ namespace, name }` are the closed Relation boundary;
  * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
@@ -138,6 +156,24 @@ export function checkRelations(
         ])
       ) {
         return err({ code: 'missing_relation_direction', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    const hasOnDelete = Object.prototype.hasOwnProperty.call(member, 'onDelete');
+    if (!hasOnDelete) {
+      if (hasExactOwnKeys(member, [...LEGACY_RFC024_BASE_KEYS])) {
+        return err({ code: 'missing_relation_on_delete', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    const hasOnUpdate = Object.prototype.hasOwnProperty.call(member, 'onUpdate');
+    if (!hasOnUpdate) {
+      if (
+        hasExactOwnKeys(member, [...LEGACY_RFC024_BASE_KEYS, 'onDelete'])
+      ) {
+        return err({ code: 'missing_relation_on_update', index });
       }
       return err({ code: 'invalid_relation_member', index });
     }
@@ -237,6 +273,40 @@ export function checkRelations(
       });
     }
 
+    const rawOnDelete = member.onDelete;
+    if (
+      typeof rawOnDelete !== 'string' ||
+      !CASCADE_POLICIES.has(rawOnDelete as CascadePolicy)
+    ) {
+      return err({
+        code: 'invalid_relation_on_delete',
+        index,
+        onDelete: rawOnDelete,
+      });
+    }
+
+    const rawOnUpdate = member.onUpdate;
+    if (
+      typeof rawOnUpdate !== 'string' ||
+      !CASCADE_POLICIES.has(rawOnUpdate as CascadePolicy)
+    ) {
+      return err({
+        code: 'invalid_relation_on_update',
+        index,
+        onUpdate: rawOnUpdate,
+      });
+    }
+
+    if (
+      (rawOnDelete === 'setNull' || rawOnUpdate === 'setNull') &&
+      rawNullable === false
+    ) {
+      return err({
+        code: 'invalid_cascade_set_null_requires_nullable',
+        index,
+      });
+    }
+
     let inverse: RelationName | undefined;
     const hasInverse = Object.prototype.hasOwnProperty.call(member, 'inverse');
     if (hasInverse) {
@@ -302,6 +372,8 @@ export function checkRelations(
       optional: rawOptional,
       nullable: rawNullable,
       direction: rawDirection as RelationDirection,
+      onDelete: rawOnDelete as CascadePolicy,
+      onUpdate: rawOnUpdate as CascadePolicy,
       ...(inverse !== undefined ? { inverse } : {}),
       ...(join !== undefined ? { join } : {}),
     };
@@ -314,7 +386,7 @@ export function checkRelations(
 /**
  * Internal: freeze an ordered sequence of already-validated Relations.
  * MUST NOT accept raw candidates, discard unknown properties, invent optional,
- * nullable, direction, inverse, or join.
+ * nullable, direction, onDelete, onUpdate, inverse, or join.
  */
 export function snapshotRelations(
   relations: readonly Relation[],
@@ -328,6 +400,8 @@ export function snapshotRelations(
         optional: boolean;
         nullable: boolean;
         direction: RelationDirection;
+        onDelete: CascadePolicy;
+        onUpdate: CascadePolicy;
         inverse?: RelationName;
         join?: RelationJoin;
       } = {
@@ -340,6 +414,8 @@ export function snapshotRelations(
         optional: relation.optional,
         nullable: relation.nullable,
         direction: relation.direction,
+        onDelete: relation.onDelete,
+        onUpdate: relation.onUpdate,
       };
       if (relation.inverse !== undefined) {
         snapshot.inverse = relation.inverse;
@@ -357,7 +433,8 @@ export function snapshotRelations(
 
 /**
  * Internal / test-only: order-sensitive Relation sequence equality
- * (name, target, multiplicity, optional, nullable, direction, inverse, join).
+ * (name, target, multiplicity, optional, nullable, direction, onDelete,
+ * onUpdate, inverse, join).
  */
 export function relationsEqual(
   left: readonly Relation[],
@@ -385,6 +462,12 @@ export function relationsEqual(
       return false;
     }
     if (l.direction !== r.direction) {
+      return false;
+    }
+    if (l.onDelete !== r.onDelete) {
+      return false;
+    }
+    if (l.onUpdate !== r.onUpdate) {
       return false;
     }
     if (l.inverse !== r.inverse) {

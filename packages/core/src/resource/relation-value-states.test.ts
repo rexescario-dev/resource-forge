@@ -58,6 +58,8 @@ function baseRelation(
     optional: false,
     nullable: false,
     direction: 'outbound',
+    onDelete: 'none',
+    onUpdate: 'none',
     ...overrides,
   };
 }

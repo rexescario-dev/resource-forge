@@ -63,6 +63,10 @@ export { composeResourceMetadata } from './extension/index.js';
 export type {
   AnnotationValidationError,
   Annotations,
+  CascadeEffects,
+  CascadeEvaluationError,
+  CascadeEvent,
+  CascadePolicy,
   Constraint,
   ConstraintEnforcementError,
   ConstraintKind,
@@ -117,6 +121,7 @@ export {
   createEmptyResourceSchema,
   createResource,
   emptyAnnotations,
+  evaluateCascadeEvent,
   invokeOperation,
   projectResourceMetadata,
   validateResource,

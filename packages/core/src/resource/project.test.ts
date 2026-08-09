@@ -298,6 +298,8 @@ describe('projectResourceMetadata', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'lineItems',
@@ -306,6 +308,8 @@ describe('projectResourceMetadata', () => {
         optional: true,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -345,6 +349,8 @@ describe('projectResourceMetadata', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ],
       annotations.value,
@@ -375,6 +381,8 @@ describe('projectResourceMetadata', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
           {
             name: 'author',
@@ -383,6 +391,8 @@ describe('projectResourceMetadata', () => {
             optional: true,
             nullable: true,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         operations: [],
