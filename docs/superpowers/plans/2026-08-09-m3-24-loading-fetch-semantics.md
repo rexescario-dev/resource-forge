@@ -379,7 +379,7 @@ Also:
 | M8 | — |
 | M9 | — |
 | Branch | `feat/m3-24-loading-fetch` |
-| PR | — |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/97 |
 | Status | **Ready for M7** |
 
 ### M5 Plan Review
