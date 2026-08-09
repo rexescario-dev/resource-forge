@@ -524,4 +524,13 @@ export type ResourceProjectionError =
   | {
       readonly code: 'invalid_metadata';
       readonly cause: MetadataValidationError;
+    }
+  | {
+      readonly code: 'duplicate_projection_source';
+      readonly sourceId: string;
+    }
+  | {
+      readonly code: 'projection_key_collision';
+      readonly key: MetadataKey;
+      readonly sources: readonly string[];
     };

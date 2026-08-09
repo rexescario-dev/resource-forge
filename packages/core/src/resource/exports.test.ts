@@ -19,6 +19,7 @@ import type {
   OperationInvocationError,
   Relation,
   RelationValidationError,
+  ResourceProjectionError,
   SemanticResultReport,
 } from '../index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
@@ -79,6 +80,24 @@ describe('M3.3 public exports', () => {
     expect(projected.ok).toBe(true);
     if (!projected.ok) return;
     expect(projected.value.entries).toHaveLength(1);
+  });
+});
+
+describe('M3.20 public exports', () => {
+  it('surfaces composition codes on ResourceProjectionError without exporting compose helper', () => {
+    expect('composeProjectionContributions' in core).toBe(false);
+
+    const duplicate: ResourceProjectionError = {
+      code: 'duplicate_projection_source',
+      sourceId: 'annotations',
+    };
+    const collision: ResourceProjectionError = {
+      code: 'projection_key_collision',
+      key: { namespace: 'rf', name: 'description' },
+      sources: ['annotations', 'fields'],
+    };
+    expect(duplicate.code).toBe('duplicate_projection_source');
+    expect(collision.code).toBe('projection_key_collision');
   });
 });
 

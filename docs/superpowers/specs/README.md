@@ -29,3 +29,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-020 — Population Uniqueness](2026-08-09-rfc-020-population-uniqueness-design.md) | Accepted — [#74](https://github.com/rexescario-dev/resource-forge/issues/74) |
 | [RFC-021 — Operation Kind / Signature / Execution](2026-08-09-rfc-021-operation-kind-signature-execution-design.md) | Accepted — [#77](https://github.com/rexescario-dev/resource-forge/issues/77) |
 | [RFC-022 — Annotation Vocabulary](2026-08-09-rfc-022-annotation-vocabulary-design.md) | Accepted — [#80](https://github.com/rexescario-dev/resource-forge/issues/80) |
+| [RFC-023 — Richer Projection (Composition Semantics)](2026-08-09-rfc-023-richer-projection-composition-design.md) | Accepted — [#83](https://github.com/rexescario-dev/resource-forge/issues/83) |
