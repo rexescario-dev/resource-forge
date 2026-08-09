@@ -15,8 +15,17 @@ export type {
   OccupancyProvider,
   OccupancySurface,
   Operation,
+  OperationHandler,
+  OperationHandlerProvider,
+  OperationInvocationError,
+  OperationKind,
   OperationName,
+  OperationParam,
+  OperationParamName,
+  OperationResultType,
+  OperationRuntimeValue,
   OperationValidationError,
+  SemanticResultReport,
   PopulationUniquenessError,
   Relation,
   RelationMultiplicity,
@@ -33,5 +42,6 @@ export { createEmptyResourceSchema } from './schema.js';
 export { createResource } from './create.js';
 export { checkConstraintValues } from './constraint-values.js';
 export { checkPopulationUniqueness } from './population-uniqueness.js';
+export { invokeOperation } from './invoke-operation.js';
 export { projectResourceMetadata } from './project.js';
 export { validateResource } from './validate.js';

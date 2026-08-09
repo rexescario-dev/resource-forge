@@ -27,3 +27,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-018 — Runtime Constraint Enforcement](2026-08-08-rfc-018-runtime-constraint-enforcement-design.md) | Accepted — [#66](https://github.com/rexescario-dev/resource-forge/issues/66) |
 | [RFC-019 — Intra-Instance Cross-Member Constraints](2026-08-08-rfc-019-uniqueness-cross-member-constraints-design.md) | Accepted — [#70](https://github.com/rexescario-dev/resource-forge/issues/70) |
 | [RFC-020 — Population Uniqueness](2026-08-09-rfc-020-population-uniqueness-design.md) | Accepted — [#74](https://github.com/rexescario-dev/resource-forge/issues/74) |
+| [RFC-021 — Operation Kind / Signature / Execution](2026-08-09-rfc-021-operation-kind-signature-execution-design.md) | Accepted — [#77](https://github.com/rexescario-dev/resource-forge/issues/77) |

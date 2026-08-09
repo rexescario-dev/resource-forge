@@ -15,10 +15,14 @@ import type {
   ConstraintValidationError,
   Field,
   FieldValidationError,
+  Operation,
+  OperationInvocationError,
   Relation,
   RelationValidationError,
+  SemanticResultReport,
 } from '../index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
+import { createResourceWithOperationsForTests } from './create-resource-with-operations.js';
 
 describe('M3.1 public exports', () => {
   it('exposes resource construction and validation', () => {
@@ -248,5 +252,44 @@ describe('M3.17 public exports', () => {
       () => undefined,
     );
     expect(checked).toEqual({ ok: true, value: undefined });
+  });
+});
+
+describe('M3.18 public exports', () => {
+  it('exposes invokeOperation, Operation kinds, and SemanticResultReport', () => {
+    expect(typeof core.invokeOperation).toBe('function');
+    expect('validateOperations' in core).toBe(false);
+
+    const operation: Operation = {
+      name: 'cancel',
+      kind: 'command',
+      params: [],
+      result: 'void',
+    };
+    const report: SemanticResultReport = { outcome: 'void' };
+    const missing: OperationInvocationError = {
+      code: 'missing_operation_handler',
+      operationName: 'cancel',
+    };
+    expect(operation.kind).toBe('command');
+    expect(report.outcome).toBe('void');
+    expect(missing.code).toBe('missing_operation_handler');
+
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+    const resource = createResourceWithOperationsForTests(identity.value, [
+      { name: 'cancel', kind: 'command', params: [], result: 'void' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const invoked = core.invokeOperation(
+      resource.value,
+      'cancel',
+      new Map(),
+      () => () => ({ outcome: 'void' }),
+    );
+    expect(invoked).toEqual({ ok: true, value: { outcome: 'void' } });
   });
 });

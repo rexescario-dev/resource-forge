@@ -558,7 +558,7 @@ describe('RFC-017 concrete constraint kinds', () => {
     expect(relations.ok).toBe(true);
 
     const operations = createResourceWithOperationsForTests(identity.value, [
-      { name: 'create' },
+      { name: 'create', kind: 'command', params: [], result: 'void' },
     ]);
     expect(operations.ok).toBe(true);
 
@@ -583,7 +583,7 @@ describe('RFC-017 concrete constraint kinds', () => {
           nullable: false,
         },
       ],
-      [{ name: 'create' }],
+      [{ name: 'create', kind: 'command', params: [], result: 'void' }],
     );
     expect(constraints.ok).toBe(true);
     if (!constraints.ok) return;
