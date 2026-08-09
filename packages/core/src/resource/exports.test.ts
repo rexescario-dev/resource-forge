@@ -82,6 +82,34 @@ describe('M3.3 public exports', () => {
   });
 });
 
+describe('M3.19 public exports', () => {
+  it('surfaces vocabulary rejection codes on invalid_annotations without validateAnnotations', () => {
+    expect('validateAnnotations' in core).toBe(false);
+
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const unknown = createResourceWithAnnotationsForTests(identity.value, [
+      { key: { namespace: 'rf', name: 'icon' }, value: 'user' },
+    ]);
+    expect(unknown.ok).toBe(false);
+    if (unknown.ok) return;
+    expect(unknown.error.code).toBe('invalid_annotations');
+    if (unknown.error.code !== 'invalid_annotations') return;
+    expect(unknown.error.cause.code).toBe('unknown_rf_annotation_key');
+
+    const badShape = createResourceWithAnnotationsForTests(identity.value, [
+      { key: { namespace: 'rf', name: 'description' }, value: null },
+    ]);
+    expect(badShape.ok).toBe(false);
+    if (badShape.ok) return;
+    expect(badShape.error.code).toBe('invalid_annotations');
+    if (badShape.error.code !== 'invalid_annotations') return;
+    expect(badShape.error.cause.code).toBe('invalid_rf_annotation_value_shape');
+  });
+});
+
 describe('M3.4 / M3.6 / M3.10 / M3.11 public exports', () => {
   it('exposes widened Field contracts without exporting optional/nullable validation helpers', () => {
     const field: Field = {

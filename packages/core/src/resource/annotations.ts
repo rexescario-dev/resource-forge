@@ -7,6 +7,8 @@ import type { JsonValue, MetadataEntry } from '../metadata/types.js';
 import { err, ok, type Result } from '../result.js';
 import type { AnnotationValidationError, Annotations } from './types.js';
 
+const RF_ANNOTATION_CATALOG = new Set(['description', 'displayName']);
+
 function freezeJsonValue(value: JsonValue): JsonValue {
   if (value === null || typeof value !== 'object') {
     return value;
@@ -54,6 +56,25 @@ export function checkAnnotations(
     for (let prior = 0; prior < accepted.length; prior += 1) {
       if (metadataKeysEqual(accepted[prior]!.key, key.value)) {
         return err({ code: 'duplicate_key', index, key: key.value });
+      }
+    }
+
+    // RFC-022 vocabulary (after key / JsonValue / duplicate — locked precedence)
+    if (key.value.namespace === 'rf') {
+      if (!RF_ANNOTATION_CATALOG.has(key.value.name)) {
+        return err({
+          code: 'unknown_rf_annotation_key',
+          index,
+          key: key.value,
+        });
+      }
+      // Catalogued keys require the JsonValue string variant (null / non-strings invalid).
+      if (typeof value.value !== 'string') {
+        return err({
+          code: 'invalid_rf_annotation_value_shape',
+          index,
+          key: key.value,
+        });
       }
     }
 
