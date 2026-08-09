@@ -25,6 +25,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
       {
         name: 'sponsor',
@@ -32,6 +33,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: true,
+        direction: 'outbound',
       },
       {
         name: 'tags',
@@ -39,6 +41,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'many',
         optional: true,
         nullable: false,
+        direction: 'outbound',
       },
       {
         name: 'aliases',
@@ -46,6 +49,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'many',
         optional: true,
         nullable: true,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -59,6 +63,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
         {
           name: 'sponsor',
@@ -66,6 +71,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: true,
+          direction: 'outbound',
         },
         {
           name: 'tags',
@@ -73,6 +79,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'many',
           optional: true,
           nullable: false,
+          direction: 'outbound',
         },
         {
           name: 'aliases',
@@ -80,6 +87,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'many',
           optional: true,
           nullable: true,
+          direction: 'outbound',
         },
       ]),
     ).toBe(true);
@@ -91,6 +99,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'many',
           optional: true,
           nullable: true,
+          direction: 'outbound',
         },
         {
           name: 'tags',
@@ -98,6 +107,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'many',
           optional: true,
           nullable: false,
+          direction: 'outbound',
         },
         {
           name: 'sponsor',
@@ -105,6 +115,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: true,
+          direction: 'outbound',
         },
         {
           name: 'customer',
@@ -112,6 +123,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ]),
     ).toBe(false);
@@ -129,6 +141,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -152,6 +165,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
       {
         name: 'editor',
@@ -159,6 +173,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: true,
         nullable: true,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -176,6 +191,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -231,6 +247,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           target: { ...customer },
           multiplicity: 'one',
           nullable: true,
+          direction: 'outbound',
         },
         code: 'invalid_relation_member',
       },
@@ -329,6 +346,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable,
+          direction: 'outbound',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -406,6 +424,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional,
           nullable: false,
+          direction: 'outbound',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -431,6 +450,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity,
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -457,6 +477,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -480,6 +501,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -506,6 +528,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -533,6 +556,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -557,6 +581,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
       {
         name: 'customer',
@@ -564,6 +589,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'one',
         optional: false,
         nullable: true,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -586,6 +612,7 @@ describe('RFC-015 relation association-reference nullability', () => {
       multiplicity: 'one' as const,
       optional: false,
       nullable: false,
+      direction: 'outbound',
       default: '',
     };
     const resource = createResourceWithRelationsForTests(identity.value, [
@@ -610,6 +637,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
         [
@@ -619,6 +647,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: true,
+            direction: 'outbound',
           },
         ],
       ),
@@ -635,6 +664,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
         [
@@ -644,6 +674,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: true,
             nullable: false,
+            direction: 'outbound',
           },
         ],
       ),
@@ -660,6 +691,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
         [
@@ -669,6 +701,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'many',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
       ),
@@ -682,6 +715,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
         [
@@ -691,6 +725,7 @@ describe('RFC-015 relation association-reference nullability', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
         ],
       ),
@@ -711,6 +746,7 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ],
       emptyAnnotations,
@@ -736,6 +772,7 @@ describe('RFC-015 relation association-reference nullability', () => {
       multiplicity: 'one' as const,
       optional: false,
       nullable: false,
+      direction: 'outbound',
     };
     const list: object[] = [
       candidate,
@@ -745,6 +782,7 @@ describe('RFC-015 relation association-reference nullability', () => {
         multiplicity: 'many',
         optional: true,
         nullable: true,
+        direction: 'outbound',
       },
     ];
     const resource = createResourceWithRelationsForTests(identity.value, list);
@@ -760,6 +798,7 @@ describe('RFC-015 relation association-reference nullability', () => {
       multiplicity: 'one',
       optional: false,
       nullable: false,
+      direction: 'outbound',
     });
 
     expect(resource.value.schema.relations.map((r) => r.name)).toEqual([
@@ -779,36 +818,44 @@ describe('RFC-015 relation association-reference nullability', () => {
   });
 
   it('rejects invalid candidates before snapshot materializes nullable', () => {
-    const missing = checkRelations([
-      {
-        name: 'customer',
-        target: { ...customer },
-        multiplicity: 'one',
-        optional: false,
-      },
-    ]);
+    const missing = checkRelations(
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+        },
+      ],
+      [],
+    );
     expect(missing.ok).toBe(false);
     if (!missing.ok) {
       expect(missing.error.code).toBe('missing_relation_nullable');
     }
 
-    const invalid = checkRelations([
-      {
-        name: 'customer',
-        target: { ...customer },
-        multiplicity: 'one',
-        optional: false,
-        nullable: 'true',
-      },
-      {
-        name: 'customer',
-        target: { ...customer },
-        multiplicity: 'one',
-        optional: false,
-        nullable: false,
-        default: '',
-      },
-    ]);
+    const invalid = checkRelations(
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: 'true',
+          direction: 'outbound',
+        },
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          default: '',
+        },
+      ],
+      [],
+    );
     expect(invalid.ok).toBe(false);
   });
 
@@ -868,6 +915,449 @@ describe('RFC-015 relation association-reference nullability', () => {
     const result = validateResource({
       identity: identity.value,
       schema: createEmptyResourceSchema(),
+      annotations: emptyAnnotations,
+    });
+    expect(result.ok).toBe(true);
+  });
+});
+
+describe('RFC-024 relation direction / inverse / join', () => {
+  const baseFields = [
+    { name: 'customerId', type: 'string' as const, optional: false, nullable: false },
+  ];
+
+  it('accepts six-member Relations and optional inverse/join combinations', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+        },
+        {
+          name: 'sponsor',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: true,
+          nullable: true,
+          direction: 'inbound',
+          inverse: 'orders',
+        },
+        {
+          name: 'owner',
+          target: { ...user },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          join: { local: 'customerId', remote: 'id' },
+        },
+        {
+          name: 'billing',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          inverse: 'billedOrders',
+          join: { local: 'customerId', remote: 'id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+    expect(resource.value.schema.relations.map((r) => r.direction)).toEqual([
+      'outbound',
+      'inbound',
+      'outbound',
+      'outbound',
+    ]);
+    expect(resource.value.schema.relations[0]).not.toHaveProperty('inverse');
+    expect(resource.value.schema.relations[0]).not.toHaveProperty('join');
+    expect(resource.value.schema.relations[1]?.inverse).toBe('orders');
+    expect(resource.value.schema.relations[2]?.join).toEqual({
+      local: 'customerId',
+      remote: 'id',
+    });
+    expect(Object.isFrozen(resource.value.schema.relations[2]?.join)).toBe(true);
+  });
+
+  it('rejects legacy five-member Relations as missing_relation_direction', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const candidate of [
+      {
+        name: 'customer',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: false,
+      },
+      {
+        nullable: false,
+        optional: false,
+        multiplicity: 'one',
+        target: { ...customer },
+        name: 'customer',
+      },
+    ]) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        candidate,
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'missing_relation_direction', index: 0 },
+        });
+      }
+    }
+  });
+
+  it('rejects five-member + inverse without direction as invalid_relation_member', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      {
+        name: 'customer',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: false,
+        inverse: 'orders',
+      },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_relation_member', index: 0 },
+      });
+    }
+  });
+
+  it('rejects invalid direction values', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const direction of ['both', 'Outbound', 1, null] as const) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction,
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'invalid_relation_direction', index: 0, direction },
+        });
+      }
+    }
+  });
+
+  it('rejects invalid inverse grammar', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const inverse of ['Orders', '', 123] as const) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          inverse,
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: {
+            code: 'invalid_relation_inverse',
+            index: 0,
+            inverse: String(inverse),
+          },
+        });
+      }
+    }
+  });
+
+  it('rejects malformed join shapes', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const join of [
+      null,
+      { local: 'customerId' },
+      { local: 'customerId', remote: 'id', extra: true },
+      'customerId',
+    ] as const) {
+      const resource = createResourceWithRelationsForTests(
+        identity.value,
+        [
+          {
+            name: 'customer',
+            target: { ...customer },
+            multiplicity: 'one',
+            optional: false,
+            nullable: false,
+            direction: 'outbound',
+            join,
+          },
+        ],
+        emptyAnnotations,
+        baseFields,
+      );
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'invalid_relation_join', index: 0 },
+        });
+      }
+    }
+  });
+
+  it('applies join FieldName grammar before local existence (local then remote)', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const nonStringLocal = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          join: { local: 123, remote: 'id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(nonStringLocal.ok).toBe(false);
+    if (!nonStringLocal.ok) {
+      expect(nonStringLocal.error).toEqual({
+        code: 'invalid_schema',
+        cause: {
+          code: 'invalid_join_local_field_name',
+          index: 0,
+          name: '123',
+        },
+      });
+    }
+
+    const badLocalGrammar = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          join: { local: 'Missing', remote: 'id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(badLocalGrammar.ok).toBe(false);
+    if (!badLocalGrammar.ok) {
+      expect(badLocalGrammar.error).toEqual({
+        code: 'invalid_schema',
+        cause: {
+          code: 'invalid_join_local_field_name',
+          index: 0,
+          name: 'Missing',
+        },
+      });
+    }
+
+    const badRemoteGrammar = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          join: { local: 'customerId', remote: 'Id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(badRemoteGrammar.ok).toBe(false);
+    if (!badRemoteGrammar.ok) {
+      expect(badRemoteGrammar.error).toEqual({
+        code: 'invalid_schema',
+        cause: {
+          code: 'invalid_join_remote_field_name',
+          index: 0,
+          name: 'Id',
+        },
+      });
+    }
+  });
+
+  it('rejects unknown join.local after shape and grammar succeed', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          join: { local: 'missing', remote: 'id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: {
+          code: 'unknown_join_local_field',
+          index: 0,
+          name: 'missing',
+        },
+      });
+    }
+  });
+
+  it('relationsEqual is false when only direction, inverse, or join differs', () => {
+    const base = {
+      name: 'customer',
+      target: customer,
+      multiplicity: 'one' as const,
+      optional: false,
+      nullable: false,
+      direction: 'outbound' as const,
+    };
+    expect(
+      relationsEqual([{ ...base }], [{ ...base, direction: 'inbound' }]),
+    ).toBe(false);
+    expect(
+      relationsEqual([{ ...base }], [{ ...base, inverse: 'orders' }]),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ ...base, inverse: 'orders' }],
+        [{ ...base, inverse: 'purchases' }],
+      ),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ ...base }],
+        [{ ...base, join: { local: 'customerId', remote: 'id' } }],
+      ),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ ...base, join: { local: 'customerId', remote: 'id' } }],
+        [{ ...base, join: { local: 'customerId', remote: 'pk' } }],
+      ),
+    ).toBe(false);
+    expect(
+      relationsEqual(
+        [{ ...base, join: { local: 'customerId', remote: 'id' } }],
+        [{ ...base, join: { local: 'customerId', remote: 'id' } }],
+      ),
+    ).toBe(true);
+  });
+
+  it('allows self-target with direction and optional inverse/join Resource-locally', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'parent',
+          target: { namespace: 'crm', name: 'Order' },
+          multiplicity: 'one',
+          optional: true,
+          nullable: true,
+          direction: 'outbound',
+          inverse: 'children',
+          join: { local: 'customerId', remote: 'customerId' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(resource.ok).toBe(true);
+  });
+
+  it('keeps Resource validation independent of target schema for inverse/join', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const result = validateResource({
+      identity: identity.value,
+      schema: {
+        fields: baseFields,
+        relations: [
+          {
+            name: 'customer',
+            target: { ...customer },
+            multiplicity: 'one',
+            optional: false,
+            nullable: false,
+            direction: 'outbound',
+            inverse: 'orders',
+            join: { local: 'customerId', remote: 'missingOnTarget' },
+          },
+        ],
+        operations: [],
+        constraints: [],
+      },
       annotations: emptyAnnotations,
     });
     expect(result.ok).toBe(true);

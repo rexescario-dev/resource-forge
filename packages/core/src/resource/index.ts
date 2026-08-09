@@ -28,6 +28,9 @@ export type {
   SemanticResultReport,
   PopulationUniquenessError,
   Relation,
+  RelationCrossRefValidationError,
+  RelationDirection,
+  RelationJoin,
   RelationMultiplicity,
   RelationName,
   RelationValidationError,
@@ -44,4 +47,5 @@ export { checkConstraintValues } from './constraint-values.js';
 export { checkPopulationUniqueness } from './population-uniqueness.js';
 export { invokeOperation } from './invoke-operation.js';
 export { projectResourceMetadata } from './project.js';
+export { checkRelationCrossRefs } from './relation-cross-refs.js';
 export { validateResource } from './validate.js';

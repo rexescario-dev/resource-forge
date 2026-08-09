@@ -60,7 +60,10 @@ export function validateResource(candidate: {
     return err({ code: 'invalid_schema', cause: fieldsResult.error });
   }
 
-  const relationsResult = checkRelations(schemaRecord.relations);
+  const relationsResult = checkRelations(
+    schemaRecord.relations,
+    fieldsResult.value,
+  );
   if (!relationsResult.ok) {
     return err({ code: 'invalid_schema', cause: relationsResult.error });
   }

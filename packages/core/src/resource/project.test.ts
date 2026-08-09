@@ -297,6 +297,7 @@ describe('projectResourceMetadata', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
       {
         name: 'lineItems',
@@ -304,6 +305,7 @@ describe('projectResourceMetadata', () => {
         multiplicity: 'many',
         optional: true,
         nullable: true,
+        direction: 'outbound',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -342,6 +344,7 @@ describe('projectResourceMetadata', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ],
       annotations.value,
@@ -371,6 +374,7 @@ describe('projectResourceMetadata', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
           {
             name: 'author',
@@ -378,6 +382,7 @@ describe('projectResourceMetadata', () => {
             multiplicity: 'one',
             optional: true,
             nullable: true,
+            direction: 'outbound',
           },
         ],
         operations: [],

@@ -33,7 +33,10 @@ export function createResourceWithOperationsForTests(
     return err({ code: 'invalid_schema', cause: checkedFields.error });
   }
 
-  const checkedRelations = checkRelations(candidateRelations);
+  const checkedRelations = checkRelations(
+    candidateRelations,
+    checkedFields.value,
+  );
   if (!checkedRelations.ok) {
     return err({ code: 'invalid_schema', cause: checkedRelations.error });
   }

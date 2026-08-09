@@ -1,8 +1,12 @@
 import { resourceIdentitiesEqual } from '../identity/equal.js';
 import { validateResourceIdentity } from '../identity/validate.js';
 import { err, ok, type Result } from '../result.js';
+import { validateFieldName } from './fields.js';
 import type {
+  FieldName,
   Relation,
+  RelationDirection,
+  RelationJoin,
   RelationMultiplicity,
   RelationName,
   RelationValidationError,
@@ -10,6 +14,16 @@ import type {
 
 const RELATION_NAME_PATTERN = /^[a-z][a-zA-Z0-9]*$/;
 const RELATION_MULTIPLICITIES = new Set<RelationMultiplicity>(['one', 'many']);
+const RELATION_DIRECTIONS = new Set<RelationDirection>(['outbound', 'inbound']);
+
+const BASE_RELATION_KEYS = [
+  'name',
+  'target',
+  'multiplicity',
+  'optional',
+  'nullable',
+  'direction',
+] as const;
 
 /** Internal: sole normative RelationName grammar (RFC-008). */
 export function validateRelationName(
@@ -39,20 +53,36 @@ function hasExactOwnKeys(
   return expected.every((key) => Object.prototype.hasOwnProperty.call(value, key));
 }
 
+function isAllowedRelationKeySet(member: Record<string, unknown>): boolean {
+  return (
+    hasExactOwnKeys(member, [...BASE_RELATION_KEYS]) ||
+    hasExactOwnKeys(member, [...BASE_RELATION_KEYS, 'inverse']) ||
+    hasExactOwnKeys(member, [...BASE_RELATION_KEYS, 'join']) ||
+    hasExactOwnKeys(member, [...BASE_RELATION_KEYS, 'inverse', 'join'])
+  );
+}
+
+function grammarNamePayload(candidate: unknown): string {
+  return typeof candidate === 'string' ? candidate : String(candidate);
+}
+
 /**
  * Internal: validate raw candidate members (closed shape, names, uniqueness,
- * declarative target, multiplicity, optional, nullable) before
- * `{ name, target, multiplicity, optional, nullable }` materialization.
- * MUST NOT strip unknown properties or invent a default multiplicity/optional/nullable.
+ * declarative target, multiplicity, optional, nullable, direction, optional
+ * inverse/join) before Relation materialization.
+ * MUST NOT strip unknown properties or invent a default multiplicity/optional/
+ * nullable/direction/inverse/join.
  *
  * Target structural keys `{ namespace, name }` are the closed Relation boundary;
  * RFC-001 `validateResourceIdentity(..., { kind: 'user' })` remains authoritative
  * for identity semantics (no second identity validity definition).
  *
  * `nullable` is association-reference nullability only (RFC-015).
+ * `join.local` resolves against owning field names (RFC-024).
  */
 export function checkRelations(
   candidate: readonly unknown[],
+  fields: readonly { readonly name: FieldName }[],
 ): Result<Relation[], RelationValidationError> {
   if (!Array.isArray(candidate)) {
     return err({ code: 'invalid_relation_member', index: 0 });
@@ -60,6 +90,7 @@ export function checkRelations(
 
   const accepted: Relation[] = [];
   const seen = new Set<string>();
+  const fieldNames = new Set(fields.map((field) => field.name));
 
   for (let index = 0; index < candidate.length; index += 1) {
     const member = candidate[index];
@@ -95,15 +126,23 @@ export function checkRelations(
       return err({ code: 'invalid_relation_member', index });
     }
 
-    if (
-      !hasExactOwnKeys(member, [
-        'name',
-        'target',
-        'multiplicity',
-        'optional',
-        'nullable',
-      ])
-    ) {
+    const hasDirection = Object.prototype.hasOwnProperty.call(member, 'direction');
+    if (!hasDirection) {
+      if (
+        hasExactOwnKeys(member, [
+          'name',
+          'target',
+          'multiplicity',
+          'optional',
+          'nullable',
+        ])
+      ) {
+        return err({ code: 'missing_relation_direction', index });
+      }
+      return err({ code: 'invalid_relation_member', index });
+    }
+
+    if (!isAllowedRelationKeySet(member)) {
       return err({ code: 'invalid_relation_member', index });
     }
 
@@ -186,14 +225,87 @@ export function checkRelations(
       });
     }
 
+    const rawDirection = member.direction;
+    if (
+      typeof rawDirection !== 'string' ||
+      !RELATION_DIRECTIONS.has(rawDirection as RelationDirection)
+    ) {
+      return err({
+        code: 'invalid_relation_direction',
+        index,
+        direction: rawDirection,
+      });
+    }
+
+    let inverse: RelationName | undefined;
+    const hasInverse = Object.prototype.hasOwnProperty.call(member, 'inverse');
+    if (hasInverse) {
+      const rawInverse = member.inverse;
+      const inverseResult = validateRelationName(rawInverse as string);
+      if (!inverseResult.ok) {
+        return err({
+          code: 'invalid_relation_inverse',
+          index,
+          inverse: inverseResult.error.name,
+        });
+      }
+      inverse = inverseResult.value;
+    }
+
+    let join: RelationJoin | undefined;
+    const hasJoin = Object.prototype.hasOwnProperty.call(member, 'join');
+    if (hasJoin) {
+      const rawJoin = member.join;
+      if (!isPlainObject(rawJoin) || !hasExactOwnKeys(rawJoin, ['local', 'remote'])) {
+        return err({ code: 'invalid_relation_join', index });
+      }
+
+      const rawLocal = rawJoin.local;
+      const localNameResult = validateFieldName(rawLocal as string);
+      if (!localNameResult.ok) {
+        return err({
+          code: 'invalid_join_local_field_name',
+          index,
+          name: grammarNamePayload(rawLocal),
+        });
+      }
+
+      const rawRemote = rawJoin.remote;
+      const remoteNameResult = validateFieldName(rawRemote as string);
+      if (!remoteNameResult.ok) {
+        return err({
+          code: 'invalid_join_remote_field_name',
+          index,
+          name: grammarNamePayload(rawRemote),
+        });
+      }
+
+      if (!fieldNames.has(localNameResult.value)) {
+        return err({
+          code: 'unknown_join_local_field',
+          index,
+          name: localNameResult.value,
+        });
+      }
+
+      join = {
+        local: localNameResult.value,
+        remote: remoteNameResult.value,
+      };
+    }
+
     seen.add(nameResult.value);
-    accepted.push({
+    const relation: Relation = {
       name: nameResult.value,
       target: targetResult.value,
       multiplicity: rawMultiplicity as RelationMultiplicity,
       optional: rawOptional,
       nullable: rawNullable,
-    });
+      direction: rawDirection as RelationDirection,
+      ...(inverse !== undefined ? { inverse } : {}),
+      ...(join !== undefined ? { join } : {}),
+    };
+    accepted.push(relation);
   }
 
   return ok(accepted);
@@ -202,14 +314,23 @@ export function checkRelations(
 /**
  * Internal: freeze an ordered sequence of already-validated Relations.
  * MUST NOT accept raw candidates, discard unknown properties, invent optional,
- * or invent nullable.
+ * nullable, direction, inverse, or join.
  */
 export function snapshotRelations(
   relations: readonly Relation[],
 ): ReadonlyArray<Relation> {
   return Object.freeze(
-    relations.map((relation) =>
-      Object.freeze({
+    relations.map((relation) => {
+      const snapshot: {
+        name: RelationName;
+        target: { namespace: string; name: string };
+        multiplicity: RelationMultiplicity;
+        optional: boolean;
+        nullable: boolean;
+        direction: RelationDirection;
+        inverse?: RelationName;
+        join?: RelationJoin;
+      } = {
         name: relation.name,
         target: Object.freeze({
           namespace: relation.target.namespace,
@@ -218,14 +339,25 @@ export function snapshotRelations(
         multiplicity: relation.multiplicity,
         optional: relation.optional,
         nullable: relation.nullable,
-      }),
-    ),
+        direction: relation.direction,
+      };
+      if (relation.inverse !== undefined) {
+        snapshot.inverse = relation.inverse;
+      }
+      if (relation.join !== undefined) {
+        snapshot.join = Object.freeze({
+          local: relation.join.local,
+          remote: relation.join.remote,
+        });
+      }
+      return Object.freeze(snapshot);
+    }),
   );
 }
 
 /**
  * Internal / test-only: order-sensitive Relation sequence equality
- * (name, target, multiplicity, optional, nullable).
+ * (name, target, multiplicity, optional, nullable, direction, inverse, join).
  */
 export function relationsEqual(
   left: readonly Relation[],
@@ -235,19 +367,36 @@ export function relationsEqual(
     return false;
   }
   for (let i = 0; i < left.length; i += 1) {
-    if (left[i]!.name !== right[i]!.name) {
+    const l = left[i]!;
+    const r = right[i]!;
+    if (l.name !== r.name) {
       return false;
     }
-    if (!resourceIdentitiesEqual(left[i]!.target, right[i]!.target)) {
+    if (!resourceIdentitiesEqual(l.target, r.target)) {
       return false;
     }
-    if (left[i]!.multiplicity !== right[i]!.multiplicity) {
+    if (l.multiplicity !== r.multiplicity) {
       return false;
     }
-    if (left[i]!.optional !== right[i]!.optional) {
+    if (l.optional !== r.optional) {
       return false;
     }
-    if (left[i]!.nullable !== right[i]!.nullable) {
+    if (l.nullable !== r.nullable) {
+      return false;
+    }
+    if (l.direction !== r.direction) {
+      return false;
+    }
+    if (l.inverse !== r.inverse) {
+      return false;
+    }
+    const lJoin = l.join;
+    const rJoin = r.join;
+    if (lJoin === undefined || rJoin === undefined) {
+      if (lJoin !== rJoin) {
+        return false;
+      }
+    } else if (lJoin.local !== rJoin.local || lJoin.remote !== rJoin.remote) {
       return false;
     }
   }
