@@ -69,8 +69,11 @@ export class ResourceForgeModule {
           provide: RESOURCE_REGISTRY,
           useFactory: async (
             explorer: HostingExplorer,
-            _options: ResourceForgeModuleOptions,
-          ) => hostRegistry(explorer),
+            options: ResourceForgeModuleOptions,
+          ) => {
+            void options; // Nest ordering only — options carry no registry/fetch config
+            return hostRegistry(explorer);
+          },
           inject: [HostingExplorer, RESOURCE_FORGE_OPTIONS],
         },
       ],
