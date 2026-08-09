@@ -8,7 +8,7 @@ Resource Forge grows by design before implementation. After the repository found
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
 | M3 | Resource model | Done |
-| M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
+| M4 | Integrations (Nest → GraphQL → Prisma) | In progress — M4.1 Nest ✅ |
 | M5 | CLI & end-to-end examples | Planned |
 
 ## Process: RFCs before contracts
@@ -158,13 +158,15 @@ Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
 ## M4 — Integrations
 
+**Status:** In progress — [M4.1 Nest](superpowers/plans/2026-08-10-m4-1-nest-discovery-host.md) ✅ ([RFC-031](superpowers/specs/2026-08-10-rfc-031-nest-discovery-host-integration-design.md) — [#106](https://github.com/rexescario-dev/resource-forge/issues/106)).
+
 Only after the core model is stable. Each adapter depends only on `@resource-forge/core`. Suggested order:
 
-1. **Nest** — host the framework; discovery; DI; module registration
-2. **GraphQL** — translate resource model into GraphQL; schema and resolver generation
-3. **Prisma** — read Prisma metadata; map models to resources; persistence
+1. **M4.1 Nest** — host the framework; discovery; DI; module registration (RFC-031) ✅ — [#106](https://github.com/rexescario-dev/resource-forge/issues/106)
+2. **M4.2 GraphQL** — translate resource model into GraphQL; schema and resolver generation
+3. **M4.3 Prisma** — read Prisma metadata; map models to resources; persistence
 
-Integrations remain independent of each other.
+Integrations remain independent of each other. Do not expand RFC-028 into Prisma/ORM realization under M4.1.
 
 ---
 

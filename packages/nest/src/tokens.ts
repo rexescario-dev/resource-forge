@@ -1,0 +1,1 @@
+export const RESOURCE_REGISTRY = Symbol('RESOURCE_REGISTRY');

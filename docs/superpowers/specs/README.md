@@ -37,3 +37,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-028 — Persistence / ORM Mapping](2026-08-09-rfc-028-persistence-orm-mapping-design.md) | Accepted — [#98](https://github.com/rexescario-dev/resource-forge/issues/98) |
 | [RFC-029 — Runtime Traversal / Query Semantics](2026-08-09-rfc-029-runtime-traversal-query-semantics-design.md) | Accepted — [#100](https://github.com/rexescario-dev/resource-forge/issues/100) |
 | [RFC-030 — Relation → Metadata Projection (Non-Contribution Closure)](2026-08-10-rfc-030-relation-metadata-projection-design.md) | Accepted — [#102](https://github.com/rexescario-dev/resource-forge/issues/102) |
+| [RFC-031 — Nest Discovery-First Host Integration](2026-08-10-rfc-031-nest-discovery-host-integration-design.md) | Accepted — [#106](https://github.com/rexescario-dev/resource-forge/issues/106) |
