@@ -428,8 +428,8 @@ describe('projectResourceMetadata', () => {
     if (!identity.ok) return;
 
     const resource = createResourceWithOperationsForTests(identity.value, [
-      { name: 'create' },
-      { name: 'cancel' },
+      { name: 'create', kind: 'command', params: [], result: 'void' },
+      { name: 'cancel', kind: 'command', params: [], result: 'void' },
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
@@ -460,7 +460,7 @@ describe('projectResourceMetadata', () => {
 
     const resource = createResourceWithOperationsForTests(
       identity.value,
-      [{ name: 'create' }],
+      [{ name: 'create', kind: 'command', params: [], result: 'void' }],
       annotations.value,
     );
     expect(resource.ok).toBe(true);
@@ -483,8 +483,8 @@ describe('projectResourceMetadata', () => {
         fields: [],
         relations: [],
         operations: [
-          { name: 'create' },
-          { name: 'create' },
+          { name: 'create', kind: 'command', params: [], result: 'void' },
+          { name: 'create', kind: 'command', params: [], result: 'void' },
         ],
         constraints: [],
       },

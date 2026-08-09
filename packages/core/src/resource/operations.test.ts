@@ -8,33 +8,51 @@ import { validateResource } from './validate.js';
 
 const customer = { namespace: 'crm', name: 'Customer' } as const;
 
-describe('RFC-012 resource operations', () => {
-  it('accepts ordered non-empty name-only operations and preserves order', () => {
+function commandOp(
+  name: string,
+  params: object[] = [],
+  result: 'string' | 'number' | 'boolean' | 'void' = 'void',
+) {
+  return { name, kind: 'command' as const, params, result };
+}
+
+function queryOp(
+  name: string,
+  params: object[] = [],
+  result: 'string' | 'number' | 'boolean' = 'number',
+) {
+  return { name, kind: 'query' as const, params, result };
+}
+
+describe('RFC-021 resource operations', () => {
+  it('accepts ordered command/query operations and preserves order', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithOperationsForTests(identity.value, [
-      { name: 'create' },
-      { name: 'cancel' },
+      commandOp('create'),
+      queryOp('totalDue'),
     ]);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
 
     expect(resource.value.schema.operations.map((o) => o.name)).toEqual([
       'create',
-      'cancel',
+      'totalDue',
     ]);
+    expect(resource.value.schema.operations[0]?.kind).toBe('command');
+    expect(resource.value.schema.operations[1]?.kind).toBe('query');
     expect(
       operationsEqual(resource.value.schema.operations, [
-        { name: 'create' },
-        { name: 'cancel' },
+        commandOp('create'),
+        queryOp('totalDue'),
       ]),
     ).toBe(true);
     expect(
       operationsEqual(resource.value.schema.operations, [
-        { name: 'cancel' },
-        { name: 'create' },
+        queryOp('totalDue'),
+        commandOp('create'),
       ]),
     ).toBe(false);
   });
@@ -54,76 +72,54 @@ describe('RFC-012 resource operations', () => {
     expect(result.value.schema.operations).toEqual([]);
   });
 
-  it('accepts grammar-valid names such as createID (regex is sole constraint)', () => {
+  it('accepts empty params for command and query', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithOperationsForTests(identity.value, [
-      { name: 'createID' },
+      commandOp('cancel', []),
+      queryOp('count', []),
     ]);
     expect(resource.ok).toBe(true);
   });
 
-  it('treats create/read/update/delete as ordinary names with no special meaning', () => {
+  it('accepts command with void and rejects query with void', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
-    const resource = createResourceWithOperationsForTests(identity.value, [
-      { name: 'create' },
-      { name: 'read' },
-      { name: 'update' },
-      { name: 'delete' },
+    const okCommand = createResourceWithOperationsForTests(identity.value, [
+      commandOp('cancel', [], 'void'),
     ]);
-    expect(resource.ok).toBe(true);
-    if (!resource.ok) return;
-    expect(resource.value.schema.operations.map((o) => o.name)).toEqual([
-      'create',
-      'read',
-      'update',
-      'delete',
+    expect(okCommand.ok).toBe(true);
+
+    const badQuery = createResourceWithOperationsForTests(identity.value, [
+      { name: 'ping', kind: 'query', params: [], result: 'void' },
     ]);
-  });
-
-  it('rejects invalid OperationName', () => {
-    const identity = createResourceIdentity('crm', 'Order');
-    expect(identity.ok).toBe(true);
-    if (!identity.ok) return;
-
-    for (const name of ['Create', 'create-order', '']) {
-      const resource = createResourceWithOperationsForTests(identity.value, [
-        { name },
-      ]);
-      expect(resource.ok).toBe(false);
-      if (!resource.ok) {
-        expect(resource.error.code).toBe('invalid_schema');
-        if (resource.error.code === 'invalid_schema') {
-          expect(resource.error.cause?.code).toBe('invalid_operation_name');
-        }
-      }
+    expect(badQuery.ok).toBe(false);
+    if (!badQuery.ok && badQuery.error.code === 'invalid_schema') {
+      expect(badQuery.error.cause?.code).toBe(
+        'invalid_operation_result_for_kind',
+      );
     }
   });
 
-  it('rejects duplicate OperationName', () => {
+  it('rejects RFC-012 name-only operations (no dual-shape)', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
     const resource = createResourceWithOperationsForTests(identity.value, [
-      { name: 'create' },
-      { name: 'create' },
+      { name: 'foo' },
     ]);
     expect(resource.ok).toBe(false);
-    if (!resource.ok) {
-      expect(resource.error.code).toBe('invalid_schema');
-      if (resource.error.code === 'invalid_schema') {
-        expect(resource.error.cause?.code).toBe('duplicate_operation_name');
-      }
+    if (!resource.ok && resource.error.code === 'invalid_schema') {
+      expect(resource.error.cause?.code).toBe('invalid_operation_member');
     }
   });
 
-  it('rejects additional semantic properties without stripping to valid', () => {
+  it('rejects incomplete kind-only members', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
@@ -132,29 +128,138 @@ describe('RFC-012 resource operations', () => {
       { name: 'create', kind: 'command' },
     ]);
     expect(resource.ok).toBe(false);
-    if (!resource.ok) {
-      expect(resource.error.code).toBe('invalid_schema');
-      if (resource.error.code === 'invalid_schema') {
-        expect(resource.error.cause?.code).toBe('invalid_operation_member');
+    if (!resource.ok && resource.error.code === 'invalid_schema') {
+      expect(resource.error.cause?.code).toBe('invalid_operation_member');
+    }
+  });
+
+  it('validates params: types, booleans, uniqueness, and order equality', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const param = {
+      name: 'reason',
+      type: 'string',
+      optional: true,
+      nullable: false,
+    };
+    const ok = createResourceWithOperationsForTests(identity.value, [
+      commandOp('cancel', [param]),
+    ]);
+    expect(ok.ok).toBe(true);
+
+    const voidParamType = createResourceWithOperationsForTests(identity.value, [
+      {
+        name: 'cancel',
+        kind: 'command',
+        params: [
+          {
+            name: 'x',
+            type: 'void',
+            optional: false,
+            nullable: false,
+          },
+        ],
+        result: 'void',
+      },
+    ]);
+    expect(voidParamType.ok).toBe(false);
+
+    const omitOptional = createResourceWithOperationsForTests(identity.value, [
+      {
+        name: 'cancel',
+        kind: 'command',
+        params: [{ name: 'x', type: 'string', nullable: false }],
+        result: 'void',
+      },
+    ]);
+    expect(omitOptional.ok).toBe(false);
+
+    const dupParam = createResourceWithOperationsForTests(identity.value, [
+      {
+        name: 'cancel',
+        kind: 'command',
+        params: [
+          {
+            name: 'reason',
+            type: 'string',
+            optional: true,
+            nullable: false,
+          },
+          {
+            name: 'reason',
+            type: 'string',
+            optional: false,
+            nullable: false,
+          },
+        ],
+        result: 'void',
+      },
+    ]);
+    expect(dupParam.ok).toBe(false);
+    if (!dupParam.ok && dupParam.error.code === 'invalid_schema') {
+      expect(dupParam.error.cause?.code).toBe('duplicate_operation_param_name');
+    }
+
+    const a = [
+      {
+        name: 'p',
+        type: 'string' as const,
+        optional: false,
+        nullable: false,
+      },
+      {
+        name: 'q',
+        type: 'number' as const,
+        optional: true,
+        nullable: true,
+      },
+    ];
+    const b = [
+      {
+        name: 'q',
+        type: 'number' as const,
+        optional: true,
+        nullable: true,
+      },
+      {
+        name: 'p',
+        type: 'string' as const,
+        optional: false,
+        nullable: false,
+      },
+    ];
+    expect(
+      operationsEqual(
+        [commandOp('op', a)],
+        [commandOp('op', b)],
+      ),
+    ).toBe(false);
+  });
+
+  it('rejects invalid OperationName and duplicates', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const name of ['Create', 'create-order', '']) {
+      const resource = createResourceWithOperationsForTests(identity.value, [
+        commandOp(name),
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok && resource.error.code === 'invalid_schema') {
+        expect(resource.error.cause?.code).toBe('invalid_operation_name');
       }
     }
 
-    const viaValidate = validateResource({
-      identity: identity.value,
-      schema: {
-        fields: [],
-        relations: [],
-        operations: [{ name: 'create', kind: 'command' } as never],
-      constraints: [],
-      },
-      annotations: emptyAnnotations,
-    });
-    expect(viaValidate.ok).toBe(false);
-    if (!viaValidate.ok) {
-      expect(viaValidate.error.code).toBe('invalid_schema');
-      if (viaValidate.error.code === 'invalid_schema') {
-        expect(viaValidate.error.cause?.code).toBe('invalid_operation_member');
-      }
+    const dup = createResourceWithOperationsForTests(identity.value, [
+      commandOp('create'),
+      commandOp('create'),
+    ]);
+    expect(dup.ok).toBe(false);
+    if (!dup.ok && dup.error.code === 'invalid_schema') {
+      expect(dup.error.cause?.code).toBe('duplicate_operation_name');
     }
   });
 
@@ -165,7 +270,7 @@ describe('RFC-012 resource operations', () => {
 
     const resource = createResourceWithOperationsForTests(
       identity.value,
-      [{ name: 'create' }],
+      [commandOp('create')],
       emptyAnnotations,
       [{ name: 'create', type: 'string', optional: false, nullable: false }],
       [
@@ -185,24 +290,38 @@ describe('RFC-012 resource operations', () => {
     expect(resource.value.schema.operations[0]?.name).toBe('create');
   });
 
-  it('freezes operations snapshot against caller mutation', () => {
+  it('freezes operations and params snapshot against caller mutation', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
 
-    const candidate = { name: 'create' };
+    const param = {
+      name: 'reason',
+      type: 'string',
+      optional: true,
+      nullable: false,
+    };
+    const candidate = commandOp('create', [param]);
     const list: object[] = [candidate];
     const resource = createResourceWithOperationsForTests(identity.value, list);
     expect(resource.ok).toBe(true);
     if (!resource.ok) return;
 
-    candidate.name = 'mutated';
-    list.push({ name: 'cancel' });
+    (candidate as { name: string }).name = 'mutated';
+    list.push(commandOp('cancel'));
+    param.name = 'mutatedParam';
 
     expect(resource.value.schema.operations.map((o) => o.name)).toEqual([
       'create',
     ]);
+    expect(resource.value.schema.operations[0]?.params[0]?.name).toBe('reason');
     expect(Object.isFrozen(resource.value.schema.operations)).toBe(true);
     expect(Object.isFrozen(resource.value.schema.operations[0])).toBe(true);
+    expect(Object.isFrozen(resource.value.schema.operations[0]?.params)).toBe(
+      true,
+    );
+    expect(
+      Object.isFrozen(resource.value.schema.operations[0]?.params[0]),
+    ).toBe(true);
   });
 });

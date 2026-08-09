@@ -127,10 +127,53 @@ export type RelationValidationError =
 /** Operation identity string conforming to RFC-012 grammar. */
 export type OperationName = string;
 
-/** Closed name-only Operation member (RFC-012). */
+/** Closed Operation semantic role (RFC-021). */
+export type OperationKind = 'command' | 'query';
+
+/** Parameter identity within one Operation’s params (RFC-021). */
+export type OperationParamName = string;
+
+/** Closed Operation parameter member (RFC-021). */
+export type OperationParam = {
+  readonly name: OperationParamName;
+  readonly type: FieldType;
+  readonly optional: boolean;
+  readonly nullable: boolean;
+};
+
+/** Declared Operation result (RFC-021); `"void"` is result-only. */
+export type OperationResultType = FieldType | 'void';
+
+/**
+ * Closed Operation member (RFC-021).
+ * Amends RFC-012 name-only floor — no dual-shape.
+ */
 export type Operation = {
   readonly name: OperationName;
+  readonly kind: OperationKind;
+  readonly params: ReadonlyArray<OperationParam>;
+  readonly result: OperationResultType;
 };
+
+/** Runtime argument value for Operation invoke (RFC-021). */
+export type OperationRuntimeValue = string | number | boolean | null;
+
+/**
+ * Concrete core representation of RFC-021 semantic result outcome.
+ * Not a wire format, host protocol, or portable representation outside core.
+ */
+export type SemanticResultReport =
+  | { readonly outcome: 'void' }
+  | { readonly outcome: 'value'; readonly value: string | number | boolean };
+
+export type OperationHandler = (
+  args: ReadonlyMap<string, OperationRuntimeValue>,
+) => SemanticResultReport;
+
+export type OperationHandlerProvider = (
+  resource: Resource,
+  operationName: OperationName,
+) => OperationHandler | undefined;
 
 export type OperationValidationError =
   | {
@@ -146,6 +189,55 @@ export type OperationValidationError =
   | {
       readonly code: 'invalid_operation_member';
       readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_operation_param';
+      readonly index: number;
+      readonly paramIndex: number;
+    }
+  | {
+      readonly code: 'duplicate_operation_param_name';
+      readonly index: number;
+      readonly paramIndex: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'invalid_operation_result_for_kind';
+      readonly index: number;
+    };
+
+export type OperationInvocationError =
+  | {
+      readonly code: 'unknown_operation';
+      readonly operationName: string;
+    }
+  | {
+      readonly code: 'unknown_argument';
+      readonly operationName: OperationName;
+      readonly paramName: string;
+    }
+  | {
+      readonly code: 'missing_required_argument';
+      readonly operationName: OperationName;
+      readonly paramName: OperationParamName;
+    }
+  | {
+      readonly code: 'null_argument';
+      readonly operationName: OperationName;
+      readonly paramName: OperationParamName;
+    }
+  | {
+      readonly code: 'argument_type_mismatch';
+      readonly operationName: OperationName;
+      readonly paramName: OperationParamName;
+    }
+  | {
+      readonly code: 'missing_operation_handler';
+      readonly operationName: OperationName;
+    }
+  | {
+      readonly code: 'result_contract_mismatch';
+      readonly operationName: OperationName;
     };
 
 /** Constraint identity string conforming to RFC-016 grammar. */

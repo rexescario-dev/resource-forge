@@ -812,7 +812,7 @@ describe('RFC-015 relation association-reference nullability', () => {
     expect(invalid.ok).toBe(false);
   });
 
-  it('accepts name-only non-empty operations without a relation cause', () => {
+  it('accepts RFC-021 operations without a relation cause', () => {
     const identity = createResourceIdentity('crm', 'Order');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
@@ -822,7 +822,9 @@ describe('RFC-015 relation association-reference nullability', () => {
       schema: {
         fields: [],
         relations: [],
-        operations: [{ name: 'create' }],
+        operations: [
+          { name: 'create', kind: 'command', params: [], result: 'void' },
+        ],
       constraints: [],
       },
       annotations: emptyAnnotations,
