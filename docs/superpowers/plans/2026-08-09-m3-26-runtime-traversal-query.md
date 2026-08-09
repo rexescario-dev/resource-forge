@@ -200,12 +200,12 @@ This slice does **not** verify host traversal/query realization.
 
 **Files:** this plan (SCR section), `docs/roadmap.md` (M3.26 ✅ only after SCR)
 
-- [ ] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes including:
+- [x] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes including:
   - `Verification base: <commit SHA>`
   - `Command: git diff --name-status <base>...HEAD -- packages/core`
   - `Result: empty`
-- [ ] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.26 ✅ on roadmap
-- [ ] **Step 3:** Leave Next Gate **None** for this slice; next product design work is a **new M2 tracking issue** for Later topics per current roadmap ordering (Relation→metadata projection — not additional RFC-029 work)
+- [x] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.26 ✅ on roadmap
+- [x] **Step 3:** Leave Next Gate **None** for this slice; next product design work is a **new M2 tracking issue** for Later topics per current roadmap ordering (Relation→metadata projection — not additional RFC-029 work)
 
 ---
 
@@ -247,13 +247,13 @@ This slice does **not** verify host traversal/query realization.
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/100 |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** |
-| M6 | — |
-| M7 | — |
-| M8 | — |
-| M9 | — |
-| Branch | — |
-| PR | — |
-| Status | **Pending execution** |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
+| Branch | `feat/m3-26-runtime-traversal-query` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/101 |
+| Status | **Slice complete** |
 
 ### M5 Plan Review
 
@@ -271,6 +271,63 @@ Gate: Proceed to M6.
 Authority: Plan governs sequencing/execution; specification governs product semantics.
 ```
 
+### Shipped
+
+- Accepted M3.26 plan as governing execution artifact for RFC-029 docs/verification closeout
+- Roadmap / specs index confirm RFC-029 Accepted; runtime traversal/query no longer a Later lead
+- Delivery diff has **no** `packages/core` changes
+- `validateResource` / `evaluateCascadeEvent` / `checkRelationLoadStates` untouched
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Verification base | `17b201978890d542254907913bbd603d60caf957` (`origin/main` at execution start) |
+| Command | `git diff --name-status 17b2019...HEAD -- packages/core` |
+| `packages/core` delivery diff | **Empty** |
+| Docs consistency | **Passed** (RFC-029 Accepted; Later = Relation→metadata projection) |
+| Tests | Optional smoke: vitest 355 passed + `tsc --noEmit` clean |
+| Lint | Skipped |
+| Build | Skipped |
+| Host realization | **Not verified** (out of scope) |
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-26-runtime-traversal-query (#100) / https://github.com/rexescario-dev/resource-forge/pull/101
+Accepted plan: docs/superpowers/plans/2026-08-09-m3-26-runtime-traversal-query.md
+Accepted specification: docs/superpowers/specs/2026-08-09-rfc-029-runtime-traversal-query-semantics-design.md
+
+Review summary: Docs/verification-only delivery matches Accepted plan Tasks 1–3. No packages/core product changes; no navigation/query API manufactured; RFC-024–028 closed. Roadmap Later remains Relation→metadata projection.
+
+Findings: None (no merge blockers)
+Gate: Proceed to M8/M9 as applicable.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Reason: No product code in this slice; no behavior-preserving refactor applicable.
+```
+
+### M9 Documentation
+
+```text
+Decision: Accepted
+Scope: docs/roadmap.md; docs/superpowers/specs/README.md; RFC-029 Status Accepted; plan SCR; M3.26 ✅
+Summary: Runtime traversal/query closed as docs/verification slice; Later remains Relation→metadata projection.
+```
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: installed docs/workflows assets (no prompt edits this slice)
+Summary: M2–M10 prompts remain coherent for docs-only closeout; no workflow asset changes required for M3.26.
+```
+
 ### Next Gate
 
-**M6 Implementation** — execute Tasks 1–3 under this Accepted plan; do not invent core APIs or host-realization checks.
+**None — slice complete**
