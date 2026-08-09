@@ -60,6 +60,7 @@ function baseRelation(
     direction: 'outbound',
     onDelete: 'none',
     onUpdate: 'none',
+    fetch: 'eager',
     ...overrides,
   };
 }

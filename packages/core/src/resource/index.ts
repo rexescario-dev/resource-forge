@@ -5,6 +5,7 @@ export type {
   CascadeEvaluationError,
   CascadeEvent,
   CascadePolicy,
+  FetchPolicy,
   Constraint,
   ConstraintEnforcementError,
   ConstraintKind,
@@ -37,6 +38,8 @@ export type {
   RelationCrossRefValidationError,
   RelationDirection,
   RelationJoin,
+  RelationLoadStateEntry,
+  RelationLoadStateError,
   RelationMultiplicity,
   RelationName,
   RelationRuntimeValue,
@@ -61,4 +64,5 @@ export { projectResourceMetadata } from './project.js';
 export { checkRelationCrossRefs } from './relation-cross-refs.js';
 export { checkRelationValueStates } from './relation-value-states.js';
 export { evaluateCascadeEvent } from './cascade.js';
+export { checkRelationLoadStates } from './load-states.js';
 export { validateResource } from './validate.js';

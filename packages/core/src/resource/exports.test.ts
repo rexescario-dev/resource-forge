@@ -14,6 +14,7 @@ import type {
   CascadeEvaluationError,
   CascadeEvent,
   CascadePolicy,
+  FetchPolicy,
   Constraint,
   ConstraintEnforcementError,
   ConstraintValidationError,
@@ -26,6 +27,8 @@ import type {
   RelationCrossRefValidationError,
   RelationDirection,
   RelationJoin,
+  RelationLoadStateEntry,
+  RelationLoadStateError,
   RelationRuntimeValue,
   RelationSingularAssociation,
   RelationValidationError,
@@ -178,6 +181,7 @@ describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
       direction: 'outbound',
       onDelete: 'none',
       onUpdate: 'none',
+      fetch: 'eager',
     };
     const error: RelationValidationError = {
       code: 'missing_relation_nullable',
@@ -218,6 +222,7 @@ describe('M3.21 public exports', () => {
       direction: 'outbound',
       onDelete: 'none',
       onUpdate: 'none',
+      fetch: 'eager',
       inverse: 'orders',
       join,
     };
@@ -317,6 +322,44 @@ describe('M3.23 public exports', () => {
     expect(core.evaluateCascadeEvent(resource.value, 'delete', new Map())).toEqual({
       ok: true,
       value: { cascades: [], setNulls: [] },
+    });
+    expect(core.validateResource(resource.value)).toEqual({
+      ok: true,
+      value: resource.value,
+    });
+  });
+});
+
+describe('M3.24 public exports', () => {
+  it('exposes fetch types and checkRelationLoadStates without wiring into validateResource', () => {
+    expect(typeof core.checkRelationLoadStates).toBe('function');
+    expect('checkRelations' in core).toBe(false);
+
+    const fetch: FetchPolicy = 'lazy';
+    const entry: RelationLoadStateEntry = { status: 'not-loaded' };
+    const loadError: RelationLoadStateError = {
+      code: 'eager_relation_not_loaded',
+      relation: 'customer',
+    };
+    const declarationError: RelationValidationError = {
+      code: 'missing_relation_fetch',
+      index: 0,
+    };
+    expect(fetch).toBe('lazy');
+    expect(entry.status).toBe('not-loaded');
+    expect(loadError.code).toBe('eager_relation_not_loaded');
+    expect(declarationError.code).toBe('missing_relation_fetch');
+
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+    const resource = createResource(identity.value);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    expect(core.checkRelationLoadStates(resource.value, new Map())).toEqual({
+      ok: true,
+      value: undefined,
     });
     expect(core.validateResource(resource.value)).toEqual({
       ok: true,

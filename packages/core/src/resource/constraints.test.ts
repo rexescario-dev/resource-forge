@@ -556,6 +556,7 @@ describe('RFC-017 concrete constraint kinds', () => {
         direction: 'outbound',
         onDelete: 'none',
         onUpdate: 'none',
+        fetch: 'eager',
       },
     ]);
     expect(relations.ok).toBe(true);
@@ -587,6 +588,7 @@ describe('RFC-017 concrete constraint kinds', () => {
           direction: 'outbound',
           onDelete: 'none',
           onUpdate: 'none',
+          fetch: 'eager',
         },
       ],
       [{ name: 'create', kind: 'command', params: [], result: 'void' }],
