@@ -106,6 +106,50 @@ describe('projectResourceMetadata', () => {
     expect(projected.error.cause.code).toBe('invalid_annotations');
   });
 
+  it('projects catalogued rf annotation strings by exact 1:1 preservation', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithAnnotationsForTests(identity.value, [
+      { key: { namespace: 'rf', name: 'description' }, value: 'A customer record' },
+      { key: { namespace: 'rf', name: 'displayName' }, value: 'Customer' },
+      { key: { namespace: 'docs', name: 'summary' }, value: 'CRM aggregate root' },
+    ]);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const projected = projectResourceMetadata(resource.value);
+    expect(projected.ok).toBe(true);
+    if (!projected.ok) return;
+
+    expect(projected.value.entries).toEqual([
+      { key: { namespace: 'rf', name: 'description' }, value: 'A customer record' },
+      { key: { namespace: 'rf', name: 'displayName' }, value: 'Customer' },
+      { key: { namespace: 'docs', name: 'summary' }, value: 'CRM aggregate root' },
+    ]);
+    expect(validateResourceMetadata(projected.value).ok).toBe(true);
+  });
+
+  it('fails projection for unknown rf annotation vocabulary', () => {
+    const projected = projectResourceMetadata({
+      identity: { namespace: 'crm', name: 'Customer' },
+      schema: createEmptyResourceSchema(),
+      annotations: [{ key: { namespace: 'rf', name: 'icon' }, value: 'user' }],
+    });
+    expect(projected.ok).toBe(false);
+    if (projected.ok) return;
+    expect(projected.error.code).toBe('invalid_resource');
+    if (projected.error.code !== 'invalid_resource') return;
+    expect(projected.error.cause.code).toBe('invalid_annotations');
+    if (projected.error.cause.code !== 'invalid_annotations') return;
+    expect(projected.error.cause.cause).toEqual({
+      code: 'unknown_rf_annotation_key',
+      index: 0,
+      key: { namespace: 'rf', name: 'icon' },
+    });
+  });
+
   it('does not contribute fields to projected metadata', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     expect(identity.ok).toBe(true);

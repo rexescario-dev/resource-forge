@@ -480,6 +480,16 @@ export type AnnotationValidationError =
       readonly code: 'duplicate_key';
       readonly index: number;
       readonly key: MetadataKey;
+    }
+  | {
+      readonly code: 'unknown_rf_annotation_key';
+      readonly index: number;
+      readonly key: MetadataKey;
+    }
+  | {
+      readonly code: 'invalid_rf_annotation_value_shape';
+      readonly index: number;
+      readonly key: MetadataKey;
     };
 
 export type Resource = {

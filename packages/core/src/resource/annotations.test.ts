@@ -60,7 +60,7 @@ describe('M3.3 annotation contracts', () => {
     expect(result.error.cause.code).toBe('invalid_key');
   });
 
-  it('accepts rf annotation keys under the same framework kind rules as metadata', () => {
+  it('accepts catalogued rf annotation keys with JsonValue string shapes', () => {
     const identity = createResourceIdentity('crm', 'Customer');
     expect(identity.ok).toBe(true);
     if (!identity.ok) return;
@@ -68,9 +68,108 @@ describe('M3.3 annotation contracts', () => {
     const result = validateResource({
       identity: identity.value,
       schema: createEmptyResourceSchema(),
-      annotations: [{ key: { namespace: 'rf', name: 'description' }, value: 'x' }],
+      annotations: [
+        { key: { namespace: 'rf', name: 'description' }, value: 'A customer record' },
+        { key: { namespace: 'rf', name: 'displayName' }, value: 'Customer' },
+        { key: { namespace: 'docs', name: 'summary' }, value: 'opaque extension' },
+      ],
     });
     expect(result.ok).toBe(true);
+  });
+
+  it('accepts empty-string values for catalogued rf keys', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const result = validateResource({
+      identity: identity.value,
+      schema: createEmptyResourceSchema(),
+      annotations: [
+        { key: { namespace: 'rf', name: 'description' }, value: '' },
+        { key: { namespace: 'rf', name: 'displayName' }, value: '' },
+      ],
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects unknown rf annotation keys', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const result = validateResource({
+      identity: identity.value,
+      schema: createEmptyResourceSchema(),
+      annotations: [{ key: { namespace: 'rf', name: 'icon' }, value: 'user' }],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.code).toBe('invalid_annotations');
+    if (result.error.code !== 'invalid_annotations') return;
+    expect(result.error.cause).toEqual({
+      code: 'unknown_rf_annotation_key',
+      index: 0,
+      key: { namespace: 'rf', name: 'icon' },
+    });
+  });
+
+  it('rejects non-string JsonValue shapes for catalogued rf keys', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const cases: Array<{ name: 'description' | 'displayName'; value: unknown }> = [
+      { name: 'description', value: null },
+      { name: 'description', value: 1 },
+      { name: 'description', value: true },
+      { name: 'description', value: { text: 'x' } },
+      { name: 'description', value: ['x'] },
+      { name: 'displayName', value: null },
+      { name: 'displayName', value: 2 },
+    ];
+
+    for (const [index, testCase] of cases.entries()) {
+      const result = validateResource({
+        identity: identity.value,
+        schema: createEmptyResourceSchema(),
+        annotations: [
+          {
+            key: { namespace: 'rf', name: testCase.name },
+            value: testCase.value as never,
+          },
+        ],
+      });
+      expect(result.ok, `case ${index}`).toBe(false);
+      if (result.ok) return;
+      expect(result.error.code).toBe('invalid_annotations');
+      if (result.error.code !== 'invalid_annotations') return;
+      expect(result.error.cause).toEqual({
+        code: 'invalid_rf_annotation_value_shape',
+        index: 0,
+        key: { namespace: 'rf', name: testCase.name },
+      });
+    }
+  });
+
+  it('reports duplicate_key before vocabulary shape for a second catalogued key', () => {
+    const identity = createResourceIdentity('crm', 'Customer');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const result = validateResource({
+      identity: identity.value,
+      schema: createEmptyResourceSchema(),
+      annotations: [
+        { key: { namespace: 'rf', name: 'description' }, value: 'ok' },
+        { key: { namespace: 'rf', name: 'description' }, value: null as never },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.code).toBe('invalid_annotations');
+    if (result.error.code !== 'invalid_annotations') return;
+    expect(result.error.cause.code).toBe('duplicate_key');
   });
 
   it('rejects invalid annotation JsonValue via validateResource', () => {
