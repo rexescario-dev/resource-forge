@@ -553,6 +553,7 @@ describe('RFC-017 concrete constraint kinds', () => {
         multiplicity: 'one',
         optional: false,
         nullable: false,
+        direction: 'outbound',
       },
     ]);
     expect(relations.ok).toBe(true);
@@ -581,6 +582,7 @@ describe('RFC-017 concrete constraint kinds', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ],
       [{ name: 'create', kind: 'command', params: [], result: 'void' }],

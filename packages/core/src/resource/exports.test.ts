@@ -18,6 +18,9 @@ import type {
   Operation,
   OperationInvocationError,
   Relation,
+  RelationCrossRefValidationError,
+  RelationDirection,
+  RelationJoin,
   RelationValidationError,
   ResourceProjectionError,
   SemanticResultReport,
@@ -163,6 +166,7 @@ describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
       multiplicity: 'one',
       optional: false,
       nullable: true,
+      direction: 'outbound',
     };
     const error: RelationValidationError = {
       code: 'missing_relation_nullable',
@@ -170,6 +174,7 @@ describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
     };
     expect(relation.optional).toBe(false);
     expect(relation.nullable).toBe(true);
+    expect(relation.direction).toBe('outbound');
     expect(error.code).toBe('missing_relation_nullable');
     expect(typeof core).toBe('object');
     expect('validateRelations' in core).toBe(false);
@@ -179,7 +184,49 @@ describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
     expect('validateRelationName' in core).toBe(false);
     expect('snapshotRelations' in core).toBe(false);
     expect('relationsEqual' in core).toBe(false);
+    expect('checkRelations' in core).toBe(false);
     expect('createResourceWithRelationsForTests' in core).toBe(false);
+  });
+});
+
+describe('M3.21 public exports', () => {
+  it('exposes direction/join types and checkRelationCrossRefs without internals', () => {
+    expect(typeof core.checkRelationCrossRefs).toBe('function');
+    expect('checkRelations' in core).toBe(false);
+    expect('relationsEqual' in core).toBe(false);
+    expect('snapshotRelations' in core).toBe(false);
+
+    const direction: RelationDirection = 'inbound';
+    const join: RelationJoin = { local: 'customerId', remote: 'id' };
+    const relation: Relation = {
+      name: 'customer',
+      target: { namespace: 'crm', name: 'Customer' },
+      multiplicity: 'one',
+      optional: false,
+      nullable: false,
+      direction: 'outbound',
+      inverse: 'orders',
+      join,
+    };
+    const crossRefError: RelationCrossRefValidationError = {
+      code: 'unknown_inverse_relation',
+      relation: 'customer',
+      inverse: 'orders',
+    };
+    const localError: RelationValidationError = {
+      code: 'missing_relation_direction',
+      index: 0,
+    };
+    expect(direction).toBe('inbound');
+    expect(relation.join?.remote).toBe('id');
+    expect(crossRefError.code).toBe('unknown_inverse_relation');
+    expect(localError.code).toBe('missing_relation_direction');
+
+    const checked = core.checkRelationCrossRefs(
+      { identity: { namespace: 'crm', name: 'Order' }, relations: [relation] },
+      [],
+    );
+    expect(checked).toEqual({ ok: true, value: undefined });
   });
 });
 

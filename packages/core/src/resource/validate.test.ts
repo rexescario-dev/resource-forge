@@ -77,6 +77,7 @@ describe('validateResource', () => {
             multiplicity: 'one',
             optional: false,
             nullable: false,
+            direction: 'outbound',
           },
           {
             name: 'lineItems',
@@ -84,6 +85,7 @@ describe('validateResource', () => {
             multiplicity: 'many',
             optional: true,
             nullable: true,
+            direction: 'outbound',
           },
         ],
         operations: [],

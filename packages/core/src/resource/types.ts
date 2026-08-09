@@ -67,13 +67,28 @@ export type RelationName = string;
 /** Closed relationship-shape vocabulary (RFC-011). */
 export type RelationMultiplicity = 'one' | 'many';
 
-/** Closed associated Relation member (RFC-015; supersedes RFC-013 Relation member floor). */
+/** Closed Relation traversal direction (RFC-024). */
+export type RelationDirection = 'outbound' | 'inbound';
+
+/** Closed join-field binding identity (RFC-024). */
+export type RelationJoin = {
+  readonly local: FieldName;
+  readonly remote: FieldName;
+};
+
+/**
+ * Closed associated Relation member (RFC-024; widens RFC-015).
+ * Required `direction`; optional `inverse` / `join` only when present.
+ */
 export type Relation = {
   readonly name: RelationName;
   readonly target: ResourceIdentity;
   readonly multiplicity: RelationMultiplicity;
   readonly optional: boolean;
   readonly nullable: boolean;
+  readonly direction: RelationDirection;
+  readonly inverse?: RelationName;
+  readonly join?: RelationJoin;
 };
 
 export type RelationValidationError =
@@ -122,6 +137,62 @@ export type RelationValidationError =
       readonly code: 'invalid_relation_nullable';
       readonly index: number;
       readonly nullable: unknown;
+    }
+  | {
+      readonly code: 'missing_relation_direction';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_direction';
+      readonly index: number;
+      readonly direction: unknown;
+    }
+  | {
+      readonly code: 'invalid_relation_inverse';
+      readonly index: number;
+      readonly inverse: unknown;
+    }
+  | {
+      readonly code: 'invalid_relation_join';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_join_local_field_name';
+      readonly index: number;
+      readonly name: string;
+    }
+  | {
+      readonly code: 'unknown_join_local_field';
+      readonly index: number;
+      readonly name: FieldName;
+    }
+  | {
+      readonly code: 'invalid_join_remote_field_name';
+      readonly index: number;
+      readonly name: string;
+    };
+
+/** Multi-Resource Relation cross-ref failure (RFC-024 §7.2). */
+export type RelationCrossRefValidationError =
+  | {
+      readonly code: 'unknown_inverse_relation';
+      readonly relation: RelationName;
+      readonly inverse: RelationName;
+    }
+  | {
+      readonly code: 'inverse_target_mismatch';
+      readonly relation: RelationName;
+      readonly inverse: RelationName;
+    }
+  | {
+      readonly code: 'inverse_direction_mismatch';
+      readonly relation: RelationName;
+      readonly inverse: RelationName;
+    }
+  | {
+      readonly code: 'unknown_join_remote_field';
+      readonly relation: RelationName;
+      readonly name: FieldName;
     };
 
 /** Operation identity string conforming to RFC-012 grammar. */

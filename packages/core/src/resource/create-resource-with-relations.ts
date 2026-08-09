@@ -18,12 +18,10 @@ import { validateResource } from './validate.js';
  *
  * Validates candidate relation (and optional field) member shape, names,
  * uniqueness, declarative targets (RFC-001 user context), multiplicity
- * (`"one" | "many"`), required `optional: boolean`, and required association-
- * reference `nullable: boolean` before constructing the snapshot; successful
- * construction freezes ordered Relations
- * `{ name, target, multiplicity, optional, nullable }` and Fields
- * `{ name, type, optional, nullable }` and then passes the Resource through
- * `validateResource`.
+ * (`"one" | "many"`), required `optional` / `nullable` / `direction`, and
+ * optional `inverse` / `join` (with `join.local` against owning fields) before
+ * constructing the snapshot; successful construction freezes ordered Relations
+ * and Fields and then passes the Resource through `validateResource`.
  */
 export function createResourceWithRelationsForTests(
   identity: ResourceIdentity,
@@ -36,7 +34,10 @@ export function createResourceWithRelationsForTests(
     return err({ code: 'invalid_schema', cause: checkedFields.error });
   }
 
-  const checkedRelations = checkRelations(candidateRelations);
+  const checkedRelations = checkRelations(
+    candidateRelations,
+    checkedFields.value,
+  );
   if (!checkedRelations.ok) {
     return err({ code: 'invalid_schema', cause: checkedRelations.error });
   }

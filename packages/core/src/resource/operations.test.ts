@@ -280,6 +280,7 @@ describe('RFC-021 resource operations', () => {
           multiplicity: 'one',
           optional: false,
           nullable: false,
+          direction: 'outbound',
         },
       ],
     );

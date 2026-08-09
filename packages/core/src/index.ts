@@ -90,6 +90,9 @@ export type {
   SemanticResultReport,
   PopulationUniquenessError,
   Relation,
+  RelationCrossRefValidationError,
+  RelationDirection,
+  RelationJoin,
   RelationMultiplicity,
   RelationName,
   RelationValidationError,
@@ -102,6 +105,7 @@ export type {
 export {
   checkConstraintValues,
   checkPopulationUniqueness,
+  checkRelationCrossRefs,
   createEmptyResourceSchema,
   createResource,
   emptyAnnotations,
