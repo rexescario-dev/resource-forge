@@ -392,7 +392,7 @@ async function awaitProvidedResource(
 | M8 | **N/A** (no broad refactor pass required) |
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-1-nest-discovery-host` |
-| PR | _pending fill after open_ |
+| PR | [#107](https://github.com/rexescario-dev/resource-forge/pull/107) |
 | Status | **Ready for merge** |
 
 ### Shipped
