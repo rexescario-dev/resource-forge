@@ -410,9 +410,9 @@ async function awaitProvidedResource(
 | --- | --- |
 | Tests | **Passed** (`pnpm --filter @resource-forge/nest test` — 24) |
 | Typecheck | **Passed** (`pnpm --filter @resource-forge/nest typecheck`) |
-| Lint | **Skipped** (not required by plan) |
+| Lint | **Passed** (`pnpm --filter @resource-forge/nest lint`; CI green) |
 | Build | **Skipped** (typecheck covers compile of src) |
-| Package validation | **Passed** (`packages/core` delivery diff empty; no graphql/prisma nest deps) |
+| Package validation | **Passed** (`packages/core` delivery diff empty; no graphql/prisma nest deps; CI green) |
 
 ### Next Gate
 
