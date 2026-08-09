@@ -35,3 +35,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-026 — Cascade Semantics](2026-08-09-rfc-026-cascade-semantics-design.md) | Accepted — [#92](https://github.com/rexescario-dev/resource-forge/issues/92) |
 | [RFC-027 — Loading / Fetch Semantics](2026-08-09-rfc-027-loading-fetch-semantics-design.md) | Accepted — [#95](https://github.com/rexescario-dev/resource-forge/issues/95) |
 | [RFC-028 — Persistence / ORM Mapping](2026-08-09-rfc-028-persistence-orm-mapping-design.md) | Accepted — [#98](https://github.com/rexescario-dev/resource-forge/issues/98) |
+| [RFC-029 — Runtime Traversal / Query Semantics](2026-08-09-rfc-029-runtime-traversal-query-semantics-design.md) | Accepted — [#100](https://github.com/rexescario-dev/resource-forge/issues/100) |
