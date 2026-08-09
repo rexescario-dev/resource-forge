@@ -393,7 +393,7 @@ async function awaitProvidedResource(
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-1-nest-discovery-host` |
 | PR | [#107](https://github.com/rexescario-dev/resource-forge/pull/107) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -416,7 +416,7 @@ async function awaitProvidedResource(
 
 ### Next Gate
 
-**None — slice complete** (await human merge of `#106` PR). M4.2 GraphQL only when explicitly started.
+**None — slice complete.** [#107](https://github.com/rexescario-dev/resource-forge/pull/107) merged; [#106](https://github.com/rexescario-dev/resource-forge/issues/106) closed. M4.2 GraphQL only when explicitly started.
 
 ---
 
