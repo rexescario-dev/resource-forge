@@ -289,7 +289,7 @@ Planning note: keeping vocabulary logic inside `annotations.ts` (rather than a n
 | M8 | **N/A** |
 | M9 | **Complete** |
 | Branch | `feat/m3-19-annotation-vocabulary` |
-| PR | _(fill after open)_ |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/82 |
 | Status | **Slice complete** |
 
 ### Shipped
