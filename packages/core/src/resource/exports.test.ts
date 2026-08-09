@@ -10,6 +10,10 @@ import {
   validateResource,
 } from '../index.js';
 import type {
+  CascadeEffects,
+  CascadeEvaluationError,
+  CascadeEvent,
+  CascadePolicy,
   Constraint,
   ConstraintEnforcementError,
   ConstraintValidationError,
@@ -172,6 +176,8 @@ describe('M3.5 / M3.7 / M3.8 / M3.10 / M3.12 public exports', () => {
       optional: false,
       nullable: true,
       direction: 'outbound',
+      onDelete: 'none',
+      onUpdate: 'none',
     };
     const error: RelationValidationError = {
       code: 'missing_relation_nullable',
@@ -210,6 +216,8 @@ describe('M3.21 public exports', () => {
       optional: false,
       nullable: false,
       direction: 'outbound',
+      onDelete: 'none',
+      onUpdate: 'none',
       inverse: 'orders',
       join,
     };
@@ -272,6 +280,47 @@ describe('M3.22 public exports', () => {
     expect(core.checkRelationValueStates(resource.value, new Map())).toEqual({
       ok: true,
       value: undefined,
+    });
+  });
+});
+
+describe('M3.23 public exports', () => {
+  it('exposes cascade types and evaluateCascadeEvent without wiring into validateResource', () => {
+    expect(typeof core.evaluateCascadeEvent).toBe('function');
+    expect('checkRelations' in core).toBe(false);
+
+    const policy: CascadePolicy = 'restrict';
+    const event: CascadeEvent = 'delete';
+    const effects: CascadeEffects = { cascades: [], setNulls: [] };
+    const evaluationError: CascadeEvaluationError = {
+      code: 'cascade_restricted',
+      relation: 'customer',
+      event: 'delete',
+    };
+    const declarationError: RelationValidationError = {
+      code: 'missing_relation_on_delete',
+      index: 0,
+    };
+    expect(policy).toBe('restrict');
+    expect(event).toBe('delete');
+    expect(effects.setNulls).toEqual([]);
+    expect(evaluationError.code).toBe('cascade_restricted');
+    expect(declarationError.code).toBe('missing_relation_on_delete');
+
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+    const resource = createResource(identity.value);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    expect(core.evaluateCascadeEvent(resource.value, 'delete', new Map())).toEqual({
+      ok: true,
+      value: { cascades: [], setNulls: [] },
+    });
+    expect(core.validateResource(resource.value)).toEqual({
+      ok: true,
+      value: resource.value,
     });
   });
 });

@@ -78,6 +78,8 @@ describe('validateResource', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
           {
             name: 'lineItems',
@@ -86,6 +88,8 @@ describe('validateResource', () => {
             optional: true,
             nullable: true,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         operations: [],

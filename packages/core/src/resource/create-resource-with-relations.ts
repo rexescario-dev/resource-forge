@@ -18,8 +18,8 @@ import { validateResource } from './validate.js';
  *
  * Validates candidate relation (and optional field) member shape, names,
  * uniqueness, declarative targets (RFC-001 user context), multiplicity
- * (`"one" | "many"`), required `optional` / `nullable` / `direction`, and
- * optional `inverse` / `join` (with `join.local` against owning fields) before
+ * (`"one" | "many"`), required `optional` / `nullable` / `direction` /
+ * `onDelete` / `onUpdate`, and optional `inverse` / `join` (with `join.local` against owning fields) before
  * constructing the snapshot; successful construction freezes ordered Relations
  * and Fields and then passes the Resource through `validateResource`.
  */

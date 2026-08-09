@@ -70,6 +70,12 @@ export type RelationMultiplicity = 'one' | 'many';
 /** Closed Relation traversal direction (RFC-024). */
 export type RelationDirection = 'outbound' | 'inbound';
 
+/** Closed Relation cascade policy (RFC-026). */
+export type CascadePolicy = 'none' | 'cascade' | 'restrict' | 'setNull';
+
+/** Declared owning Resource event for cascade evaluation (RFC-026). */
+export type CascadeEvent = 'delete' | 'update';
+
 /** Closed join-field binding identity (RFC-024). */
 export type RelationJoin = {
   readonly local: FieldName;
@@ -77,8 +83,8 @@ export type RelationJoin = {
 };
 
 /**
- * Closed associated Relation member (RFC-024; widens RFC-015).
- * Required `direction`; optional `inverse` / `join` only when present.
+ * Closed associated Relation member (RFC-026; widens RFC-024).
+ * Required `direction`, `onDelete`, `onUpdate`; optional `inverse` / `join` only when present.
  */
 export type Relation = {
   readonly name: RelationName;
@@ -89,6 +95,8 @@ export type Relation = {
   readonly direction: RelationDirection;
   readonly inverse?: RelationName;
   readonly join?: RelationJoin;
+  readonly onDelete: CascadePolicy;
+  readonly onUpdate: CascadePolicy;
 };
 
 export type RelationValidationError =
@@ -170,6 +178,54 @@ export type RelationValidationError =
       readonly code: 'invalid_join_remote_field_name';
       readonly index: number;
       readonly name: string;
+    }
+  | {
+      readonly code: 'missing_relation_on_delete';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'missing_relation_on_update';
+      readonly index: number;
+    }
+  | {
+      readonly code: 'invalid_relation_on_delete';
+      readonly index: number;
+      readonly onDelete: unknown;
+    }
+  | {
+      readonly code: 'invalid_relation_on_update';
+      readonly index: number;
+      readonly onUpdate: unknown;
+    }
+  | {
+      readonly code: 'invalid_cascade_set_null_requires_nullable';
+      readonly index: number;
+    };
+
+/** Contract-level cascade evaluation effects (RFC-026). */
+export type CascadeEffects = {
+  readonly cascades: ReadonlyArray<{
+    readonly relation: RelationName;
+    readonly targets: ReadonlyArray<
+      RelationSingularAssociation | RelationAssociationElement
+    >;
+  }>;
+  readonly setNulls: ReadonlyArray<{
+    readonly relation: RelationName;
+  }>;
+};
+
+/** Cascade evaluation failure (RFC-026). */
+export type CascadeEvaluationError =
+  | {
+      readonly code: 'cascade_restricted';
+      readonly relation: RelationName;
+      readonly event: CascadeEvent;
+    }
+  | {
+      readonly code: 'cascade_relation_value_shape_mismatch';
+      readonly relation: RelationName;
+      readonly multiplicity: RelationMultiplicity;
     };
 
 /** Multi-Resource Relation cross-ref failure (RFC-024 §7.2). */

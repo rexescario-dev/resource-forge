@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1–M3.22 ✅; remaining Later (cascade / load / persistence / traversal / Relation projection) |
+| M3 | Resource model | In progress — M3.1–M3.23 ✅; remaining Later (load / persistence / traversal / Relation projection) |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -49,7 +49,8 @@ M3 gate RFCs:
 | RFC-023 | Richer Projection — Composition Semantics (disjoint-union composition; hard `MetadataKey` collision; annotations sole concrete source; no new emitters) | Accepted — [#83](https://github.com/rexescario-dev/resource-forge/issues/83) |
 | RFC-024 | Direction / Joins — Relationship Traversal Semantics (required `direction`; optional `inverse` + `{ local, remote }` `join`; reverse-edge identity; no runtime) | Accepted — [#86](https://github.com/rexescario-dev/resource-forge/issues/86) |
 | RFC-025 | Value-State Semantics (absent / empty / association null / element null; empty≠absent; empty≢null; null elements forbidden) | Accepted — [#89](https://github.com/rexescario-dev/resource-forge/issues/89) |
-| Later | Cascade; loading/fetch; persistence/ORM mapping; runtime traversal/query; Relation→metadata projection | Planned |
+| RFC-026 | Cascade Semantics (required `onDelete` / `onUpdate`; closed `CascadePolicy`; contract-level evaluation) | Accepted — [#92](https://github.com/rexescario-dev/resource-forge/issues/92) |
+| Later | Loading/fetch; persistence/ORM mapping; runtime traversal/query; Relation→metadata projection | Planned |
 
 See [RFC process](rfc-process.md) and [RFC review checklist](rfc-review-checklist.md).
 
@@ -140,6 +141,7 @@ Suggested implementation slices (see M3 implementation plan):
 - **M3.20** — Projection Composition per RFC-023 (disjoint-union composition; hard `MetadataKey` collision; annotations sole concrete source) ✅ — [#84](https://github.com/rexescario-dev/resource-forge/issues/84)
 - **M3.21** — Direction / Joins per RFC-024 (required `direction`; optional `inverse` + `{ local, remote }` `join`; multi-Resource resolve) ✅ — [#87](https://github.com/rexescario-dev/resource-forge/issues/87)
 - **M3.22** — Value-State Semantics per RFC-025 (`checkFieldValueStates` / `checkRelationValueStates`; empty≠absent; null elements forbidden) ✅ — [#90](https://github.com/rexescario-dev/resource-forge/issues/90)
+- **M3.23** — Cascade Semantics per RFC-026 (required `onDelete` / `onUpdate`; `evaluateCascadeEvent`; setNull⇒nullable; presence-symmetric restrict) ✅ — [#93](https://github.com/rexescario-dev/resource-forge/issues/93)
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 

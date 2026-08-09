@@ -26,6 +26,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'sponsor',
@@ -34,6 +36,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'tags',
@@ -42,6 +46,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: true,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'aliases',
@@ -50,6 +56,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: true,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -64,6 +72,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'sponsor',
@@ -72,6 +82,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'tags',
@@ -80,6 +92,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: true,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'aliases',
@@ -88,6 +102,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: true,
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]),
     ).toBe(true);
@@ -100,6 +116,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: true,
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'tags',
@@ -108,6 +126,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: true,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'sponsor',
@@ -116,6 +136,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'customer',
@@ -124,6 +146,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]),
     ).toBe(false);
@@ -142,6 +166,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -166,6 +192,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'editor',
@@ -174,6 +202,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: true,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -192,6 +222,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(true);
@@ -248,6 +280,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           multiplicity: 'one',
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         code: 'invalid_relation_member',
       },
@@ -347,6 +381,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -425,6 +461,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -451,6 +489,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -478,6 +518,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -502,6 +544,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -529,6 +573,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -557,6 +603,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -582,6 +630,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: false,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
       {
         name: 'customer',
@@ -590,6 +640,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: false,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ]);
     expect(resource.ok).toBe(false);
@@ -613,6 +665,8 @@ describe('RFC-015 relation association-reference nullability', () => {
       optional: false,
       nullable: false,
       direction: 'outbound',
+      onDelete: 'none',
+      onUpdate: 'none',
       default: '',
     };
     const resource = createResourceWithRelationsForTests(identity.value, [
@@ -638,6 +692,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         [
@@ -648,6 +704,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: true,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
       ),
@@ -665,6 +723,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         [
@@ -675,6 +735,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: true,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
       ),
@@ -692,6 +754,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         [
@@ -702,6 +766,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
       ),
@@ -716,6 +782,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
         [
@@ -726,6 +794,8 @@ describe('RFC-015 relation association-reference nullability', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
           },
         ],
       ),
@@ -747,6 +817,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ],
       emptyAnnotations,
@@ -773,6 +845,8 @@ describe('RFC-015 relation association-reference nullability', () => {
       optional: false,
       nullable: false,
       direction: 'outbound',
+      onDelete: 'none',
+      onUpdate: 'none',
     };
     const list: object[] = [
       candidate,
@@ -783,6 +857,8 @@ describe('RFC-015 relation association-reference nullability', () => {
         optional: true,
         nullable: true,
         direction: 'outbound',
+        onDelete: 'none',
+        onUpdate: 'none',
       },
     ];
     const resource = createResourceWithRelationsForTests(identity.value, list);
@@ -799,6 +875,8 @@ describe('RFC-015 relation association-reference nullability', () => {
       optional: false,
       nullable: false,
       direction: 'outbound',
+      onDelete: 'none',
+      onUpdate: 'none',
     });
 
     expect(resource.value.schema.relations.map((r) => r.name)).toEqual([
@@ -843,6 +921,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: 'true',
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'customer',
@@ -851,6 +931,8 @@ describe('RFC-015 relation association-reference nullability', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           default: '',
         },
       ],
@@ -941,6 +1023,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
         },
         {
           name: 'sponsor',
@@ -949,6 +1033,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: true,
           nullable: true,
           direction: 'inbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           inverse: 'orders',
         },
         {
@@ -958,6 +1044,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           join: { local: 'customerId', remote: 'id' },
         },
         {
@@ -967,6 +1055,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           inverse: 'billedOrders',
           join: { local: 'customerId', remote: 'id' },
         },
@@ -1064,6 +1154,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction,
+          onDelete: 'none',
+          onUpdate: 'none',
         },
       ]);
       expect(resource.ok).toBe(false);
@@ -1090,6 +1182,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           inverse,
         },
       ]);
@@ -1128,6 +1222,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
             join,
           },
         ],
@@ -1159,6 +1255,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           join: { local: 123, remote: 'id' },
         },
       ],
@@ -1187,6 +1285,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           join: { local: 'Missing', remote: 'id' },
         },
       ],
@@ -1215,6 +1315,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           join: { local: 'customerId', remote: 'Id' },
         },
       ],
@@ -1249,6 +1351,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: false,
           nullable: false,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           join: { local: 'missing', remote: 'id' },
         },
       ],
@@ -1276,6 +1380,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
       optional: false,
       nullable: false,
       direction: 'outbound' as const,
+      onDelete: 'none',
+      onUpdate: 'none',
     };
     expect(
       relationsEqual([{ ...base }], [{ ...base, direction: 'inbound' }]),
@@ -1324,6 +1430,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
           optional: true,
           nullable: true,
           direction: 'outbound',
+          onDelete: 'none',
+          onUpdate: 'none',
           inverse: 'children',
           join: { local: 'customerId', remote: 'customerId' },
         },
@@ -1351,6 +1459,8 @@ describe('RFC-024 relation direction / inverse / join', () => {
             optional: false,
             nullable: false,
             direction: 'outbound',
+            onDelete: 'none',
+            onUpdate: 'none',
             inverse: 'orders',
             join: { local: 'customerId', remote: 'missingOnTarget' },
           },
@@ -1361,5 +1471,269 @@ describe('RFC-024 relation direction / inverse / join', () => {
       annotations: emptyAnnotations,
     });
     expect(result.ok).toBe(true);
+  });
+});
+
+describe('RFC-026 relation cascade declaration', () => {
+  const baseFields = [
+    { name: 'customerId', type: 'string' as const, optional: false, nullable: false },
+  ];
+
+  it('rejects legacy RFC-024 six-member Relations as missing_relation_on_delete', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const candidate of [
+      {
+        name: 'customer',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: false,
+        direction: 'outbound',
+      },
+      {
+        direction: 'outbound',
+        nullable: false,
+        optional: false,
+        multiplicity: 'one',
+        target: { ...customer },
+        name: 'customer',
+      },
+    ]) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        candidate,
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'missing_relation_on_delete', index: 0 },
+        });
+      }
+    }
+  });
+
+  it('rejects base + onDelete without onUpdate as missing_relation_on_update', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      {
+        name: 'customer',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: false,
+        direction: 'outbound',
+        onDelete: 'none',
+      },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'missing_relation_on_update', index: 0 },
+      });
+    }
+  });
+
+  it('rejects base + inverse without cascade members as invalid_relation_member', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      {
+        name: 'customer',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: false,
+        direction: 'outbound',
+        inverse: 'orders',
+      },
+    ]);
+    expect(resource.ok).toBe(false);
+    if (!resource.ok) {
+      expect(resource.error).toEqual({
+        code: 'invalid_schema',
+        cause: { code: 'invalid_relation_member', index: 0 },
+      });
+    }
+  });
+
+  it('rejects invalid cascade policy vocabulary', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const onDelete of ['CASCADE', 'set-null', ''] as const) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          onDelete,
+          onUpdate: 'none',
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'invalid_relation_on_delete', index: 0, onDelete },
+        });
+      }
+    }
+
+    for (const onUpdate of ['restrict ', 0] as const) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          onDelete: 'none',
+          onUpdate,
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'invalid_relation_on_update', index: 0, onUpdate },
+        });
+      }
+    }
+  });
+
+  it('rejects setNull when nullable is false', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    for (const policy of [
+      { onDelete: 'setNull' as const, onUpdate: 'none' as const },
+      { onDelete: 'none' as const, onUpdate: 'setNull' as const },
+    ]) {
+      const resource = createResourceWithRelationsForTests(identity.value, [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          ...policy,
+        },
+      ]);
+      expect(resource.ok).toBe(false);
+      if (!resource.ok) {
+        expect(resource.error).toEqual({
+          code: 'invalid_schema',
+          cause: { code: 'invalid_cascade_set_null_requires_nullable', index: 0 },
+        });
+      }
+    }
+  });
+
+  it('accepts setNull when nullable is true including many', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      {
+        name: 'tags',
+        target: { ...tag },
+        multiplicity: 'many',
+        optional: true,
+        nullable: true,
+        direction: 'outbound',
+        onDelete: 'setNull',
+        onUpdate: 'setNull',
+      },
+    ]);
+    expect(resource.ok).toBe(true);
+  });
+
+  it('accepts optional false + nullable true + setNull (optional is not a setNull gate)', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(identity.value, [
+      {
+        name: 'sponsor',
+        target: { ...customer },
+        multiplicity: 'one',
+        optional: false,
+        nullable: true,
+        direction: 'outbound',
+        onDelete: 'setNull',
+        onUpdate: 'setNull',
+      },
+    ]);
+    expect(resource.ok).toBe(true);
+  });
+
+  it('relationsEqual is false when only cascade policies differ', () => {
+    const base = {
+      name: 'customer',
+      target: customer,
+      multiplicity: 'one' as const,
+      optional: false,
+      nullable: false,
+      direction: 'outbound' as const,
+      onDelete: 'none' as const,
+      onUpdate: 'none' as const,
+    };
+    expect(
+      relationsEqual([{ ...base }], [{ ...base, onDelete: 'cascade' }]),
+    ).toBe(false);
+    expect(
+      relationsEqual([{ ...base }], [{ ...base, onUpdate: 'restrict' }]),
+    ).toBe(false);
+  });
+
+  it('snapshots freeze onDelete and onUpdate', () => {
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+
+    const resource = createResourceWithRelationsForTests(
+      identity.value,
+      [
+        {
+          name: 'customer',
+          target: { ...customer },
+          multiplicity: 'one',
+          optional: false,
+          nullable: false,
+          direction: 'outbound',
+          onDelete: 'cascade',
+          onUpdate: 'restrict',
+          inverse: 'orders',
+          join: { local: 'customerId', remote: 'id' },
+        },
+      ],
+      emptyAnnotations,
+      baseFields,
+    );
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    const relation = resource.value.schema.relations[0];
+    expect(relation?.onDelete).toBe('cascade');
+    expect(relation?.onUpdate).toBe('restrict');
+    expect(Object.isFrozen(relation)).toBe(true);
   });
 });
