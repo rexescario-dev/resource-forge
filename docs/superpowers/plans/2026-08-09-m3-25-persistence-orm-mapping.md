@@ -184,9 +184,9 @@ No hard code prerequisites. Slice A and B may run in either order; C last. Do **
 
 **Files:** this plan (SCR section), `docs/roadmap.md` (M3.25 ✅ only after SCR)
 
-- [ ] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes
-- [ ] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.25 ✅ on roadmap
-- [ ] **Step 3:** Leave Next Gate **None** for this slice; next product design work is a **new M2 tracking issue** for Later topics per current roadmap ordering (not additional RFC-028 work)
+- [x] **Step 1:** After M6–M10 (as applicable), fill SCR Status **Slice complete**, PR URL, validation notes
+- [x] **Step 2:** **Only after** Slice A + Slice B verification and SCR are complete, mark M3.25 ✅ on roadmap
+- [x] **Step 3:** Leave Next Gate **None** for this slice; next product design work is a **new M2 tracking issue** for Later topics per current roadmap ordering (not additional RFC-028 work)
 
 ---
 
@@ -224,13 +224,13 @@ No hard code prerequisites. Slice A and B may run in either order; C last. Do **
 | Tracking | https://github.com/rexescario-dev/resource-forge/issues/98 |
 | M4 | Plan **Accepted** |
 | M5 | Review **Accepted** |
-| M6 | — |
-| M7 | — |
-| M8 | — |
-| M9 | — |
-| Branch | — |
-| PR | — |
-| Status | **In progress** (M6 authorized) |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** |
+| M9 | **Complete** |
+| Branch | `feat/m3-25-persistence-orm-mapping` |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/99 |
+| Status | **Slice complete** |
 
 ### M5 Plan Review
 
@@ -248,6 +248,60 @@ Gate: Proceed to M6.
 Authority: Plan governs sequencing/execution; specification governs product semantics.
 ```
 
+### Shipped
+
+- Accepted M3.25 plan as governing execution artifact for RFC-028 docs/verification closeout
+- Roadmap / specs index confirm RFC-028 Accepted; persistence/ORM mapping no longer a Later lead
+- Delivery diff has **no** `packages/core` changes
+- `validateResource` / `evaluateCascadeEvent` / `checkRelationLoadStates` untouched
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| `packages/core` delivery diff | **Empty** (`git diff --name-status origin/main...HEAD -- packages/core`) |
+| Docs consistency | **Passed** (RFC-028 Accepted; Later = Runtime traversal/query; Relation→metadata projection) |
+| Tests | Optional smoke: vitest exit 0 + `tsc --noEmit` clean (tinypool teardown noise only) |
+| Lint | Skipped |
+| Build | Skipped |
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m3-25-persistence-orm-mapping (#98) / https://github.com/rexescario-dev/resource-forge/pull/99
+Accepted plan: docs/superpowers/plans/2026-08-09-m3-25-persistence-orm-mapping.md
+Accepted specification: docs/superpowers/specs/2026-08-09-rfc-028-persistence-orm-mapping-design.md
+
+Review summary: Docs/verification-only delivery matches Accepted plan Tasks 1–3. No packages/core product changes; no persistence API manufactured; RFC-024–027 closed. Roadmap Later no longer leads with persistence/ORM mapping.
+
+Findings: None (no merge blockers)
+Gate: Proceed to M8/M9 as applicable.
+```
+
+### M8 Refactoring
+
+```text
+Decision: N/A
+Reason: No product code in this slice; no behavior-preserving refactor applicable.
+```
+
+### M9 Documentation
+
+```text
+Decision: Accepted
+Scope: docs/roadmap.md; docs/superpowers/specs/README.md; RFC-028 Status Accepted; plan SCR; M3.25 ✅
+Summary: Persistence/ORM mapping closed as docs/verification slice; Later remains runtime traversal/query and Relation→metadata projection.
+```
+
+### M10 Workflow Validation
+
+```text
+Decision: Accepted
+Subject: installed docs/workflows assets (no prompt edits this slice)
+Summary: M2–M10 prompts remain coherent for docs-only closeout; no workflow asset changes required for M3.25.
+```
+
 ### Next Gate
 
-**M6 Implementation** — execute Tasks 1–3. Do not invent core APIs.
+**None — slice complete**

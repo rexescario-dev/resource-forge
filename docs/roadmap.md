@@ -7,7 +7,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M1 | Repository & workspace foundation | Done |
 | — | Core architecture RFCs (gate before M2) | Done |
 | M2 | Core contracts (vocabulary, not behavior) | Done |
-| M3 | Resource model | In progress — M3.1–M3.24 ✅; RFC-028 Accepted; remaining Later (traversal / Relation projection) |
+| M3 | Resource model | In progress — M3.1–M3.25 ✅; remaining Later (traversal / Relation projection) |
 | M4 | Integrations (Nest → GraphQL → Prisma) | Planned |
 | M5 | CLI & end-to-end examples | Planned |
 
@@ -145,6 +145,7 @@ Suggested implementation slices (see M3 implementation plan):
 - **M3.22** — Value-State Semantics per RFC-025 (`checkFieldValueStates` / `checkRelationValueStates`; empty≠absent; null elements forbidden) ✅ — [#90](https://github.com/rexescario-dev/resource-forge/issues/90)
 - **M3.23** — Cascade Semantics per RFC-026 (required `onDelete` / `onUpdate`; `evaluateCascadeEvent`; setNull⇒nullable; presence-symmetric restrict) ✅ — [#93](https://github.com/rexescario-dev/resource-forge/issues/93)
 - **M3.24** — Loading / Fetch Semantics per RFC-027 (required `fetch: eager|lazy`; `checkRelationLoadStates`; not-loaded ≠ value state) ✅ — [#96](https://github.com/rexescario-dev/resource-forge/issues/96)
+- **M3.25** — Persistence / ORM Mapping per RFC-028 (docs/verification closeout; no core persistence API) ✅ — [#98](https://github.com/rexescario-dev/resource-forge/issues/98)
 
 Still transport-agnostic; no Nest / GraphQL / Prisma work in M3.
 
