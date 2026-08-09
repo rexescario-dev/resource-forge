@@ -166,19 +166,19 @@ No hard code prerequisites. Slice A and B may run in either order; C last. Do **
 
 **Files:** `docs/roadmap.md`, `docs/superpowers/specs/README.md`, optionally parent M3 plan cross-links if present
 
-- [ ] **Step 1:** Confirm RFC-028 row is **Accepted** in `docs/superpowers/specs/README.md` and M3 gate table in `docs/roadmap.md`
-- [ ] **Step 2:** Confirm persistence/ORM mapping is **no longer a Later lead** because RFC-028 is Accepted; Later topic wording remains exactly as in current `docs/roadmap.md` (do not invent a new ordering)
-- [ ] **Step 3:** Confirm M3 milestone/status prose mentions RFC-028 Accepted and does not claim persistence remains the Later lead
-- [ ] **Step 4:** Fix any drift found (docs only; do not amend RFC-028 semantics)
+- [x] **Step 1:** Confirm RFC-028 row is **Accepted** in `docs/superpowers/specs/README.md` and M3 gate table in `docs/roadmap.md`
+- [x] **Step 2:** Confirm persistence/ORM mapping is **no longer a Later lead** because RFC-028 is Accepted; Later topic wording remains exactly as in current `docs/roadmap.md` (do not invent a new ordering)
+- [x] **Step 3:** Confirm M3 milestone/status prose mentions RFC-028 Accepted and does not claim persistence remains the Later lead
+- [x] **Step 4:** Fix any drift found (docs only; do not amend RFC-028 semantics)
 
 ### Task 2: No-core-surface verification (Slice B)
 
 **Files:** `packages/core/**` (read-only verification)
 
-- [ ] **Step 1:** Run `git diff --name-status <base>...HEAD -- packages/core` and confirm there are **no** changes under `packages/core/**`. Expected result for this slice: empty. If any files appear, they MUST be documentation/test-only and MUST NOT introduce persistence mapping semantics or exports — but the plan ownership target is simply **no `packages/core` changes**
-- [ ] **Step 2:** Secondary defense: confirm no new persistence-mapping modules/exports under `packages/core` (vacuous if Step 1 is empty)
-- [ ] **Step 3:** Confirm `validateResource`, `evaluateCascadeEvent`, and `checkRelationLoadStates` are not modified by this slice
-- [ ] **Step 4:** Optional: run `@resource-forge/core` vitest/`tsc --noEmit` as smoke that the tree remains green without product changes
+- [x] **Step 1:** Run `git diff --name-status <base>...HEAD -- packages/core` and confirm there are **no** changes under `packages/core/**`. Expected result for this slice: empty. If any files appear, they MUST be documentation/test-only and MUST NOT introduce persistence mapping semantics or exports — but the plan ownership target is simply **no `packages/core` changes**
+- [x] **Step 2:** Secondary defense: confirm no new persistence-mapping modules/exports under `packages/core` (vacuous if Step 1 is empty)
+- [x] **Step 3:** Confirm `validateResource`, `evaluateCascadeEvent`, and `checkRelationLoadStates` are not modified by this slice
+- [x] **Step 4:** Optional: run `@resource-forge/core` vitest/`tsc --noEmit` as smoke that the tree remains green without product changes
 
 ### Task 3: Slice Completion Report (Slice C)
 
