@@ -15,15 +15,20 @@ import type {
   ConstraintValidationError,
   Field,
   FieldValidationError,
+  FieldValueStateError,
   Operation,
   OperationInvocationError,
   Relation,
   RelationCrossRefValidationError,
   RelationDirection,
   RelationJoin,
+  RelationRuntimeValue,
+  RelationSingularAssociation,
   RelationValidationError,
+  RelationValueStateError,
   ResourceProjectionError,
   SemanticResultReport,
+  ValueStateError,
 } from '../index.js';
 import { createResourceWithAnnotationsForTests } from './create-resource-with-annotations.js';
 import { createResourceWithOperationsForTests } from './create-resource-with-operations.js';
@@ -227,6 +232,47 @@ describe('M3.21 public exports', () => {
       [],
     );
     expect(checked).toEqual({ ok: true, value: undefined });
+  });
+});
+
+describe('M3.22 public exports', () => {
+  it('exposes value-state checks and types without wiring into validateResource', () => {
+    expect(typeof core.checkFieldValueStates).toBe('function');
+    expect(typeof core.checkRelationValueStates).toBe('function');
+    expect(typeof core.checkConstraintValues).toBe('function');
+
+    const fieldError: FieldValueStateError = {
+      code: 'forbidden_absent_field',
+      field: 'total',
+    };
+    const relationError: RelationValueStateError = {
+      code: 'forbidden_null_relation_element',
+      relation: 'tags',
+      index: 0,
+    };
+    const umbrella: ValueStateError = fieldError;
+    const singular: RelationSingularAssociation = Object.freeze({});
+    const runtime: RelationRuntimeValue = singular;
+    expect(fieldError.code).toBe('forbidden_absent_field');
+    expect(relationError.index).toBe(0);
+    expect(umbrella.code).toBe('forbidden_absent_field');
+    expect(runtime).toEqual({});
+
+    const identity = createResourceIdentity('crm', 'Order');
+    expect(identity.ok).toBe(true);
+    if (!identity.ok) return;
+    const resource = createResource(identity.value);
+    expect(resource.ok).toBe(true);
+    if (!resource.ok) return;
+
+    expect(core.checkFieldValueStates(resource.value, new Map())).toEqual({
+      ok: true,
+      value: undefined,
+    });
+    expect(core.checkRelationValueStates(resource.value, new Map())).toEqual({
+      ok: true,
+      value: undefined,
+    });
   });
 });
 

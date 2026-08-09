@@ -31,3 +31,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-022 — Annotation Vocabulary](2026-08-09-rfc-022-annotation-vocabulary-design.md) | Accepted — [#80](https://github.com/rexescario-dev/resource-forge/issues/80) |
 | [RFC-023 — Richer Projection (Composition Semantics)](2026-08-09-rfc-023-richer-projection-composition-design.md) | Accepted — [#83](https://github.com/rexescario-dev/resource-forge/issues/83) |
 | [RFC-024 — Direction / Joins (Relationship Traversal Semantics)](2026-08-09-rfc-024-direction-joins-design.md) | Accepted — [#86](https://github.com/rexescario-dev/resource-forge/issues/86) |
+| [RFC-025 — Value-State Semantics (Empty-vs-Absent / Null Elements)](2026-08-09-rfc-025-value-state-semantics-design.md) | Accepted — [#89](https://github.com/rexescario-dev/resource-forge/issues/89) |
