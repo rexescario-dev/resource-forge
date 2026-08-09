@@ -34,3 +34,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-025 — Value-State Semantics (Empty-vs-Absent / Null Elements)](2026-08-09-rfc-025-value-state-semantics-design.md) | Accepted — [#89](https://github.com/rexescario-dev/resource-forge/issues/89) |
 | [RFC-026 — Cascade Semantics](2026-08-09-rfc-026-cascade-semantics-design.md) | Accepted — [#92](https://github.com/rexescario-dev/resource-forge/issues/92) |
 | [RFC-027 — Loading / Fetch Semantics](2026-08-09-rfc-027-loading-fetch-semantics-design.md) | Accepted — [#95](https://github.com/rexescario-dev/resource-forge/issues/95) |
+| [RFC-028 — Persistence / ORM Mapping](2026-08-09-rfc-028-persistence-orm-mapping-design.md) | Accepted — [#98](https://github.com/rexescario-dev/resource-forge/issues/98) |
