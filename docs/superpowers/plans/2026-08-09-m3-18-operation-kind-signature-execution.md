@@ -351,7 +351,7 @@ Planning note: placing invoke in `invoke-operation.ts` (rather than growing `ope
 | M8 | **N/A** |
 | M9 | **Complete** |
 | Branch | `feat/m3-18-operation-kind-signature-execution` |
-| PR | (delivery PR for #78) |
+| PR | https://github.com/rexescario-dev/resource-forge/pull/79 |
 | Status | **Slice complete** |
 
 ### Shipped
