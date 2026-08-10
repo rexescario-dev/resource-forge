@@ -39,3 +39,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-030 — Relation → Metadata Projection (Non-Contribution Closure)](2026-08-10-rfc-030-relation-metadata-projection-design.md) | Accepted — [#102](https://github.com/rexescario-dev/resource-forge/issues/102) |
 | [RFC-031 — Nest Discovery-First Host Integration](2026-08-10-rfc-031-nest-discovery-host-integration-design.md) | Accepted — [#106](https://github.com/rexescario-dev/resource-forge/issues/106) |
 | [RFC-032 — GraphQL Schema & Resolver Generation](2026-08-10-rfc-032-graphql-schema-resolver-generation-design.md) | Accepted — [#109](https://github.com/rexescario-dev/resource-forge/issues/109) |
+| [RFC-033 — Prisma Correspondence Verification](2026-08-10-rfc-033-prisma-correspondence-verification-design.md) | Accepted — [#112](https://github.com/rexescario-dev/resource-forge/issues/112) |
