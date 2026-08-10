@@ -455,7 +455,7 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 | M8 | **N/A** (no broad refactor pass required) |
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-2-graphql-schema-resolver` |
-| PR | _(pending — fill after `gh pr create`)_ |
+| PR | [#110](https://github.com/rexescario-dev/resource-forge/pull/110) |
 | Status | **Ready for merge** |
 
 ### Shipped
@@ -480,7 +480,25 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 
 ### Next Gate
 
-**Merge** — one delivery PR for `#109` (Accepted plan + implementation + SCR). M10 slice process path validated (M5→M6→M7→M8 N/A→M9); workflow library assets unchanged.
+**Merge** — [#110](https://github.com/rexescario-dev/resource-forge/pull/110) for `#109` (Accepted plan + implementation + SCR). M10 slice process path validated (M5→M6→M7→M8 N/A→M9); workflow library assets unchanged.
+
+### M7 Code Review (record)
+
+```text
+Decision: Approved for merge
+Subject: PR #110 / branch feat/m4-2-graphql-schema-resolver
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-032-graphql-schema-resolver-generation-design.md
+Accepted plan: docs/superpowers/plans/2026-08-10-m4-2-graphql-schema-resolver-generation.md
+Plan tasks: 1–7 covered (wiring, naming, object types, operations/RfVoid/Query-root, translateResources, ResolverBindings+invokeOperation, docs/SCR)
+Verification: graphql test 33 / typecheck / lint green; packages/core diff empty; no nest/prisma deps
+Rationale: Implements RFC-032 fail-closed paired translation within @resource-forge/graphql ownership; no invented core/Nest/Prisma/emitter semantics; no merge blockers.
+```
+
+### M8 / M9 / M10
+
+- **M8:** N/A — no worthwhile behavior-preserving refactor identified beyond M6 structure.
+- **M9:** Complete — package README + roadmap M4.2 indexing; RFC-032 already Accepted in specs index.
+- **M10:** Accepted for this slice’s process path (gates reachable; SCR emitted; one PR per tracking issue). Workflow prompt library assets were not modified; no library revalidation required.
 
 ---
 
