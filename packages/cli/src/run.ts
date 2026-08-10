@@ -1,10 +1,7 @@
+import { CLI_VERSION } from './cli-version.js';
+import { COMMAND_REGISTRY } from './command-registry.js';
+import { runDoctor } from './commands/doctor.js';
 import { runValidate } from './commands/validate.js';
-
-/**
- * Package-local CLI version corresponding to `@resource-forge/cli`.
- * Keep in sync with package.json `version` (no filesystem discovery at runtime).
- */
-const CLI_VERSION = '0.0.0';
 
 export type RunResult = {
   exitCode: number;
@@ -12,12 +9,8 @@ export type RunResult = {
   stderr: string;
 };
 
-type CommandHandler = (argvAfterCommand: readonly string[]) => RunResult;
-
-/** Internal command registry (non-public). */
-const COMMAND_REGISTRY = new Map<string, CommandHandler>([
-  ['validate', runValidate],
-]);
+COMMAND_REGISTRY.set('validate', runValidate);
+COMMAND_REGISTRY.set('doctor', runDoctor);
 
 const HELP_TEXT = `Usage: rf [options] [command]
 
@@ -29,6 +22,7 @@ Options:
 
 Commands:
   validate <file>  Validate a JSON Resource document
+  doctor           Check CLI package environment health
 `;
 
 function helpResult(): RunResult {

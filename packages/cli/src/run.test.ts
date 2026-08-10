@@ -1,8 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { COMMAND_REGISTRY } from './command-registry.js';
 import * as cli from './index.js';
+import {
+  getResolveCoreCallCountForTests,
+  resetResolveCoreCallCountForTests,
+  resetResolveCoreForTests,
+  setResolveCoreForTests,
+} from './resolve-core.js';
 import { run } from './run.js';
 
 const packageJson = JSON.parse(
@@ -21,6 +28,11 @@ const invalidIdentityPath = join(fixturesDir, 'invalid-identity.json');
 const invalidJsonPath = join(fixturesDir, 'invalid-json.txt');
 const nonObjectArrayPath = join(fixturesDir, 'non-object-array.json');
 const missingPath = join(fixturesDir, 'does-not-exist.json');
+
+afterEach(() => {
+  resetResolveCoreForTests();
+  resetResolveCoreCallCountForTests();
+});
 
 describe('run()', () => {
   it('prints help for bare argv', () => {
@@ -145,6 +157,72 @@ describe('run() validate', () => {
   });
 });
 
+describe('run() doctor', () => {
+  it('reports healthy environment', () => {
+    const result = run(['doctor']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toMatch(/version:\s*ok/);
+    expect(result.stdout).toMatch(/registry:\s*ok/);
+    expect(result.stdout).toMatch(/core:\s*ok/);
+  });
+
+  it('returns exit 2 with extra positional without running probes', () => {
+    resetResolveCoreCallCountForTests();
+    const result = run(['doctor', 'extra']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+    expect(getResolveCoreCallCountForTests()).toBe(0);
+  });
+
+  it('returns exit 2 for undefined post-command options', () => {
+    resetResolveCoreCallCountForTests();
+    const result = run(['doctor', '--flag']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+    expect(getResolveCoreCallCountForTests()).toBe(0);
+  });
+
+  it('preserves global --help when followed by doctor', () => {
+    const result = run(['--help', 'doctor']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toMatch(/--help/);
+    expect(result.stdout).not.toMatch(/version:\s*ok/);
+  });
+
+  it('reports core FAIL via internal seam and still reports siblings', () => {
+    setResolveCoreForTests(() => {
+      throw new Error('simulated missing core');
+    });
+    const result = run(['doctor']);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toMatch(/version:\s*ok/);
+    expect(result.stdout).toMatch(/registry:\s*ok/);
+    expect(result.stdout).toMatch(/core:\s*FAIL/);
+  });
+
+  it('registry check observes the same dispatch registry as run', () => {
+    const validateHandler = COMMAND_REGISTRY.get('validate');
+    expect(validateHandler).toBeDefined();
+    COMMAND_REGISTRY.delete('validate');
+    try {
+      const result = run(['doctor']);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toBe('');
+      expect(result.stdout).toMatch(/registry:\s*FAIL/);
+      expect(result.stdout).toMatch(/version:\s*ok/);
+      // Collect-all: siblings still reported (core pass/fail independent of registry).
+      expect(result.stdout).toMatch(/core:\s*(ok|FAIL)/);
+    } finally {
+      COMMAND_REGISTRY.set('validate', validateHandler!);
+    }
+  });
+});
+
 describe('public package surface', () => {
   it('exports run and does not export placeholder or internal symbols', () => {
     expect(typeof cli.run).toBe('function');
@@ -153,6 +231,8 @@ describe('public package surface', () => {
     expect(cli).not.toHaveProperty('PACKAGE_VERSION');
     expect(cli).not.toHaveProperty('CommandRegistry');
     expect(cli).not.toHaveProperty('validateResourceDocument');
+    expect(cli).not.toHaveProperty('COMMAND_REGISTRY');
+    expect(cli).not.toHaveProperty('setResolveCoreForTests');
   });
 
   it('depends only on @resource-forge/core among workspace packages', () => {
