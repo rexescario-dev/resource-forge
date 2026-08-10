@@ -305,9 +305,9 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Modify: `packages/graphql/package.json`
 - Possibly root lockfile via `pnpm` from repo root
 
-- [ ] **Step 1:** Add dependency `graphql` (`^16.0.0` planning pin)
-- [ ] **Step 2:** Confirm dependencies include `@resource-forge/core` and do **not** include `@resource-forge/nest` or `@resource-forge/prisma`
-- [ ] **Step 3:** Run `pnpm install` at repo root; `pnpm --filter @resource-forge/graphql typecheck` still passes (placeholder OK)
+- [x] **Step 1:** Add dependency `graphql` (`^16.0.0` planning pin)
+- [x] **Step 2:** Confirm dependencies include `@resource-forge/core` and do **not** include `@resource-forge/nest` or `@resource-forge/prisma`
+- [x] **Step 3:** Run `pnpm install` at repo root; `pnpm --filter @resource-forge/graphql typecheck` still passes (placeholder OK)
 
 ### Task 2: Naming + legality + collisions (Slice B)
 
@@ -315,16 +315,16 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Create: `packages/graphql/src/naming.ts`
 - Create: `packages/graphql/src/naming.test.ts`
 
-- [ ] **Step 1: Write failing tests** for:
+- [x] **Step 1: Write failing tests** for:
   1. `crm`/`Customer` → type `CrmCustomer`; root `(crm/Customer, getById)` → `crmCustomer_getById`
   2. Illegal/reserved **type** names fail: `Query`, `Mutation`, `Subscription`, `String`, `Int`, `Float`, `Boolean`, `ID`, `RfVoid`, `__Type`
   3. Illegal member/param/root-field lexical / `__*` failures
   4. Two distinct identities mapping to same type name → collision detected (construct inputs or force via test of collision helper)
   5. Two distinct `(identity, op)` pairs mapping to same root field → collision detected
   6. Document/assert: functions are not assumed injective; collision detection is required
-- [ ] **Step 2: Run — expect FAIL**
-- [ ] **Step 3: Implement** naming helpers per locked algorithms + `isLegalGraphqlName` / reserved-type checks + collision detectors
-- [ ] **Step 4: Tests PASS**
+- [x] **Step 2: Run — expect FAIL**
+- [x] **Step 3: Implement** naming helpers per locked algorithms + `isLegalGraphqlName` / reserved-type checks + collision detectors
+- [x] **Step 4: Tests PASS**
 
 ### Task 3: Nullability helpers + object types (Slice C)
 
@@ -334,7 +334,7 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Create: `packages/graphql/src/schema.test.ts`
 - Create: `packages/graphql/src/errors.ts` (as needed)
 
-- [ ] **Step 1: Write failing tests** for:
+- [x] **Step 1: Write failing tests** for:
   1. Field scalars `string`/`number`/`boolean` → `String`/`Float`/`Boolean` with output nullability from `nullable`
   2. Relation `one` to in-unit target; `many` → `[Target!]!` vs `[Target!]`
   3. Cycle `A↔B` succeeds when both in unit
@@ -342,9 +342,9 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
   5. Field∩Relation same name → fail
   6. Resource with empty fields+relations → fail (zero-field)
   7. Output runtime contract cases for `optional`×`nullable` may be covered in Task 6 resolver tests if cleaner (SDL nullability helpers remain in scope here)
-- [ ] **Step 2: Run — expect FAIL**
-- [ ] **Step 3: Implement** object-type builder + nullability helpers as an **internal intermediate** consumed later by `translateResources`. Prefer building object types in isolation first; do not invent Query fields in product code.
-- [ ] **Step 4: Tests PASS** for object-type / relation / zero-field / collision cases that do not yet require full Query-root closure (or combine with Task 4 if isolation is awkward)
+- [x] **Step 2: Run — expect FAIL**
+- [x] **Step 3: Implement** object-type builder + nullability helpers as an **internal intermediate** consumed later by `translateResources`. Prefer building object types in isolation first; do not invent Query fields in product code.
+- [x] **Step 4: Tests PASS** for object-type / relation / zero-field / collision cases that do not yet require full Query-root closure (or combine with Task 4 if isolation is awkward)
 
 **Planning note:** Object-type construction is an internal intermediate; it MUST NOT constitute translation success independently of the complete §4–§8 validation and paired-output pipeline. Keep Query-root closure assertions in Tasks 4–5 so product code never synthesizes Query fields.
 
@@ -354,15 +354,15 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Modify: `packages/graphql/src/schema.ts`
 - Modify: `packages/graphql/src/schema.test.ts`
 
-- [ ] **Step 1: Write failing tests** for:
+- [x] **Step 1: Write failing tests** for:
   1. `query` Operation → Query field with identity-preserving arg names; non-void result `Base!`
   2. `command` → Mutation field; `void` → `RfVoid!` and schema includes `RfVoid { ok: Boolean! }`
   3. No commands → schema has no Mutation type (or equivalent absence)
   4. Unit with Resources + fields but zero `query` Operations → fail (Query-root closure)
   5. Zero Resources → fail
   6. Arg optional×nullable runtime reinforcement cases (capture presence vs null)
-- [ ] **Step 2: Implement** Query/Mutation field generation + `RfVoid` + unit-level Query-root closure checks
-- [ ] **Step 3: Tests PASS**
+- [x] **Step 2: Implement** Query/Mutation field generation + `RfVoid` + unit-level Query-root closure checks
+- [x] **Step 3: Tests PASS**
 
 ### Task 5: `translateResources` orchestration (Slice E)
 
@@ -371,16 +371,16 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Create: `packages/graphql/src/translate.test.ts`
 - Modify: `packages/graphql/src/index.ts`
 
-- [ ] **Step 1: Write failing tests** for end-to-end:
+- [x] **Step 1: Write failing tests** for end-to-end:
   1. Happy path (Customer+Order cycle + query+command+void) → success with `schema` + `resolverBindings` (Field/Relation/Operation maps populated per inventory)
   2. Invalid Resource → fail
   3. Full §8 matrix sample: reserved type name via crafted identity if representable; Field/Relation collision; missing target; empty unit; no query ops; zero-field; naming collision
   4. Annotations present or absent do not change structural success (metadata inert)
   5. Failure returns no successful schema/resolverBindings pair
   6. **GraphQL.js schema validity:** every successful translation’s `schema` satisfies `validateSchema(schema)` with **zero** errors (Query root present with ≥1 field; Mutation absent when no commands; object types fieldful; cycles via thunks; `RfVoid` registered when used; no duplicate types/fields)
-- [ ] **Step 2: Implement** `translateResources`: validate → name/check collisions → build schema → build `resolverBindings` → `validateSchema` → Result
-- [ ] **Step 3: Export** public translate API (+ error types as needed)
-- [ ] **Step 4: Tests PASS**
+- [x] **Step 2: Implement** `translateResources`: validate → name/check collisions → build schema → build `resolverBindings` → `validateSchema` → Result
+- [x] **Step 3: Export** public translate API (+ error types as needed)
+- [x] **Step 4: Tests PASS**
 
 ### Task 6: Resolver contracts (Slice F)
 
@@ -389,15 +389,15 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Create: `packages/graphql/src/resolvers.test.ts`
 - Modify: `packages/graphql/src/translate.ts` as needed to wire contracts
 
-- [ ] **Step 1: Write failing tests** for:
+- [x] **Step 1: Write failing tests** for:
   1. FieldBinding contents + resolve path from host instance surface; optional×nullable absentBehavior
   2. RelationBinding contents + host-supplied association; RFC-029 not-loaded classification via host double where exercised
   3. OperationBinding calls **`invokeOperation`** from `@resource-forge/core` with host `OperationHandlerProvider`; spy/assert that GraphQL does not reimplement arg/result rules; missing handler → resolve-time failure; void → `{ ok: true }`
   4. Default field resolution MAY satisfy FieldBinding when parent already carries values—assert semantic outcomes, not mandatory custom resolver function
   5. Assert successful translation’s `resolverBindings` is not an empty stub (maps contain expected bindings for the happy-path unit)
-- [ ] **Step 2: Implement** `ResolverBindings` builders + thin GraphQL resolve adapters that call `invokeOperation` for Operations and enforce Field/Relation absentBehavior
-- [ ] **Step 3: Document** host instance-surface / `OperationHandlerProvider` conventions in README (Task 7) matching the inventory
-- [ ] **Step 4: Tests PASS**
+- [x] **Step 2: Implement** `ResolverBindings` builders + thin GraphQL resolve adapters that call `invokeOperation` for Operations and enforce Field/Relation absentBehavior
+- [x] **Step 3: Document** host instance-surface / `OperationHandlerProvider` conventions in README (Task 7) matching the inventory
+- [x] **Step 4: Tests PASS**
 
 ### Task 7: Docs + boundary verification (Slice G)
 
@@ -408,12 +408,12 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 - Modify: this plan SCR section during M6–M10
 - Modify: `packages/graphql/src/index.test.ts` for public exports
 
-- [ ] **Step 1:** Rewrite graphql README for translate usage, fail-closed summary, Nest/Prisma independence; remove “placeholder only” wording
-- [ ] **Step 2:** Confirm `git diff --name-status <base>...HEAD -- packages/core` is empty
-- [ ] **Step 3:** Confirm graphql package.json has no nest/prisma dependencies
-- [ ] **Step 4:** Run full graphql test + typecheck + lint green
-- [ ] **Step 5:** Fill Slice Completion Report; mark M4.2 ✅ on roadmap only after SCR complete
-- [ ] **Step 6:** Update index tests to assert `translateResources` (and key exports) exist
+- [x] **Step 1:** Rewrite graphql README for translate usage, fail-closed summary, Nest/Prisma independence; remove “placeholder only” wording
+- [x] **Step 2:** Confirm `git diff --name-status <base>...HEAD -- packages/core` is empty
+- [x] **Step 3:** Confirm graphql package.json has no nest/prisma dependencies
+- [x] **Step 4:** Run full graphql test + typecheck + lint green
+- [x] **Step 5:** Fill Slice Completion Report; mark M4.2 ✅ on roadmap only after SCR complete
+- [x] **Step 6:** Update index tests to assert `translateResources` (and key exports) exist
 
 ---
 
@@ -450,31 +450,37 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 | Tracking | [#109](https://github.com/rexescario-dev/resource-forge/issues/109) |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** |
-| M6 | — |
-| M7 | — |
-| M8 | — |
-| M9 | — |
-| Branch | — |
-| PR | — |
-| Status | **Not started** |
+| M6 | **Complete** |
+| M7 | **Approved** |
+| M8 | **N/A** (no broad refactor pass required) |
+| M9 | **Complete** (package README + roadmap indexing) |
+| Branch | `feat/m4-2-graphql-schema-resolver` |
+| PR | _(pending — fill after `gh pr create`)_ |
+| Status | **Ready for merge** |
 
 ### Shipped
 
-—
+- `@resource-forge/graphql` `translateResources` → paired `GraphQLSchema` + `ResolverBindings`
+- Deterministic naming with legality/reserved/`RfVoid` rejection and post-map collision detection
+- Field/Relation/Operation SDL mapping, Query-root closure, Mutation omission, `RfVoid`
+- Operation bindings call core `invokeOperation` only; missing handler = resolve-time failure
+- GraphQL.js `validateSchema` on every successful translation
+- Vitest coverage for success + fail-closed matrix (33 tests)
+- Docs: graphql README + roadmap M4.2 ✅; RFC-032 Accepted indexed
 
 ### Validation
 
 | Check | Result |
 | --- | --- |
-| Tests | — |
-| Typecheck | — |
-| Lint | — |
-| Build | — |
-| Package validation | — |
+| Tests | **Passed** (`pnpm --filter @resource-forge/graphql test` — 33) |
+| Typecheck | **Passed** (`pnpm --filter @resource-forge/graphql typecheck`) |
+| Lint | **Passed** (`pnpm --filter @resource-forge/graphql lint`) |
+| Build | **Skipped** (typecheck covers compile of src) |
+| Package validation | **Passed** (`packages/core` delivery diff empty; no nest/prisma deps on graphql) |
 
 ### Next Gate
 
-**M6 Implementation** on `#109` — plan Accepted; M6 authorized. Prefer one PR per tracking issue (Accepted plan + implementation + SCR).
+**Merge** — one delivery PR for `#109` (Accepted plan + implementation + SCR). M10 slice process path validated (M5→M6→M7→M8 N/A→M9); workflow library assets unchanged.
 
 ---
 
