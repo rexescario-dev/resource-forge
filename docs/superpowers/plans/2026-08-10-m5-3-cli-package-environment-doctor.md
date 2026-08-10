@@ -240,20 +240,20 @@ Derived only from Accepted RFC-038 (and preserved RFC-036/037 shell rules):
 - Optionally create: `packages/cli/src/command-registry.ts`
 - Modify: `packages/cli/src/run.ts` (and validate registration path only if imports move)
 
-- [ ] **Step 1:** Reuse the existing RFC-036 package-local version source for doctor. Extract to a shared module **only if** needed so `--version` and doctor consume the **same** source. Do **not** add filesystem/`package.json` discovery.
-- [ ] **Step 2:** Ensure doctor will inspect the **same** dispatch registry object `run` uses. Extract/share into a module **only if** necessary for that identity; otherwise keep the map where it lives and pass/share the reference. Preserve existing validate dispatch behavior.
-- [ ] **Step 3:** Ensure nothing new is exported from `index.ts`.
-- [ ] **Step 4:** Run existing CLI tests — all PASS (any extract is behavior-preserving).
-- [ ] **Step 5:** Commit if there was a real share/extract; skip a no-op commit if nothing moved yet and Task 3 will register `doctor` in place.
+- [x] **Step 1:** Reuse the existing RFC-036 package-local version source for doctor. Extract to a shared module **only if** needed so `--version` and doctor consume the **same** source. Do **not** add filesystem/`package.json` discovery.
+- [x] **Step 2:** Ensure doctor will inspect the **same** dispatch registry object `run` uses. Extract/share into a module **only if** necessary for that identity; otherwise keep the map where it lives and pass/share the reference. Preserve existing validate dispatch behavior.
+- [x] **Step 3:** Ensure nothing new is exported from `index.ts`.
+- [x] **Step 4:** Run existing CLI tests — all PASS (any extract is behavior-preserving).
+- [x] **Step 5:** Commit if there was a real share/extract; skip a no-op commit if nothing moved yet and Task 3 will register `doctor` in place.
 
 ### Task 2: Failing `run(['doctor'])` tests (TDD)
 
 **Files:**
 - Modify: `packages/cli/src/run.test.ts`
 
-- [ ] **Step 1:** Write tests for healthy doctor, usage (extra positional / option), RFC-036 help-before-dispatch (`['--help','doctor']`), and registry-identity (may land with Task 3 if it needs the seam/registry hook — prefer writing healthy/usage/help first).
-- [ ] **Step 2:** Run `pnpm --filter @resource-forge/cli test` — establish **red** for new doctor cases; RFC-036/037 cases still pass.
-- [ ] **Step 3:** Proceed to implementation (Task 3) to green — do **not** treat committing red tests as a required step.
+- [x] **Step 1:** Write tests for healthy doctor, usage (extra positional / option), RFC-036 help-before-dispatch (`['--help','doctor']`), and registry-identity (may land with Task 3 if it needs the seam/registry hook — prefer writing healthy/usage/help first).
+- [x] **Step 2:** Run `pnpm --filter @resource-forge/cli test` — establish **red** for new doctor cases; RFC-036/037 cases still pass.
+- [x] **Step 3:** Proceed to implementation (Task 3) to green — do **not** treat committing red tests as a required step.
 
 Example assertions (informative):
 
@@ -283,20 +283,20 @@ it('doctor returns exit 2 with extra positional', () => {
 - Modify: `packages/cli/src/run.ts` (register `doctor` on the **existing** dispatch registry; update help text)
 - Modify: `packages/cli/src/run.test.ts` (green cases + core-failure + registry-identity)
 
-- [ ] **Step 1:** Implement default **sync** resolve of `@resource-forge/core` (e.g. `createRequire(import.meta.url).resolve('@resource-forge/core')`). Do not assert exports.
-- [ ] **Step 2:** Add internal-only `setResolveCoreForTests` / `resetResolveCoreForTests` (or equivalent) — **not** exported from `index.ts`; **not** `run(argv, opts)`.
-- [ ] **Step 3:** Implement `runCheck` (or equivalent) per the **Check-failure helper contract**: expected inability → `{ ok: false }`; unexpected implementation throw → rethrow/bubble.
-- [ ] **Step 4:** Implement `runDoctor(argvAfterCommand)`:
+- [x] **Step 1:** Implement default **sync** resolve of `@resource-forge/core` (e.g. `createRequire(import.meta.url).resolve('@resource-forge/core')`). Do not assert exports.
+- [x] **Step 2:** Add internal-only `setResolveCoreForTests` / `resetResolveCoreForTests` (or equivalent) — **not** exported from `index.ts`; **not** `run(argv, opts)`.
+- [x] **Step 3:** Implement `runCheck` (or equivalent) per the **Check-failure helper contract**: expected inability → `{ ok: false }`; unexpected implementation throw → rethrow/bubble.
+- [x] **Step 4:** Implement `runDoctor(argvAfterCommand)`:
   - If any remaining tokens → exit `2` usage; **return before probes**
   - Else run version / registry / core via `runCheck` (collect-all)
   - Render deterministic stdout report with stable labels/statuses
   - Exit `0` if all ok else `1` (expected health failures only on this path)
-- [ ] **Step 5:** Register `doctor` on the **same** dispatch registry object; update root help to list `doctor`. Do **not** add a second expected-commands list. Do **not** add a doctor-specific global `--help`/`--version` parser — rely on existing RFC-036 handling in `run` before dispatch.
-- [ ] **Step 6:** Green core-failure test (seam → `core` FAIL, siblings still reported, exit `1`, stdout report).
-- [ ] **Step 7:** Green registry-identity test (mutate/unregister on the real dispatch map → `registry` FAIL; restore).
-- [ ] **Step 8:** Fix stale `index.ts` comment if it still says “No product commands.”
-- [ ] **Step 9:** Run `pnpm --filter @resource-forge/cli test|typecheck|lint` — PASS.
-- [ ] **Step 10:** Confirm public export remains `run` only.
+- [x] **Step 5:** Register `doctor` on the **same** dispatch registry object; update root help to list `doctor`. Do **not** add a second expected-commands list. Do **not** add a doctor-specific global `--help`/`--version` parser — rely on existing RFC-036 handling in `run` before dispatch.
+- [x] **Step 6:** Green core-failure test (seam → `core` FAIL, siblings still reported, exit `1`, stdout report).
+- [x] **Step 7:** Green registry-identity test (mutate/unregister on the real dispatch map → `registry` FAIL; restore).
+- [x] **Step 8:** Fix stale `index.ts` comment if it still says “No product commands.”
+- [x] **Step 9:** Run `pnpm --filter @resource-forge/cli test|typecheck|lint` — PASS.
+- [x] **Step 10:** Confirm public export remains `run` only.
 
 ### Task 4: Docs + SCR closeout (conditional)
 
@@ -306,10 +306,10 @@ it('doctor returns exit 2 with extra positional', () => {
 - Modify: `docs/roadmap.md` **only for** M5.3 lifecycle accuracy (Draft plan → Accepted plan → ✅ after merge)
 - Modify: this plan’s SCR during M7–M10
 
-- [ ] **Step 1:** Update package README: `rf doctor`, exit table (healthy / health fail / usage), out-of-scope (project doctor, discovery, generators). Keep `validate` accurate.
-- [ ] **Step 2:** Touch root README / roadmap **only** where current wording is rendered inaccurate by shipping `doctor`.
-- [ ] **Step 3:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout.
-- [ ] **Step 4:** Final `pnpm --filter @resource-forge/cli test typecheck lint build`.
+- [x] **Step 1:** Update package README: `rf doctor`, exit table (healthy / health fail / usage), out-of-scope (project doctor, discovery, generators). Keep `validate` accurate.
+- [x] **Step 2:** Touch root README / roadmap **only** where current wording is rendered inaccurate by shipping `doctor`.
+- [x] **Step 3:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout.
+- [x] **Step 4:** Final `pnpm --filter @resource-forge/cli test typecheck lint build`.
 
 ---
 
@@ -348,33 +348,37 @@ it('doctor returns exit 2 with extra positional', () => {
 | Tracking | [#128](https://github.com/rexescario-dev/resource-forge/issues/128) |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** (2026-08-10) |
-| M6 | Pending |
-| M7 | Pending |
-| M8 | Pending |
-| M9 | Pending |
-| M10 | Pending |
+| M6 | **Complete** |
+| M7 | **Approved** (2026-08-10) |
+| M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
+| M9 | **Complete** (package README + root README CLI role + roadmap M5.3) |
+| M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-3-cli-doctor` |
 | PR | [#130](https://github.com/rexescario-dev/resource-forge/pull/130) |
-| Status | **Ready for M6** |
+| Status | **Ready for merge** |
 
 ### Shipped
 
-_(fill during M6–M9)_
+- Registered `doctor` command: `rf doctor` / `run(['doctor'])`
+- Collect-all isolated checks: version (package-local), dispatch registry (`validate` + `doctor`), sync `@resource-forge/core` resolvability
+- `runCheck` expected-vs-unexpected failure contract; internal core-resolve test seam
+- Shared `CLI_VERSION` + `COMMAND_REGISTRY` (same object as dispatch)
+- Public API remains `run` only; bin unchanged
 
 ### Verification
 
 | Check | Result |
 | --- | --- |
-| `pnpm --filter @resource-forge/cli test` | Pending |
-| typecheck / lint / build | Pending |
-| CI | Pending |
-| Public export `run` only | Pending |
-| Sole RF workspace dep `core` | Pending |
+| `pnpm --filter @resource-forge/cli test` | **PASS** (28 tests: 24 run + 4 document; tinypool teardown noise only) |
+| typecheck / lint / build | **PASS** |
+| CI | Pending on delivery PR |
+| Public export `run` only | **PASS** |
+| Sole RF workspace dep `core` | **PASS** |
 
 ### Next Gate
 
-**M6 Implementation** — execute Accepted plan tasks. RFC-038 remains authoritative for product semantics.
+**Merge** — then SCR Status **Slice complete** on closeout commit if required by convention.
 
 ---
 
-**Status: Accepted.** Authoritative for M5.3 sequencing/execution. RFC-038 remains authoritative for product semantics. M6 authorized for `#128`.
+**Status: Accepted.** Authoritative for M5.3 sequencing/execution history. RFC-038 remains authoritative for product semantics. Delivery ready for merge via tracking [#128](https://github.com/rexescario-dev/resource-forge/issues/128).
