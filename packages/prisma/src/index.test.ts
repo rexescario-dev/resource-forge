@@ -27,4 +27,9 @@ describe('@resource-forge/prisma', () => {
     const mod = await import('./index.js');
     expect(typeof mod.emitPrismaSchema).toBe('function');
   });
+
+  it('exports createPrismaResourceBinding', async () => {
+    const mod = await import('./index.js');
+    expect(typeof mod.createPrismaResourceBinding).toBe('function');
+  });
 });

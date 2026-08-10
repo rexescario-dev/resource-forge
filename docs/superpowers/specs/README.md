@@ -41,3 +41,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-032 — GraphQL Schema & Resolver Generation](2026-08-10-rfc-032-graphql-schema-resolver-generation-design.md) | Accepted — [#109](https://github.com/rexescario-dev/resource-forge/issues/109) |
 | [RFC-033 — Prisma Correspondence Verification](2026-08-10-rfc-033-prisma-correspondence-verification-design.md) | Accepted — [#112](https://github.com/rexescario-dev/resource-forge/issues/112) |
 | [RFC-034 — Prisma Schema Realization](2026-08-10-rfc-034-prisma-schema-realization-design.md) | Accepted — [#115](https://github.com/rexescario-dev/resource-forge/issues/115) |
+| [RFC-035 — Prisma Client Persistence Bindings](2026-08-10-rfc-035-prisma-client-bindings-design.md) | Accepted — [#118](https://github.com/rexescario-dev/resource-forge/issues/118) |
