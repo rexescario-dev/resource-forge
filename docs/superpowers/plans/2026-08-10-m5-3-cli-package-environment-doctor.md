@@ -1,9 +1,9 @@
 # M5.3 CLI Package Environment Doctor — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft** (M5 returned once; revised for re-entry). REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` **after** this plan is Accepted. Follow TDD. Implement **only** Accepted RFC-038 CLI Package Environment Doctor in `@resource-forge/cli`. Do **not** invent discovery, config, stdin, Resource validation, Nest/GraphQL/Prisma/workspace probing, structured diagnostics, or `run(argv, opts)`. Do **not** treat `run` as a registry command. Do **not** assert `@resource-forge/core` exports. Preserve RFC-036/037: sole public export `run`; bin stream/exit only; exit `0/1/2` meanings unchanged; tests centered on `run(['doctor'])`. Preserve RFC-036 global `--help`/`--version` handling exactly — do **not** add a doctor-specific global parser.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD. Implement **only** Accepted RFC-038 CLI Package Environment Doctor in `@resource-forge/cli`. Do **not** invent discovery, config, stdin, Resource validation, Nest/GraphQL/Prisma/workspace probing, structured diagnostics, or `run(argv, opts)`. Do **not** treat `run` as a registry command. Do **not** assert `@resource-forge/core` exports. Preserve RFC-036/037: sole public export `run`; bin stream/exit only; exit `0/1/2` meanings unchanged; tests centered on `run(['doctor'])`. Preserve RFC-036 global `--help`/`--version` handling exactly — do **not** add a doctor-specific global parser. Use the Check-failure helper contract (expected inability → FAIL + continue; unexpected implementation throw → bubble).
 
-**Status:** Draft  
-**M5:** Returned for Revision (2026-08-10) — plan blockers closed in this revision: (1) expected check FAIL vs unexpected implementation throw helper contract; (2) share/extract registry only if needed for same-object identity; (3) reuse existing package-local version source, extract only if needed; (4) remove “commit red tests” guidance; (5) docs updates conditional on inaccuracy; (6) registry-identity test; (7) `--help doctor` via existing RFC-036 globals only. Awaiting Plan Review re-entry.  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-10) — Plan Review re-entry; no plan blockers after prior return closures (expected vs unexpected check contract; minimal share/extract; registry-identity test; conditional docs; drop red-commit guidance; RFC-036 globals only for `--help doctor`). Public-export `run` only; sync core resolve; same dispatch registry object; TDD via `run(['doctor'])` retained. RFC-038 remains Accepted. M6 authorized; task checkboxes remain open until execution.  
 **Tracking:** [#128](https://github.com/rexescario-dev/resource-forge/issues/128)  
 **Source RFC:** [RFC-038 CLI Package Environment Doctor](../specs/2026-08-10-rfc-038-cli-package-environment-doctor-design.md) (**Accepted**)  
 **Depends on:** [RFC-036 CLI Foundation](../specs/2026-08-10-rfc-036-cli-foundation-design.md) (**Accepted**); [RFC-037 CLI Resource Validation](../specs/2026-08-10-rfc-037-cli-resource-validation-design.md) (**Accepted**); existing `@resource-forge/cli → @resource-forge/core` workspace dependency  
@@ -346,8 +346,8 @@ it('doctor returns exit 2 with extra positional', () => {
 | --- | --- |
 | Slice | M5.3 CLI Package Environment Doctor |
 | Tracking | [#128](https://github.com/rexescario-dev/resource-forge/issues/128) |
-| M4 | Implementation Plan: **Draft** (revised after M5 return) |
-| M5 | Pending Plan Review re-entry |
+| M4 | Implementation Plan: **Accepted** |
+| M5 | Review **Accepted** (2026-08-10) |
 | M6 | Pending |
 | M7 | Pending |
 | M8 | Pending |
@@ -355,7 +355,7 @@ it('doctor returns exit 2 with extra positional', () => {
 | M10 | Pending |
 | Branch | `feat/m5-3-cli-doctor` |
 | PR | [#130](https://github.com/rexescario-dev/resource-forge/pull/130) |
-| Status | **Draft plan** (returned once; revised) |
+| Status | **Ready for M6** |
 
 ### Shipped
 
@@ -373,8 +373,8 @@ _(fill during M6–M9)_
 
 ### Next Gate
 
-**M5 Plan Review re-entry** — Accept or Return this revised Draft. Do not begin M6 until Accepted.
+**M6 Implementation** — execute Accepted plan tasks. RFC-038 remains authoritative for product semantics.
 
 ---
 
-**Status: Draft.** Authoritative for M5.3 sequencing once Accepted at M5. RFC-038 remains authoritative for product semantics.
+**Status: Accepted.** Authoritative for M5.3 sequencing/execution. RFC-038 remains authoritative for product semantics. M6 authorized for `#128`.
