@@ -369,7 +369,7 @@ it('returns exit 2 when path is missing', () => {
 | M9 | **Complete** (package README + root README CLI role + roadmap M5.2) |
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-2-cli-resource-validation` |
-| PR | TBD (delivery) |
+| PR | [#126](https://github.com/rexescario-dev/resource-forge/pull/126) |
 | Status | **Ready for merge** |
 
 ### Shipped
