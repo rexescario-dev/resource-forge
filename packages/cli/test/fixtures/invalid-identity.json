@@ -1,0 +1,10 @@
+{
+  "identity": { "namespace": "CRM", "name": "Customer" },
+  "schema": {
+    "fields": [],
+    "relations": [],
+    "operations": [],
+    "constraints": []
+  },
+  "annotations": []
+}

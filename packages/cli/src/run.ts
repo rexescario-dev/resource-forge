@@ -1,3 +1,5 @@
+import { runValidate } from './commands/validate.js';
+
 /**
  * Package-local CLI version corresponding to `@resource-forge/cli`.
  * Keep in sync with package.json `version` (no filesystem discovery at runtime).
@@ -10,18 +12,23 @@ export type RunResult = {
   stderr: string;
 };
 
-/** Internal empty command registry (non-public extension seam). */
-const COMMAND_REGISTRY = new Set<string>();
+type CommandHandler = (argvAfterCommand: readonly string[]) => RunResult;
+
+/** Internal command registry (non-public). */
+const COMMAND_REGISTRY = new Map<string, CommandHandler>([
+  ['validate', runValidate],
+]);
 
 const HELP_TEXT = `Usage: rf [options] [command]
 
-Resource Forge CLI (shell foundation).
+Resource Forge CLI.
 
 Options:
   --help     Show help
   --version  Show version
 
-No product commands are registered in this release.
+Commands:
+  validate <file>  Validate a JSON Resource document
 `;
 
 function helpResult(): RunResult {
@@ -55,7 +62,7 @@ function unexpectedFailure(cause: unknown): RunResult {
 }
 
 /**
- * Pure CLI runner. `argv` excludes Node executable and script path.
+ * CLI runner. `argv` excludes Node executable and script path.
  * Does not write process streams or terminate the process.
  */
 export function run(argv: readonly string[]): RunResult {
@@ -70,6 +77,7 @@ function runUnchecked(argv: readonly string[]): RunResult {
   let help = false;
   let version = false;
   let command: string | undefined;
+  let commandIndex = -1;
 
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i]!;
@@ -87,18 +95,30 @@ function runUnchecked(argv: readonly string[]): RunResult {
     }
 
     command = token;
-    // Remaining tokens ignored for M5.1; empty registry ⇒ unknown command.
+    commandIndex = i;
     break;
   }
 
-  if (command !== undefined && !COMMAND_REGISTRY.has(command)) {
+  if (command === undefined) {
+    if (help || !version) {
+      return helpResult();
+    }
+    return versionResult();
+  }
+
+  const handler = COMMAND_REGISTRY.get(command);
+  if (handler === undefined) {
     return unknownCommand(command);
   }
 
-  if (help || (!help && !version)) {
-    // Bare `rf` and `--help` (including `--help --version`).
+  // Preserve RFC-036 global --help / --version when those builtins apply.
+  if (help) {
     return helpResult();
   }
+  if (version) {
+    return versionResult();
+  }
 
-  return versionResult();
+  const rest = argv.slice(commandIndex + 1);
+  return handler(rest);
 }
