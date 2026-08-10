@@ -513,7 +513,7 @@ Assert delivery diff does not touch `packages/core/**`. Assert `package.json` ha
 | M8 | **N/A** (no broad refactor pass required) |
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-3-prisma-correspondence` |
-| PR | _(link after open)_ |
+| PR | [#113](https://github.com/rexescario-dev/resource-forge/pull/113) |
 | Status | **Ready for merge** |
 
 ### Shipped
