@@ -32,4 +32,9 @@ describe('@resource-forge/prisma', () => {
     const mod = await import('./index.js');
     expect(typeof mod.createPrismaResourceBinding).toBe('function');
   });
+
+  it('exports synthesizeResourcesFromDmmf', async () => {
+    const mod = await import('./index.js');
+    expect(typeof mod.synthesizeResourcesFromDmmf).toBe('function');
+  });
 });

@@ -47,3 +47,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-038 — CLI Package Environment Doctor](2026-08-10-rfc-038-cli-package-environment-doctor-design.md) | Accepted — [#128](https://github.com/rexescario-dev/resource-forge/issues/128) |
 | [RFC-039 — CLI Generate Resource](2026-08-10-rfc-039-cli-generate-resource-design.md) | Accepted — [#132](https://github.com/rexescario-dev/resource-forge/issues/132) |
 | [RFC-040 — CLI Init Project Marker](2026-08-10-rfc-040-cli-init-project-marker-design.md) | Accepted — [#135](https://github.com/rexescario-dev/resource-forge/issues/135) |
+| [RFC-041 — CLI Generate From-Prisma (Bootstrap)](2026-08-10-rfc-041-cli-generate-from-prisma-design.md) | Accepted — [#138](https://github.com/rexescario-dev/resource-forge/issues/138) |

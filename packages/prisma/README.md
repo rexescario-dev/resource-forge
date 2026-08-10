@@ -1,18 +1,20 @@
 # @resource-forge/prisma
 
-Prisma correspondence verification, schema realization, and thin Client
-persistence bindings for Resource Forge
+Prisma correspondence verification, schema realization, thin Client
+persistence bindings, and DMMF→Resource bootstrap synthesis for Resource Forge
 ([RFC-033](../../docs/superpowers/specs/2026-08-10-rfc-033-prisma-correspondence-verification-design.md),
 [RFC-034](../../docs/superpowers/specs/2026-08-10-rfc-034-prisma-schema-realization-design.md),
-[RFC-035](../../docs/superpowers/specs/2026-08-10-rfc-035-prisma-client-bindings-design.md)).
+[RFC-035](../../docs/superpowers/specs/2026-08-10-rfc-035-prisma-client-bindings-design.md),
+[RFC-041](../../docs/superpowers/specs/2026-08-10-rfc-041-cli-generate-from-prisma-design.md)).
 
 ## Purpose
 
 1. **Verify** that validated core `Resource` values correspond to an existing Prisma DMMF-shaped document (`verifyPrismaCorrespondence`).
 2. **Emit** Prisma model semantics from a Resource unit (`emitPrismaSchema`), with a derived DMMF-shaped companion for the Emission Correspondence Invariant.
 3. **Bind** Resource-shaped scalar CRUD to an **injected** structural model delegate (`createPrismaResourceBinding`).
+4. **Bootstrap** starter Resource documents from a Supported DMMF Profile (`synthesizeResourcesFromDmmf`) — deterministic and lossy; **not** a round-trip / RFC-033 verify obligation.
 
-Emit and verify never require Prisma Client, Prisma CLI/engine, or database access. Binding also does **not** import or depend on `@prisma/client`; hosts that use a real Client install it themselves and pass e.g. `client.customer` as the delegate. Provider-specific `schema.prisma` validity is host-owned (RFC-034 §4.6).
+Emit, verify, and bootstrap never require Prisma Client, Prisma CLI/engine, or database access. Binding also does **not** import or depend on `@prisma/client`; hosts that use a real Client install it themselves and pass e.g. `client.customer` as the delegate. Provider-specific `schema.prisma` validity is host-owned (RFC-034 §4.6).
 
 ## Binding usage
 
@@ -106,20 +108,32 @@ Public verify entry: `verifyPrismaCorrespondence(resources, dmmf, mapping?) → 
 - `dmmf` must be a DMMF-shaped document (`datamodel.models[]`).
 - Optional `mapping` overrides Prisma schema-level model/field/relation names.
 
+## Bootstrap usage
+
+```ts
+import { synthesizeResourcesFromDmmf } from '@resource-forge/prisma';
+
+const result = synthesizeResourcesFromDmmf({ dmmf, namespace: 'crm' });
+// { emissions: [{ modelName, filename, resource }], refusals: [...] }
+```
+
+CLI thin adapter: `rf generate from-prisma <dmmfPath> <outDir> --namespace <namespace>`. Bootstrap is lossy and does **not** imply RFC-033 correspondence.
+
 ## Direction
 
 ```text
 Resource (authoritative) → Prisma models / DMMF-shaped evidence / delegate calls (realized / observed)
+DMMF (Supported Profile) → starter Resource JSON (bootstrap aid; not round-trip)
 ```
 
-Prisma → Resource generation remains out of scope.
+`schema.prisma` parsing and reverse generation beyond this bootstrap remain out of scope until separately Accepted.
 
 ## Dependency rules
 
 - May depend on `@resource-forge/core`
 - Must **not** depend on `@resource-forge/nest` or `@resource-forge/graphql`
-- Must **not** import/require Prisma Client, Prisma CLI/engine, or database access for emit, verify, or binding
-- Emit/verify-only consumers do **not** need `@prisma/client` installed
+- Must **not** import/require Prisma Client, Prisma CLI/engine, or database access for emit, verify, binding, or bootstrap
+- Emit/verify/bootstrap-only consumers do **not** need `@prisma/client` installed
 - Real Prisma hosts install `@prisma/client` themselves and inject model delegates
 
 ## Status
@@ -127,3 +141,4 @@ Prisma → Resource generation remains out of scope.
 - M4.3.1 verification: Accepted RFC-033 / [#112](https://github.com/rexescario-dev/resource-forge/issues/112)
 - M4.3.2 schema realization: Accepted RFC-034 / [#115](https://github.com/rexescario-dev/resource-forge/issues/115)
 - M4.3.3 Client persistence bindings: Accepted RFC-035 / [#118](https://github.com/rexescario-dev/resource-forge/issues/118)
+- M5.6 DMMF→Resource bootstrap: Accepted RFC-041 / [#138](https://github.com/rexescario-dev/resource-forge/issues/138)

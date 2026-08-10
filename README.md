@@ -39,7 +39,7 @@ See [docs/architecture.md](docs/architecture.md).
 | `@resource-forge/nest` | NestJS integration (future) |
 | `@resource-forge/graphql` | GraphQL transport (future) |
 | `@resource-forge/prisma` | Prisma adapter (future) |
-| `@resource-forge/cli` | CLI foundation (`rf` / `run`) + `validate` + `doctor` + `generate resource` + `init` |
+| `@resource-forge/cli` | CLI foundation (`rf` / `run`) + `validate` + `doctor` + `generate resource` + `generate from-prisma` + `init` |
 
 ## Roadmap summary
 
