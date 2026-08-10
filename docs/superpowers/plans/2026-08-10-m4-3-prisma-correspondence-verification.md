@@ -514,7 +514,7 @@ Assert delivery diff does not touch `packages/core/**`. Assert `package.json` ha
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-3-prisma-correspondence` |
 | PR | [#113](https://github.com/rexescario-dev/resource-forge/pull/113) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -522,7 +522,7 @@ Assert delivery diff does not touch `packages/core/**`. Assert `package.json` ha
 - DMMF-in normalize → internal `ConsumedModelGraph`; bare graph input rejected as `unusable_dmmf`
 - Host mapping + identity-preserving defaults; Field∪Relation injectivity
 - Field allow-lists + nullable-only; Relation in-unit closure, multiplicity, join owner-side ordered from/to
-- Vitest coverage (33 tests)
+- Vitest coverage for success + fail-closed matrix (33 tests)
 - Docs: prisma README + roadmap M4.3.1 ✅; RFC-033 Accepted indexed
 
 ### Validation
@@ -531,13 +531,13 @@ Assert delivery diff does not touch `packages/core/**`. Assert `package.json` ha
 | --- | --- |
 | Tests | **Passed** (`pnpm --filter @resource-forge/prisma test` — 33) |
 | Typecheck | **Passed** (`pnpm --filter @resource-forge/prisma typecheck`) |
-| Lint | **Passed** (`pnpm --filter @resource-forge/prisma lint`) |
+| Lint | **Passed** (`pnpm --filter @resource-forge/prisma lint`; CI green on #113) |
 | Build | **Skipped** (typecheck covers compile of src) |
-| Package validation | **Passed** (`packages/core` delivery diff empty; no nest/graphql/client deps) |
+| Package validation | **Passed** (`packages/core` delivery diff empty; no nest/graphql/client deps; CI green) |
 
 ### Next Gate
 
-**None — slice complete pending merge.** M4.3.2/M4.3.3 only when explicitly started.
+**None — slice complete.** [#113](https://github.com/rexescario-dev/resource-forge/pull/113) merged; [#112](https://github.com/rexescario-dev/resource-forge/issues/112) closed. M4.3.2 schema realization / M4.3.3 Client bindings only when explicitly started.
 
 ### M7 Code Review (record)
 
@@ -561,4 +561,4 @@ Rationale: Implements RFC-033 fail-closed DMMF correspondence verification withi
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M4.3.1 sequencing/execution history. RFC-033 remains authoritative for product semantics. Delivery via tracking [#112](https://github.com/rexescario-dev/resource-forge/issues/112).
+**Status: Accepted.** Authoritative for M4.3.1 sequencing/execution history. RFC-033 remains authoritative for product semantics. Delivery complete via [#113](https://github.com/rexescario-dev/resource-forge/pull/113).
