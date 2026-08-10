@@ -378,7 +378,7 @@ Pipeline (planning aid): profile OK → index complete model set → classify re
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-6-cli-generate-from-prisma` |
 | PR | [#139](https://github.com/rexescario-dev/resource-forge/pull/139) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -395,7 +395,7 @@ Pipeline (planning aid): profile OK → index complete model set → classify re
 | `pnpm --filter @resource-forge/prisma test` | **PASS** (99 tests incl. 18 bootstrap; tinypool teardown noise ignored) |
 | `pnpm --filter @resource-forge/cli test` | **PASS** (69 tests; tinypool teardown noise ignored) |
 | typecheck / lint / build (prisma + cli) | **PASS** |
-| CI | pending on PR |
+| CI | **Passed** on [#139](https://github.com/rexescario-dev/resource-forge/pull/139) |
 | Public CLI export `run` only | **PASS** |
 | Doctor registry still `validate` + `doctor` | **PASS** |
 | Profile API errors vs model refusals | **PASS** |
@@ -404,8 +404,8 @@ Pipeline (planning aid): profile OK → index complete model set → classify re
 
 ### Next Gate
 
-**Merge** — delivery PR for `#138`, then SCR closeout to **Slice complete**.
+**None — slice complete.** Delivery merged via [#139](https://github.com/rexescario-dev/resource-forge/pull/139).
 
 ---
 
-**Status: Accepted.** Authoritative for M5.6 sequencing/execution. RFC-041 remains authoritative for product semantics.
+**Status: Accepted.** Authoritative for M5.6 sequencing/execution history. RFC-041 remains authoritative for product semantics. Delivery complete via [#139](https://github.com/rexescario-dev/resource-forge/pull/139).
