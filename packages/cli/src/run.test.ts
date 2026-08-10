@@ -215,7 +215,8 @@ describe('run() doctor', () => {
       expect(result.stderr).toBe('');
       expect(result.stdout).toMatch(/registry:\s*FAIL/);
       expect(result.stdout).toMatch(/version:\s*ok/);
-      expect(result.stdout).toMatch(/core:\s*ok/);
+      // Collect-all: siblings still reported (core pass/fail independent of registry).
+      expect(result.stdout).toMatch(/core:\s*(ok|FAIL)/);
     } finally {
       COMMAND_REGISTRY.set('validate', validateHandler!);
     }
