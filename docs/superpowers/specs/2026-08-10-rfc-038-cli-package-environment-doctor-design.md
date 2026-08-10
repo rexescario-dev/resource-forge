@@ -114,7 +114,7 @@ This RFC does not define:
 ### 3.1 Package boundary
 
 1. Product surface for this slice remains `@resource-forge/cli`.
-2. The package MAY continue to depend on `@resource-forge/core` (already allowed by RFC-037). Doctor’s core check is resolvability of that direct dependency.
+2. `@resource-forge/cli` continues to depend on `@resource-forge/core` as established by RFC-037. Doctor’s core check is resolvability of that direct dependency.
 3. The package MUST NOT depend on `@resource-forge/nest`, `@resource-forge/graphql`, or `@resource-forge/prisma` for M5.3 doctor.
 4. Doctor MUST NOT probe Nest/GraphQL/Prisma packages or enumerate workspace packages.
 
@@ -146,7 +146,7 @@ This RFC does not define:
 
 ## 5. Health checks
 
-After a well-formed `doctor` invocation, M5.3 MUST run **all** of the following checks (**collect-all**), each **isolated** so a failure in one does not prevent the others from producing a pass/fail result:
+After a well-formed `doctor` invocation, M5.3 MUST run **all** of the following checks (**collect-all**). Each check is **isolated**: it MUST convert an expected inability to establish its condition into a check failure; such a failure MUST NOT abort sibling checks. An unavailable version or failed dynamic import is an expected check failure (`FAIL`). An unexpected programming/runtime exception outside those expected inability paths remains the §6 unexpected internal failure (stderr / exit `1`), not a silent early abort of the collect-all report.
 
 ### 5.1 Version
 
@@ -156,9 +156,11 @@ After a well-formed `doctor` invocation, M5.3 MUST run **all** of the following 
 
 ### 5.2 Registry
 
-1. The internal command registry MUST contain handlers for `validate` and `doctor`.
-2. Absence of either → check **fail**.
-3. Doctor MUST NOT require `run` to appear in the command registry (`run` is the public TypeScript API, not an argv command).
+1. The registry check MUST inspect the **same** internal command registry used by CLI dispatch (not a second “expected commands” list maintained solely for doctor).
+2. That dispatch registry MUST contain handlers for `validate` and `doctor`.
+3. Absence of either → check **fail**.
+4. Doctor MUST NOT require `run` to appear in the command registry (`run` is the public TypeScript API, not an argv command).
+5. Reaching the doctor handler already proves `doctor` is registered for this invocation; the meaningful registry assertion is that the **dispatch** registry still contains both expected command surfaces—especially the pre-existing `validate`.
 
 ### 5.3 Core resolvability
 
@@ -188,14 +190,17 @@ Normative meaning for scripts:
 2. **Exit `1`** — either (a) well-formed doctor with one or more expected health-check failures (report on stdout), or (b) unexpected internal failure (message on stderr). Distinguishing (a) vs (b) is by stream/report shape, not a fourth exit code.
 3. **Exit `2`** — usage failure for `doctor`, or unchanged RFC-036 usage/unknown-command cases.
 
+The normal three-check report contract applies to well-formed invocations whose check execution completes. An unexpected internal failure follows RFC-036’s stderr error path and is **not** required to produce the normal health report.
+
 No structured/JSON diagnostic output in M5.3.
 
 ## 7. Output contract
 
-1. For well-formed doctor invocations, stdout MUST carry a human-readable report covering all three normative checks.
+1. For well-formed doctor invocations whose check execution completes, stdout MUST carry a human-readable report covering all three normative checks.
 2. Check **identities/labels** and pass/fail **statuses** MUST be deterministic and stable enough for tests.
 3. Exact prose wording is non-normative.
 4. Tests SHOULD assert labels/statuses, exit codes, and stream placement—not brittle full-output snapshots.
+5. Unexpected internal failures are governed by §6 (stderr); they are not required to satisfy the three-check stdout report requirement.
 
 ## 8. Testing contract
 
