@@ -396,7 +396,7 @@ it('returns exit 2 for resources-only half-init', () => {
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-5-cli-init-project-marker` |
 | PR | [#136](https://github.com/rexescario-dev/resource-forge/pull/136) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -420,8 +420,8 @@ it('returns exit 2 for resources-only half-init', () => {
 
 ### Next Gate
 
-**Merge delivery PR** for `#135`, then mark SCR **Slice complete** on closeout if required.
+**None — slice complete.** Delivery merged via [#136](https://github.com/rexescario-dev/resource-forge/pull/136).
 
 ---
 
-**Status: Accepted.** Authoritative for M5.5 sequencing/execution. RFC-040 remains authoritative for product semantics. Delivery in progress on `feat/m5-5-cli-init-project-marker`.
+**Status: Accepted.** Authoritative for M5.5 sequencing/execution history. RFC-040 remains authoritative for product semantics. Delivery complete via [#136](https://github.com/rexescario-dev/resource-forge/pull/136).
