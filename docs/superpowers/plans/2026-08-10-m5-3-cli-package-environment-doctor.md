@@ -355,7 +355,7 @@ it('doctor returns exit 2 with extra positional', () => {
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-3-cli-doctor` |
 | PR | [#130](https://github.com/rexescario-dev/resource-forge/pull/130) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -371,14 +371,14 @@ it('doctor returns exit 2 with extra positional', () => {
 | --- | --- |
 | `pnpm --filter @resource-forge/cli test` | **PASS** (28 tests: 24 run + 4 document; tinypool teardown noise only) |
 | typecheck / lint / build | **PASS** |
-| CI | Pending on delivery PR |
+| CI | **Passed** on [#130](https://github.com/rexescario-dev/resource-forge/pull/130) |
 | Public export `run` only | **PASS** |
 | Sole RF workspace dep `core` | **PASS** |
 
 ### Next Gate
 
-**Merge** — then SCR Status **Slice complete** on closeout commit if required by convention.
+**None — slice complete.** Delivery merged via [#130](https://github.com/rexescario-dev/resource-forge/pull/130).
 
 ---
 
-**Status: Accepted.** Authoritative for M5.3 sequencing/execution history. RFC-038 remains authoritative for product semantics. Delivery ready for merge via tracking [#128](https://github.com/rexescario-dev/resource-forge/issues/128).
+**Status: Accepted.** Authoritative for M5.3 sequencing/execution history. RFC-038 remains authoritative for product semantics. Delivery complete via [#130](https://github.com/rexescario-dev/resource-forge/pull/130).
