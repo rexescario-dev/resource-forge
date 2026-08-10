@@ -164,7 +164,7 @@ Only after the core model is stable. Each adapter depends only on `@resource-for
 
 1. **M4.1 Nest** — host the framework; discovery; DI; module registration (RFC-031) ✅ — [#106](https://github.com/rexescario-dev/resource-forge/issues/106)
 2. **M4.2 GraphQL** — translate resource model into GraphQL; schema and resolver generation (RFC-032) ✅ — [#109](https://github.com/rexescario-dev/resource-forge/issues/109)
-3. **M4.3 Prisma** — Resource→Prisma correspondence verification (M4.3.1 / RFC-033) ✅ — [#112](https://github.com/rexescario-dev/resource-forge/issues/112); schema realization (M4.3.2) and Client bindings (M4.3.3) remain follow-ons
+3. **M4.3 Prisma** — Resource→Prisma correspondence verification (M4.3.1 / RFC-033) ✅ — [#112](https://github.com/rexescario-dev/resource-forge/issues/112); schema realization (M4.3.2 / RFC-034) ✅ — [#115](https://github.com/rexescario-dev/resource-forge/issues/115); Client bindings (M4.3.3) remain a follow-on
 
 Integrations remain independent of each other. Do not expand RFC-028 into Prisma/ORM realization under M4.1.
 
