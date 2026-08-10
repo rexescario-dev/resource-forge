@@ -355,7 +355,7 @@ it('returns exit 2 for unknown kind', () => {
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-4-cli-generate-resource` |
 | PR | [#133](https://github.com/rexescario-dev/resource-forge/pull/133) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -373,7 +373,7 @@ it('returns exit 2 for unknown kind', () => {
 | --- | --- |
 | `pnpm --filter @resource-forge/cli test` | **PASS** (42 tests: 38 run + 4 document) |
 | typecheck / lint / build | **PASS** |
-| CI | Pending (delivery PR) |
+| CI | **Passed** on [#133](https://github.com/rexescario-dev/resource-forge/pull/133) |
 | Public export `run` only | **PASS** |
 | Sole RF workspace dep `core` | **PASS** |
 | Validate round-trip on generated file | **PASS** |
@@ -381,8 +381,8 @@ it('returns exit 2 for unknown kind', () => {
 
 ### Next Gate
 
-**Merge delivery PR** for `#132`, then SCR Slice complete closeout. RFC-039 remains authoritative for product semantics.
+**None — slice complete.** Delivery merged via [#133](https://github.com/rexescario-dev/resource-forge/pull/133).
 
 ---
 
-**Status: Accepted.** Authoritative for M5.4 sequencing/execution history. RFC-039 remains authoritative for product semantics. Delivery pending merge.
+**Status: Accepted.** Authoritative for M5.4 sequencing/execution history. RFC-039 remains authoritative for product semantics. Delivery complete via [#133](https://github.com/rexescario-dev/resource-forge/pull/133).
