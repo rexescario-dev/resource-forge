@@ -354,7 +354,7 @@ it('returns exit 2 for unknown kind', () => {
 | M9 | **Complete** (package README + root README CLI role + roadmap M5.4) |
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-4-cli-generate-resource` |
-| PR | TBD (delivery) |
+| PR | [#133](https://github.com/rexescario-dev/resource-forge/pull/133) |
 | Status | **Ready for merge** |
 
 ### Shipped
