@@ -12,6 +12,16 @@ const packageJson = JSON.parse(
   ),
 ) as { version: string; dependencies?: Record<string, string> };
 
+const fixturesDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../test/fixtures',
+);
+const validMinimalPath = join(fixturesDir, 'valid-minimal.json');
+const invalidIdentityPath = join(fixturesDir, 'invalid-identity.json');
+const invalidJsonPath = join(fixturesDir, 'invalid-json.txt');
+const nonObjectArrayPath = join(fixturesDir, 'non-object-array.json');
+const missingPath = join(fixturesDir, 'does-not-exist.json');
+
 describe('run()', () => {
   it('prints help for bare argv', () => {
     const result = run([]);
@@ -64,8 +74,74 @@ describe('run()', () => {
     expect(result.exitCode).toBe(2);
     expect(result.stdout).toBe('');
     expect(result.stderr.length).toBeGreaterThan(0);
-    expect(result.stderr.toLowerCase()).toMatch(/unknown option|unsupported|invalid/);
+    expect(result.stderr.toLowerCase()).toMatch(
+      /unknown option|unsupported|invalid/,
+    );
     expect(result.stderr.toLowerCase()).not.toMatch(/unknown command/);
+  });
+});
+
+describe('run() validate', () => {
+  it('validates a minimal Resource file', () => {
+    const result = run(['validate', validMinimalPath]);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+  });
+
+  it('returns exit 1 for semantically invalid Resource JSON', () => {
+    const result = run(['validate', invalidIdentityPath]);
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 when path is missing', () => {
+    const result = run(['validate']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for extra positional arguments', () => {
+    const result = run(['validate', validMinimalPath, 'extra.json']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for missing file', () => {
+    const result = run(['validate', missingPath]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for invalid JSON', () => {
+    const result = run(['validate', invalidJsonPath]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for non-object JSON', () => {
+    const result = run(['validate', nonObjectArrayPath]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for undefined post-command options', () => {
+    const result = run(['validate', '--flag']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('preserves global --help when followed by validate', () => {
+    const result = run(['--help', 'validate']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toMatch(/--help/);
   });
 });
 
@@ -76,12 +152,13 @@ describe('public package surface', () => {
     expect(cli).not.toHaveProperty('PACKAGE_NAME');
     expect(cli).not.toHaveProperty('PACKAGE_VERSION');
     expect(cli).not.toHaveProperty('CommandRegistry');
+    expect(cli).not.toHaveProperty('validateResourceDocument');
   });
 
-  it('has no @resource-forge/* dependencies', () => {
+  it('depends only on @resource-forge/core among workspace packages', () => {
     const deps = Object.keys(packageJson.dependencies ?? {});
-    expect(deps.filter((name) => name.startsWith('@resource-forge/'))).toEqual(
-      [],
-    );
+    expect(deps.filter((name) => name.startsWith('@resource-forge/'))).toEqual([
+      '@resource-forge/core',
+    ]);
   });
 });

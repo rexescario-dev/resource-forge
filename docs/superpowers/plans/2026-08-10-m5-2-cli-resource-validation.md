@@ -225,20 +225,20 @@ Invalid semantic fixture: same shape with `"namespace": "CRM"` (invalid identity
 - Create: `packages/cli/test/fixtures/non-object-array.json` (`[]`)
 - Modify: `pnpm-lock.yaml` (core workspace edge only)
 
-- [ ] **Step 1:** Add `"dependencies": { "@resource-forge/core": "workspace:*" }` to `packages/cli/package.json`. Keep description accurate (CLI foundation + resource validation command).
-- [ ] **Step 2:** Run `pnpm install` and commit **only** the lockfile delta for that workspace edge.
-- [ ] **Step 3:** Write the four fixtures above (valid / invalid-identity / invalid-json / non-object-array).
-- [ ] **Step 4:** Update README: document `rf validate <file>`, CLI vs `run` API, core delegation, and out-of-scope (`doctor`, discovery, stdin). No aspirational command tables.
+- [x] **Step 1:** Add `"dependencies": { "@resource-forge/core": "workspace:*" }` to `packages/cli/package.json`. Keep description accurate (CLI foundation + resource validation command).
+- [x] **Step 2:** Run `pnpm install` and commit **only** the lockfile delta for that workspace edge.
+- [x] **Step 3:** Write the four fixtures above (valid / invalid-identity / invalid-json / non-object-array).
+- [x] **Step 4:** Update README: document `rf validate <file>`, CLI vs `run` API, core delegation, and out-of-scope (`doctor`, discovery, stdin). No aspirational command tables.
 
 ### Task 2: Failing `run(['validate', …])` tests (TDD)
 
 **Files:**
 - Modify: `packages/cli/src/run.test.ts`
 
-- [ ] **Step 1:** Add fixture path helpers (resolve via `import.meta.url` to `../test/fixtures/...`).
-- [ ] **Step 2:** Write failing tests for success, semantic failure, missing path, extra positional, missing file, invalid JSON, non-object JSON, post-command option, and update the dependency assertion to allow **only** `@resource-forge/core`.
-- [ ] **Step 3:** Run `pnpm --filter @resource-forge/cli test` — expect new validate cases to **FAIL** (unknown command or missing behavior) while RFC-036 cases still pass.
-- [ ] **Step 4:** Commit the failing tests + fixtures (red) if the branch workflow prefers red commits; otherwise keep with implementation commit in Task 5.
+- [x] **Step 1:** Add fixture path helpers (resolve via `import.meta.url` to `../test/fixtures/...`).
+- [x] **Step 2:** Write failing tests for success, semantic failure, missing path, extra positional, missing file, invalid JSON, non-object JSON, post-command option, and update the dependency assertion to allow **only** `@resource-forge/core`.
+- [x] **Step 3:** Run `pnpm --filter @resource-forge/cli test` — expect new validate cases to **FAIL** (unknown command or missing behavior) while RFC-036 cases still pass.
+- [x] **Step 4:** Commit the failing tests + fixtures (red) if the branch workflow prefers red commits; otherwise keep with implementation commit in Task 5.
 
 Example assertions (informative):
 
@@ -270,23 +270,23 @@ it('returns exit 2 when path is missing', () => {
 - Create: `packages/cli/src/validate-document.ts`
 - Create: `packages/cli/src/validate-document.test.ts` (optional but recommended)
 
-- [ ] **Step 1:** Write failing unit tests for: valid JSON object → ok; invalid identity object → semantic; malformed JSON → input_decode; `[]` / `null` / `"x"` → input_decode.
-- [ ] **Step 2:** Implement pure `validateResourceDocument(jsonText)`:
+- [x] **Step 1:** Write failing unit tests for: valid JSON object → ok; invalid identity object → semantic; malformed JSON → input_decode; `[]` / `null` / `"x"` → input_decode.
+- [x] **Step 2:** Implement pure `validateResourceDocument(jsonText)`:
   - `JSON.parse` in try/catch → input_decode on throw
   - reject values that are not plain JSON objects suitable to pass as a Resource candidate (arrays / `null` / primitives → input_decode). The object guard is **only** a JSON-shape guard for input/decode classification.
   - Call `validateResource` using its **existing** Accepted core input type/signature (the `{ identity, schema, annotations }` candidate shape). Do **not** introduce a new core-facing type, and do **not** use an unsafe cast merely to bypass the core contract or invent a CLI-only validation assertion.
   - Map `err` → semantic with a short message (exact wording non-normative; distinguishable from input_decode)
   - Map `ok` → `{ ok: true }`
-- [ ] **Step 3:** Ensure the module does **not** import `node:fs` and is **not** exported from `index.ts`.
-- [ ] **Step 4:** Run document tests — PASS.
+- [x] **Step 3:** Ensure the module does **not** import `node:fs` and is **not** exported from `index.ts`.
+- [x] **Step 4:** Run document tests — PASS.
 
 ### Task 4: Command-local file reader
 
 **Files:**
 - Create: `packages/cli/src/read-explicit-file.ts`
 
-- [ ] **Step 1:** Implement a tiny helper, e.g. `readExplicitFile(path: string): { ok: true; text: string } | { ok: false; message: string }` using `readFileSync` (utf8) and mapping thrown errors to `ok: false`.
-- [ ] **Step 2:** Do **not** export from `index.ts`. Do **not** scan directories or resolve globs.
+- [x] **Step 1:** Implement a tiny helper, e.g. `readExplicitFile(path: string): { ok: true; text: string } | { ok: false; message: string }` using `readFileSync` (utf8) and mapping thrown errors to `ok: false`.
+- [x] **Step 2:** Do **not** export from `index.ts`. Do **not** scan directories or resolve globs.
 
 ### Task 5: Validate handler + registry dispatch in `run`
 
@@ -295,22 +295,22 @@ it('returns exit 2 when path is missing', () => {
 - Modify: `packages/cli/src/run.ts`
 - Modify: `packages/cli/src/run.test.ts` (green the Task 2 cases)
 
-- [ ] **Step 1:** Implement `runValidate(argvAfterCommand: readonly string[]): RunResult`:
+- [x] **Step 1:** Implement `runValidate(argvAfterCommand: readonly string[]): RunResult`:
   - If first token missing → exit `2` usage
   - If any token after the first path starts with `-` → exit `2` (undefined option)
   - If more than one positional → exit `2`
   - `readExplicitFile(path)`; on failure → exit `2`
   - `validateResourceDocument(text)`; map outcome → exit `0` / `1` / `2` with stderr; success stdout `''`
-- [ ] **Step 2:** Change `runUnchecked` parsing:
+- [x] **Step 2:** Change `runUnchecked` parsing:
   - Collect global `--help` / `--version` / invalid globals as today **until** the first non-option token (command), preserving RFC-036 grammar `rf [global-options] [command]`.
   - **Preserve RFC-036's established handling of global `--help` / `--version` exactly.** Do not invent plan-level precedence for cases like `['--help', 'validate']`. Only once RFC-036's global-option handling has identified `validate` as the command to run should remaining argv be passed to the validate handler.
   - If command unknown → unknown-command exit `2` (RFC-036).
   - If command is `validate` **and** global-option handling has selected command dispatch (not a builtin help/version outcome) → pass **remaining** argv after the command token to `runValidate`. Preserve the Accepted RFC-037 command-dispatch rule (RFC-037 §3.5): do not fall through to root help **merely** because a registered command token is present (e.g. `['validate', path]` must invoke validate, not root help).
   - If no command: preserve RFC-036 help/version behavior (`help || !version` → help; else version).
-- [ ] **Step 3:** Register `validate` in the internal registry (private map/set + dispatch).
-- [ ] **Step 4:** Update root help text so it **MAY** list `validate` (informative); remove “No product commands are registered” if no longer true.
-- [ ] **Step 5:** Run `pnpm --filter @resource-forge/cli test` — all PASS.
-- [ ] **Step 6:** Confirm `index.ts` still exports only `run`.
+- [x] **Step 3:** Register `validate` in the internal registry (private map/set + dispatch).
+- [x] **Step 4:** Update root help text so it **MAY** list `validate` (informative); remove “No product commands are registered” if no longer true.
+- [x] **Step 5:** Run `pnpm --filter @resource-forge/cli test` — all PASS.
+- [x] **Step 6:** Confirm `index.ts` still exports only `run`.
 
 ### Task 6: Docs / validation closeout
 
@@ -319,10 +319,10 @@ it('returns exit 2 when path is missing', () => {
 - Modify: this plan’s SCR section during M7–M10
 - Modify: `packages/cli/README.md` if any drift
 
-- [ ] **Step 1:** Update roadmap M5.2 line to reference plan / `#124` at the appropriate lifecycle point (Draft → Accepted plan → ✅ after merge).
-- [ ] **Step 2:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout per repo convention.
-- [ ] **Step 3:** Run final `pnpm --filter @resource-forge/cli test typecheck lint build`.
-- [ ] **Step 4:** Record in SCR that public export remains `run` only; sole RF workspace dep is `core`; no bin pre-read.
+- [x] **Step 1:** Update roadmap M5.2 line to reference plan / `#124` at the appropriate lifecycle point (Draft → Accepted plan → ✅ after merge).
+- [x] **Step 2:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout per repo convention.
+- [x] **Step 3:** Run final `pnpm --filter @resource-forge/cli test typecheck lint build`.
+- [x] **Step 4:** Record in SCR that public export remains `run` only; sole RF workspace dep is `core`; no bin pre-read.
 
 ---
 
@@ -363,29 +363,107 @@ it('returns exit 2 when path is missing', () => {
 | Tracking | [#124](https://github.com/rexescario-dev/resource-forge/issues/124) |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** (2026-08-10) |
-| M6 | **Authorized — not started** |
-| M7 | **TBD** |
-| M8 | **TBD** |
-| M9 | **TBD** |
-| Branch | `docs/rfc-037-cli-resource-validation-accept` (fold into delivery PR for `#124`) |
-| PR | [#125](https://github.com/rexescario-dev/resource-forge/pull/125) (docs/plan; delivery PR TBD) |
-| Status | **Ready for M6** |
+| M6 | **Complete** |
+| M7 | **Approved** (2026-08-10) |
+| M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
+| M9 | **Complete** (package README + root README CLI role + roadmap M5.2) |
+| M10 | **Accepted** (slice process path; workflow library assets unmodified) |
+| Branch | `feat/m5-2-cli-resource-validation` |
+| PR | TBD (delivery) |
+| Status | **Ready for merge** |
+
+### Shipped
+
+- Registered `validate` command: `rf validate <file>` / `run(['validate', path])`
+- Command-local explicit-path read (bin unchanged; no `run` FS DI)
+- Internal pure `validateResourceDocument` → `@resource-forge/core` `validateResource`
+- Exit `0` / `1` / `2` mapping per RFC-037; RFC-036 global `--help`/`--version` preserved
+- `@resource-forge/cli` depends on `@resource-forge/core` only among workspace packages
+- Public export remains `run` only
 
 ### Validation
 
 | Check | Result |
 | --- | --- |
-| Plan executability | **Passed** (M5 re-entry) |
-| Spec conflict rule | **Stated** (RFC-037 wins) |
-| Prior return closures | **Verified** (no §3.5.2; RFC-036 globals; no cast bypass) |
-| Implementation | **N/A** until M6 |
+| Tests | **Passed** (`pnpm --filter @resource-forge/cli test` — 22 tests) |
+| Typecheck | **Passed** |
+| Lint | **Passed** |
+| Build | **Passed** |
+| Package validation | **Passed** (`run` only public; sole RF dep `core`; no bin pre-read) |
+| CI | Pending on delivery PR |
 
 ### Next Gate
 
-**M6 Implementation** — execute task checkboxes under the Accepted plan; RFC-037 governs product semantics.
+**Merge** — then SCR Status **Slice complete** on closeout commit if required by convention.
+
+### M7 Code Review
+
+```text
+Decision: Approved for merge
+Subject: feat/m5-2-cli-resource-validation
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-037-cli-resource-validation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md
+
+Plan tasks reviewed:
+- Task 1 package/fixtures/README: ✓
+- Task 2 run(['validate']) tests: ✓
+- Task 3 validateResourceDocument: ✓
+- Task 4 readExplicitFile: ✓
+- Task 5 handler + registry dispatch: ✓
+- Task 6 docs/SCR: ✓
+
+Verification evidence:
+- pnpm --filter @resource-forge/cli test → 22 passed
+- typecheck / lint / build → passed
+
+Review summary: Implements RFC-037 composition (run → validate handler → command-local read → pure document → validateResource); run-only public API; RFC-036 globals preserved; fences held.
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations:
+- annotationsValue as Annotations is the JSON→core boundary after Array.isArray; validateResource remains semantic authority
+
+Gate: Merge per human/project norms. M8/M9 may follow when appropriate.
+```
+
+### M8 / M9 / M10
+
+```text
+Decision: N/A
+Subject: packages/cli M5.2 validate surface
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-037-cli-resource-validation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md
+M7 / authorization: Approved for merge (2026-08-10)
+Gate: N/A — proceed to M9
+```
+
+```text
+Decision: Complete
+Subject: M5.2 / #124
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-037-cli-resource-validation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md
+M7: Approved for merge
+M8: N/A
+
+Documentation scope:
+- packages/cli/README.md
+- README.md (cli role)
+- docs/roadmap.md (M5.2 Ready for merge)
+- plan SCR
+
+Gate: Documentation complete. Code/behavior unchanged by this stage.
+```
+
+```text
+Decision: Accepted (slice process path)
+Subject: M5.2 CLI Resource Validation workflow path
+Governing specification: docs/workflows/specs/agent-workflow-design.md
+Blocking findings: None
+Non-blocking observations: Workflow library assets unmodified; product-slice path only
+Gate: Workflow path for this slice validated; library revalidation N/A
+```
 
 ---
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M5.2 sequencing/execution. RFC-037 remains authoritative for product semantics. M6 authorized for [#124](https://github.com/rexescario-dev/resource-forge/issues/124).
+**Status: Accepted.** Authoritative for M5.2 sequencing/execution history. RFC-037 remains authoritative for product semantics. Delivery ready for merge via tracking [#124](https://github.com/rexescario-dev/resource-forge/issues/124).

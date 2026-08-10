@@ -1,7 +1,7 @@
 {
   "name": "@resource-forge/cli",
   "version": "0.0.0",
-  "description": "CLI execution foundation (shell) for Resource Forge",
+  "description": "CLI foundation and Resource validation command for Resource Forge",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -24,5 +24,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --config ../../vitest.config.ts",
     "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@resource-forge/core": "workspace:*"
   }
 }
