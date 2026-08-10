@@ -456,7 +456,7 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 | M9 | **Complete** (package README + roadmap indexing) |
 | Branch | `feat/m4-2-graphql-schema-resolver` |
 | PR | [#110](https://github.com/rexescario-dev/resource-forge/pull/110) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -474,13 +474,13 @@ git diff --name-status <base>...HEAD -- packages/core   # expect empty
 | --- | --- |
 | Tests | **Passed** (`pnpm --filter @resource-forge/graphql test` — 33) |
 | Typecheck | **Passed** (`pnpm --filter @resource-forge/graphql typecheck`) |
-| Lint | **Passed** (`pnpm --filter @resource-forge/graphql lint`) |
+| Lint | **Passed** (`pnpm --filter @resource-forge/graphql lint`; CI green on #110) |
 | Build | **Skipped** (typecheck covers compile of src) |
-| Package validation | **Passed** (`packages/core` delivery diff empty; no nest/prisma deps on graphql) |
+| Package validation | **Passed** (`packages/core` delivery diff empty; no nest/prisma deps on graphql; CI green) |
 
 ### Next Gate
 
-**Merge** — [#110](https://github.com/rexescario-dev/resource-forge/pull/110) for `#109` (Accepted plan + implementation + SCR). M10 slice process path validated (M5→M6→M7→M8 N/A→M9); workflow library assets unchanged.
+**None — slice complete.** [#110](https://github.com/rexescario-dev/resource-forge/pull/110) merged; [#109](https://github.com/rexescario-dev/resource-forge/issues/109) closed. M4.3 Prisma only when explicitly started.
 
 ### M7 Code Review (record)
 
@@ -504,4 +504,4 @@ Rationale: Implements RFC-032 fail-closed paired translation within @resource-fo
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M4.2 sequencing/execution. RFC-032 remains authoritative for product semantics. M6 may begin. Prefer one pull request per tracking issue for the delivery slice.
+**Status: Accepted.** Authoritative for M4.2 sequencing/execution history. RFC-032 remains authoritative for product semantics. Delivery complete via [#110](https://github.com/rexescario-dev/resource-forge/pull/110).
