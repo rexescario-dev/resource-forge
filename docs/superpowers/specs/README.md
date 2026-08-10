@@ -44,3 +44,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-035 — Prisma Client Persistence Bindings](2026-08-10-rfc-035-prisma-client-bindings-design.md) | Accepted — [#118](https://github.com/rexescario-dev/resource-forge/issues/118) |
 | [RFC-036 — CLI Foundation](2026-08-10-rfc-036-cli-foundation-design.md) | Accepted — [#121](https://github.com/rexescario-dev/resource-forge/issues/121) |
 | [RFC-037 — CLI Resource Validation](2026-08-10-rfc-037-cli-resource-validation-design.md) | Accepted — [#124](https://github.com/rexescario-dev/resource-forge/issues/124) |
+| [RFC-038 — CLI Package Environment Doctor](2026-08-10-rfc-038-cli-package-environment-doctor-design.md) | Accepted — [#128](https://github.com/rexescario-dev/resource-forge/issues/128) |
