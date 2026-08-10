@@ -22,4 +22,9 @@ describe('@resource-forge/prisma', () => {
   it('exports verifyPrismaCorrespondence', () => {
     expect(typeof verifyPrismaCorrespondence).toBe('function');
   });
+
+  it('exports emitPrismaSchema', async () => {
+    const mod = await import('./index.js');
+    expect(typeof mod.emitPrismaSchema).toBe('function');
+  });
 });
