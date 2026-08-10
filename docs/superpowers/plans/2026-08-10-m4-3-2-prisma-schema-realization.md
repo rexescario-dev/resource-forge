@@ -305,7 +305,7 @@ Unilateral / inverse matrix (expected):
 | M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
 | M9 | **Complete** (package README + roadmap + specs index) |
 | Branch | `feat/m4-3-2-prisma-schema-realization` |
-| PR | _(filled after open)_ |
+| PR | [#116](https://github.com/rexescario-dev/resource-forge/pull/116) |
 | Status | **Ready for merge** |
 
 ### Shipped
