@@ -370,7 +370,7 @@ it('returns exit 2 when path is missing', () => {
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-2-cli-resource-validation` |
 | PR | [#126](https://github.com/rexescario-dev/resource-forge/pull/126) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -390,11 +390,11 @@ it('returns exit 2 when path is missing', () => {
 | Lint | **Passed** |
 | Build | **Passed** |
 | Package validation | **Passed** (`run` only public; sole RF dep `core`; no bin pre-read) |
-| CI | Pending on delivery PR |
+| CI | **Passed** on [#126](https://github.com/rexescario-dev/resource-forge/pull/126) |
 
 ### Next Gate
 
-**Merge** — then SCR Status **Slice complete** on closeout commit if required by convention.
+**None — slice complete.** Delivery merged via [#126](https://github.com/rexescario-dev/resource-forge/pull/126).
 
 ### M7 Code Review
 
@@ -466,4 +466,4 @@ Gate: Workflow path for this slice validated; library revalidation N/A
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M5.2 sequencing/execution history. RFC-037 remains authoritative for product semantics. Delivery ready for merge via tracking [#124](https://github.com/rexescario-dev/resource-forge/issues/124).
+**Status: Accepted.** Authoritative for M5.2 sequencing/execution history. RFC-037 remains authoritative for product semantics. Delivery complete via [#126](https://github.com/rexescario-dev/resource-forge/pull/126).
