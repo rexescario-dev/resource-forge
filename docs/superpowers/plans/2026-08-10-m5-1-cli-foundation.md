@@ -289,7 +289,7 @@ Derived only from Accepted RFC-036:
 | M8 | — |
 | M9 | Partial (package README + roadmap M5.1 indexing in this PR) |
 | Branch | `feat/m5-1-cli-foundation` |
-| PR | — |
+| PR | [#122](https://github.com/rexescario-dev/resource-forge/pull/122) |
 | Status | **Ready for M7** |
 
 ### Shipped
