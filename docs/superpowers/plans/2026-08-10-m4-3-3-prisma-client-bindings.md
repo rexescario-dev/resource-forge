@@ -334,7 +334,7 @@ Hard prerequisites: Task 1 before 2–3; Task 2 before or with 3; Task 4 after 3
 | M9 | **Complete** (package README + roadmap M4.3.3 + specs index) |
 | Branch | `feat/m4-3-3-prisma-client-bindings` |
 | PR | [#119](https://github.com/rexescario-dev/resource-forge/pull/119) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -353,17 +353,17 @@ Hard prerequisites: Task 1 before 2–3; Task 2 before or with 3; Task 4 after 3
 | Typecheck | **Passed** |
 | Lint | **Passed** |
 | Build | N/A (package typechecks; dist not required for review) |
-| Package validation | **Passed** (deps: `@resource-forge/core` only; no nest/graphql/client) |
+| Package validation | **Passed** (deps: `@resource-forge/core` only; no nest/graphql/client); CI green on [#119](https://github.com/rexescario-dev/resource-forge/pull/119) |
 
 ### Next Gate
 
-**Merge delivery PR** — then mark Status **Slice complete** / Next Gate **None** after merge (SCR closeout if needed).
+**None — slice complete.**
 
 ### M7 outcome (record)
 
 ```text
 Decision: Approved for merge
-Subject: feat/m4-3-3-prisma-client-bindings / tracking #118
+Subject: feat/m4-3-3-prisma-client-bindings / tracking #118 / PR #119
 Accepted specification: docs/superpowers/specs/2026-08-10-rfc-035-prisma-client-bindings-design.md
 Accepted plan: docs/superpowers/plans/2026-08-10-m4-3-3-prisma-client-bindings.md
 Plan tasks: 1–5 covered
@@ -381,4 +381,4 @@ Rationale: Implements RFC-035 Resource-shaped createPrismaResourceBinding within
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M4.3.3 sequencing/execution history. RFC-035 remains authoritative for product semantics. Delivery ready via tracking `#118`.
+**Status: Accepted.** Authoritative for M4.3.3 sequencing/execution history. RFC-035 remains authoritative for product semantics. Delivery complete via [#119](https://github.com/rexescario-dev/resource-forge/pull/119).
