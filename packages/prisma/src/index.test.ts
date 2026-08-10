@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CORE_DEPENDENCY, PACKAGE_NAME, PACKAGE_VERSION } from './index.js';
+import {
+  CORE_DEPENDENCY,
+  PACKAGE_NAME,
+  PACKAGE_VERSION,
+  verifyPrismaCorrespondence,
+} from './index.js';
 
 describe('@resource-forge/prisma', () => {
   it('exports its package name placeholder', () => {
@@ -12,5 +17,9 @@ describe('@resource-forge/prisma', () => {
 
   it('depends on @resource-forge/core', () => {
     expect(CORE_DEPENDENCY).toBe('@resource-forge/core');
+  });
+
+  it('exports verifyPrismaCorrespondence', () => {
+    expect(typeof verifyPrismaCorrespondence).toBe('function');
   });
 });
