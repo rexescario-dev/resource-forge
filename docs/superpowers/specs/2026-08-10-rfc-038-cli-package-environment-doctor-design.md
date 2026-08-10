@@ -1,10 +1,11 @@
 # RFC-038: CLI Package Environment Doctor
 
 **Date:** 2026-08-10  
-**Status:** Draft  
+**Status:** Accepted  
+**M3:** Accepted (2026-08-10) — Design Review; no design blockers. Locked: `rf doctor` CLI/package environment health only; zero post-command tokens; argv gate before probes; collect-all isolated checks (expected inability → check FAIL without aborting siblings); version = non-empty package-local string; registry inspects same dispatch registry for `validate` + `doctor` (`run` excluded); `@resource-forge/core` resolvability-only (no export contract); entrypoint tautology explicit; exit `0` healthy / `1` expected health fail (stdout report) or unexpected (stderr, no required three-check report) / `2` usage; no new exit codes and no reinterpretation of RFC-036/037 meanings; public API remains `run` only; no `run(argv, opts)`; no discovery/config/Resource validation/adapter or workspace probing; internal core-failure test seam only; testing centered on `run(['doctor'])`. Editorial tightenings retained (definitive core dependency; isolation boundary; dispatch-registry identity; unexpected-failure report exemption). M4 (implementation planning) authorized for `#128`.  
 **Package:** `@resource-forge/cli` (registers `doctor`; continues to depend on `@resource-forge/core` as established by RFC-037)  
 **Tracking:** [#128](https://github.com/rexescario-dev/resource-forge/issues/128)  
-**Depends on:** [RFC-036 CLI Foundation](2026-08-10-rfc-036-cli-foundation-design.md) (**Accepted**) for `rf` / `run(argv)` / exit `0/1/2` / bin adapter / internal command registry; [RFC-037 CLI Resource Validation](2026-08-10-rfc-037-cli-resource-validation-design.md) (**Accepted**) for the existing `validate` product command and the allowed `@resource-forge/cli → @resource-forge/core` dependency  
+**Depends on:** [RFC-036 CLI Foundation](2026-08-10-rfc-036-cli-foundation-design.md) (**Accepted**) for `rf` / `run(argv)` / exit `0/1/2` / bin adapter / internal command registry; [RFC-037 CLI Resource Validation](2026-08-10-rfc-037-cli-resource-validation-design.md) (**Accepted**) for the existing `validate` product command and the `@resource-forge/cli → @resource-forge/core` dependency  
 **Followed by:** M5.3 implementation planning/delivery for `#128` after Accept; later project/workspace doctor, stdin UX, generators, discovery/config, Nest/GraphQL/Prisma CLI wiring, and structured diagnostics only under separately Accepted designs  
 **Unblocks:** A deterministic `rf doctor` command that answers whether the Resource Forge CLI environment is installed and wired correctly—without inventing discovery, configuration, or Resource validation
 
