@@ -395,7 +395,7 @@ it('returns exit 2 for resources-only half-init', () => {
 | M9 | **Complete** (package README + root README CLI role + roadmap M5.5) |
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-5-cli-init-project-marker` |
-| PR | _(set on open)_ |
+| PR | [#136](https://github.com/rexescario-dev/resource-forge/pull/136) |
 | Status | **Ready for merge** |
 
 ### Shipped
