@@ -413,7 +413,7 @@ it('returns exit 2 for resources-only half-init', () => {
 | --- | --- |
 | `pnpm --filter @resource-forge/cli test` | **PASS** (61 tests: 57 run + 4 document) |
 | typecheck / lint / build | **PASS** |
-| CI | _(pending PR)_ |
+| CI | **Passed** on [#136](https://github.com/rexescario-dev/resource-forge/pull/136) |
 | Public export `run` only | **PASS** |
 | Doctor registry still `validate` + `doctor` | **PASS** |
 | Create-safety (stage+`linkSync`; non-conforming on failure; no overwrite; post-classify FS fail → 1; `link` last exit-affecting op) | **PASS** |
