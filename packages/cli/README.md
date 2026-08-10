@@ -1,30 +1,39 @@
 # @resource-forge/cli
 
-## Purpose
+CLI execution foundation for Resource Forge (M5.1 / RFC-036).
 
-Command-line interface for Resource Forge.
+## Current surface
 
-## Responsibilities
+```text
+rf
+rf --help
+rf --version
+```
 
-- Project initialization
-- Resource generation
-- Adapter-assisted generation workflows
+Unknown commands and unsupported global options produce a non-zero usage error on stderr. Semantic product commands are **not** part of this slice.
 
-## Current status
+## Package API
 
-Placeholder. No CLI commands are implemented yet.
+The sole public TypeScript export is `run(argv)`:
+
+```ts
+import { run } from '@resource-forge/cli';
+
+const result = run(['--help']);
+// { exitCode, stdout, stderr }
+```
+
+`argv` excludes the Node executable and script path. `run` does not write to process streams or terminate the process. The `rf` executable is a thin adapter around `run`.
+
+## Out of scope (this slice)
+
+- `validate` / `doctor`
+- generators (`init`, `generate`, …)
+- Nest / GraphQL / Prisma wiring
+- project config / discovery
+- examples applications
 
 ## Dependency rules
 
-- May depend on `@resource-forge/core`
-- No framework runtime dependencies in this scaffold
-
-## Future scope
-
-Planned commands (not implemented):
-
-```text
-rf init
-rf generate resource User
-rf generate from-prisma
-```
+- No `@resource-forge/*` workspace product dependencies in M5.1
+- No framework runtime dependencies
