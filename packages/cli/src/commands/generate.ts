@@ -2,6 +2,7 @@ import { createResourceIdentity, createResource } from '@resource-forge/core';
 import type { Resource } from '@resource-forge/core';
 import type { RunResult } from '../run.js';
 import { writeResourceDocument } from '../write-resource-document.js';
+import { runGenerateFromPrisma } from './generate-from-prisma.js';
 
 function usageError(message: string): RunResult {
   return { exitCode: 2, stdout: '', stderr: `${message}\n` };
@@ -27,26 +28,9 @@ function formatCoreError(error: unknown): string {
   return 'Resource construction failed';
 }
 
-/**
- * Generate handler: argv gate + FS prechecks + core construction + encode + write.
- */
-export function runGenerate(argvAfterCommand: readonly string[]): RunResult {
-  if (argvAfterCommand.length === 0) {
-    return usageError(
-      'Usage: rf generate resource <namespace> <name> <path>',
-    );
-  }
-
-  const kind = argvAfterCommand[0]!;
-  if (kind.startsWith('-')) {
-    return usageError(`Unknown option: ${kind}`);
-  }
-  if (kind !== 'resource') {
-    return usageError(`Unknown generate kind: ${kind}`);
-  }
-
-  if (argvAfterCommand.length !== 4) {
-    for (const token of argvAfterCommand.slice(1)) {
+function runGenerateResource(argvAfterKind: readonly string[]): RunResult {
+  if (argvAfterKind.length !== 3) {
+    for (const token of argvAfterKind) {
       if (token.startsWith('-')) {
         return usageError(`Unknown option: ${token}`);
       }
@@ -56,9 +40,9 @@ export function runGenerate(argvAfterCommand: readonly string[]): RunResult {
     );
   }
 
-  const namespace = argvAfterCommand[1]!;
-  const name = argvAfterCommand[2]!;
-  const path = argvAfterCommand[3]!;
+  const namespace = argvAfterKind[0]!;
+  const name = argvAfterKind[1]!;
+  const path = argvAfterKind[2]!;
 
   for (const token of [namespace, name, path]) {
     if (token.startsWith('-')) {
@@ -97,4 +81,28 @@ export function runGenerate(argvAfterCommand: readonly string[]): RunResult {
   }
 
   return { exitCode: 0, stdout: '', stderr: '' };
+}
+
+/**
+ * Generate handler: dispatches kind tokens `resource` | `from-prisma`.
+ */
+export function runGenerate(argvAfterCommand: readonly string[]): RunResult {
+  if (argvAfterCommand.length === 0) {
+    return usageError(
+      'Usage: rf generate resource <namespace> <name> <path> | rf generate from-prisma <dmmfPath> <outDir> --namespace <namespace>',
+    );
+  }
+
+  const kind = argvAfterCommand[0]!;
+  if (kind.startsWith('-')) {
+    return usageError(`Unknown option: ${kind}`);
+  }
+  if (kind === 'resource') {
+    return runGenerateResource(argvAfterCommand.slice(1));
+  }
+  if (kind === 'from-prisma') {
+    return runGenerateFromPrisma(argvAfterCommand.slice(1));
+  }
+
+  return usageError(`Unknown generate kind: ${kind}`);
 }

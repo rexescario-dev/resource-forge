@@ -29,6 +29,8 @@ Commands:
   doctor           Check CLI package environment health
   generate resource <namespace> <name> <path>
                    Write a minimal valid Resource JSON document
+  generate from-prisma <dmmfPath> <outDir> --namespace <namespace>
+                   Bootstrap Resource JSON files from a Prisma DMMF document
   init [path]      Create resource-forge.json + resources/ project marker
 `;
 

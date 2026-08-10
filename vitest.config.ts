@@ -12,6 +12,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@resource-forge/core': path.resolve(root, 'packages/core/src/index.ts'),
+      '@resource-forge/prisma': path.resolve(
+        root,
+        'packages/prisma/src/index.ts',
+      ),
     },
   },
 });

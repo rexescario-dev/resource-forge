@@ -669,6 +669,213 @@ describe('init-project create safety', () => {
   });
 });
 
+describe('run() generate from-prisma', () => {
+  const dirs: string[] = [];
+
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) {
+      rmSync(dir, { recursive: true, force: true });
+    }
+    resetWriteResourceDocumentForTests();
+  });
+
+  function tempDir(): string {
+    const dir = mkdtempSync(join(tmpdir(), 'rf-fp-'));
+    dirs.push(dir);
+    return dir;
+  }
+
+  function writeDmmf(dir: string, models: unknown[]): string {
+    const path = join(dir, 'schema.dmmf.json');
+    writeFileSync(path, `${JSON.stringify({ datamodel: { models } }, null, 2)}\n`);
+    return path;
+  }
+
+  function scalar(name: string, type: string, isRequired = true) {
+    return {
+      name,
+      kind: 'scalar',
+      type,
+      isList: false,
+      isRequired,
+    };
+  }
+
+  it('writes Resources and reports refusals sorted by model name', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    const dmmf = writeDmmf(dir, [
+      {
+        name: 'User',
+        fields: [scalar('id', 'Int')],
+      },
+      {
+        name: 'Comment',
+        fields: [scalar('id', 'Int')],
+      },
+      {
+        name: 'Post',
+        fields: [scalar('id', 'Int'), scalar('createdAt', 'DateTime')],
+      },
+    ]);
+
+    const result = run([
+      'generate',
+      'from-prisma',
+      dmmf,
+      out,
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(join(out, 'User.json'))).toBe(true);
+    expect(existsSync(join(out, 'Comment.json'))).toBe(true);
+    expect(existsSync(join(out, 'Post.json'))).toBe(false);
+    expect(run(['validate', join(out, 'User.json')]).exitCode).toBe(0);
+    const lines = result.stderr.trim().split('\n');
+    expect(lines[0]).toBe('generated: Comment.json');
+    expect(lines[1]).toBe('generated: User.json');
+    expect(lines[2]).toMatch(/^refused: Post/);
+  });
+
+  it('accepts --namespace before positionals', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    const dmmf = writeDmmf(dir, [
+      { name: 'User', fields: [scalar('id', 'Int')] },
+    ]);
+    const result = run([
+      'generate',
+      'from-prisma',
+      '--namespace',
+      'crm',
+      dmmf,
+      out,
+    ]);
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(join(out, 'User.json'))).toBe(true);
+  });
+
+  it('returns exit 2 when DMMF path missing even if outDir invalid', () => {
+    const result = run([
+      'generate',
+      'from-prisma',
+      join(tempDir(), 'missing.json'),
+      join(tempDir(), 'also-missing'),
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toMatch(/does not exist/i);
+  });
+
+  it('returns exit 2 for invalid outDir before reading malformed DMMF', () => {
+    const dir = tempDir();
+    const dmmf = join(dir, 'bad.json');
+    writeFileSync(dmmf, '{');
+    const result = run([
+      'generate',
+      'from-prisma',
+      dmmf,
+      join(dir, 'nope'),
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).not.toMatch(/Malformed/);
+  });
+
+  it('returns exit 2 on collisions with zero writes', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    writeFileSync(join(out, 'User.json'), '{}\n');
+    const dmmf = writeDmmf(dir, [
+      { name: 'User', fields: [scalar('id', 'Int')] },
+      { name: 'Post', fields: [scalar('id', 'Int')] },
+    ]);
+    const result = run([
+      'generate',
+      'from-prisma',
+      dmmf,
+      out,
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toMatch(/collision: User\.json/);
+    expect(existsSync(join(out, 'Post.json'))).toBe(false);
+  });
+
+  it('returns exit 1 when all models refused', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    const dmmf = writeDmmf(dir, [
+      {
+        name: 'Post',
+        fields: [scalar('createdAt', 'DateTime')],
+      },
+    ]);
+    const result = run([
+      'generate',
+      'from-prisma',
+      dmmf,
+      out,
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(1);
+    expect(existsSync(join(out, 'Post.json'))).toBe(false);
+  });
+
+  it('returns exit 1 on mid-write create-only failure and retains prior file', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    const dmmf = writeDmmf(dir, [
+      { name: 'Comment', fields: [scalar('id', 'Int')] },
+      { name: 'User', fields: [scalar('id', 'Int')] },
+    ]);
+
+    let calls = 0;
+    setFinalizeWriteForTests((tempPath, destination) => {
+      calls += 1;
+      if (calls === 1) {
+        linkSync(tempPath, destination);
+        return;
+      }
+      const err = new Error('simulated create failure') as NodeJS.ErrnoException;
+      err.code = 'EPERM';
+      throw err;
+    });
+
+    const result = run([
+      'generate',
+      'from-prisma',
+      dmmf,
+      out,
+      '--namespace',
+      'crm',
+    ]);
+    expect(result.exitCode).toBe(1);
+    expect(existsSync(join(out, 'Comment.json'))).toBe(true);
+  });
+
+  it('returns exit 2 for missing --namespace', () => {
+    const dir = tempDir();
+    const out = join(dir, 'out');
+    mkdirSync(out);
+    const dmmf = writeDmmf(dir, [
+      { name: 'User', fields: [scalar('id', 'Int')] },
+    ]);
+    const result = run(['generate', 'from-prisma', dmmf, out]);
+    expect(result.exitCode).toBe(2);
+  });
+});
+
 describe('public package surface', () => {
   it('exports run and does not export placeholder or internal symbols', () => {
     expect(typeof cli.run).toBe('function');
@@ -685,10 +892,10 @@ describe('public package surface', () => {
     expect(cli).not.toHaveProperty('setLinkMarkerForTests');
   });
 
-  it('depends only on @resource-forge/core among workspace packages', () => {
+  it('depends on @resource-forge/core and @resource-forge/prisma among workspace packages', () => {
     const deps = Object.keys(packageJson.dependencies ?? {});
-    expect(deps.filter((name) => name.startsWith('@resource-forge/'))).toEqual([
-      '@resource-forge/core',
-    ]);
+    expect(
+      deps.filter((name) => name.startsWith('@resource-forge/')).sort(),
+    ).toEqual(['@resource-forge/core', '@resource-forge/prisma']);
   });
 });
