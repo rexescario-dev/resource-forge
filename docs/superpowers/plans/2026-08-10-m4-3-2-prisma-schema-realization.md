@@ -306,7 +306,7 @@ Unilateral / inverse matrix (expected):
 | M9 | **Complete** (package README + roadmap + specs index) |
 | Branch | `feat/m4-3-2-prisma-schema-realization` |
 | PR | [#116](https://github.com/rexescario-dev/resource-forge/pull/116) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -324,14 +324,32 @@ Unilateral / inverse matrix (expected):
 | Typecheck | **Passed** |
 | Lint | **Passed** |
 | Build | N/A (package typechecks; dist not required for review) |
-| Package validation | **Passed** (deps: `@resource-forge/core` only; no nest/graphql/client) |
+| Package validation | **Passed** (deps: `@resource-forge/core` only; no nest/graphql/client); CI green on [#116](https://github.com/rexescario-dev/resource-forge/pull/116) |
 
 ### Next Gate
 
-**None — Ready for merge** (human merge of delivery PR for `#115`).
+**None — slice complete.**
+
+### M7 outcome (record)
+
+```text
+Decision: Approved for merge
+Subject: feat/m4-3-2-prisma-schema-realization / tracking #115 / PR #116
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-034-prisma-schema-realization-design.md
+Accepted plan: docs/superpowers/plans/2026-08-10-m4-3-2-prisma-schema-realization.md
+Plan tasks: 1–6 covered
+Verification: prisma test 62 / typecheck / lint green; packages/core untouched; no nest/graphql/client deps
+Rationale: Implements RFC-034 Resource-authoritative emitPrismaSchema within @resource-forge/prisma; no invented core/Nest/GraphQL/Client semantics; no merge blockers.
+```
+
+### M8 / M9 / M10
+
+- **M8:** N/A — no worthwhile behavior-preserving refactor beyond M6 structure.
+- **M9:** Complete — package README + roadmap M4.3.2 indexing; RFC-034 already Accepted in specs index.
+- **M10:** Accepted for this slice’s process path (gates reachable; SCR emitted; one PR per tracking issue). Workflow prompt library assets were not modified; no library revalidation required.
 
 ---
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M4.3.2 sequencing/execution. RFC-034 remains authoritative for product semantics. M6–M9 complete for this slice.
+**Status: Accepted.** Authoritative for M4.3.2 sequencing/execution history. RFC-034 remains authoritative for product semantics. Delivery complete via [#116](https://github.com/rexescario-dev/resource-forge/pull/116).
