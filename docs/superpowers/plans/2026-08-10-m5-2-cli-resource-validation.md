@@ -3,6 +3,7 @@
 > **For agentic workers:** Status is **Draft**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD. Implement **only** Accepted RFC-037 CLI Resource Validation in `@resource-forge/cli`. Do **not** register `doctor` or other product commands. Do **not** invent config, discovery, stdin, globbing, structured diagnostics, `run(argv, opts)` / FS DI, or a public `validateResourceDocument`. Do **not** amend `@resource-forge/core` validation semantics. Do **not** depend on `@resource-forge/nest|graphql|prisma`. Preserve RFC-036: sole public export `run`; bin stream/exit only (no validate pre-read); exit `0/1/2`; tests centered on `run()`.
 
 **Status:** Draft  
+**M5:** Returned for Revision (2026-08-10) — Plan Review; required corrections applied in this revision: (1) remove nonexistent RFC-037 §3.5.2 cite; (2) do not invent global `--help validate` dispatch precedence—preserve RFC-036 global-option handling, then dispatch validate only when identified as the command; (3) Task 3 must use existing `validateResource` signature without unsafe cast bypass. Re-enter Plan Review.  
 **Tracking:** [#124](https://github.com/rexescario-dev/resource-forge/issues/124)  
 **Source RFC:** [RFC-037 CLI Resource Validation](../specs/2026-08-10-rfc-037-cli-resource-validation-design.md) (**Accepted**)  
 **Depends on:** [RFC-036 CLI Foundation](../specs/2026-08-10-rfc-036-cli-foundation-design.md) (**Accepted**); Accepted `@resource-forge/core` `validateResource` (RFC-005+)  
@@ -77,7 +78,8 @@ prefer one delivery PR for tracking #124 containing Accepted RFC
 | Exit `1` | Semantic `validateResource` err **or** unexpected internal |
 | Exit `2` | Input/decode: bad arity, missing/unreadable file, invalid JSON, non-object JSON; plus RFC-036 usage |
 | Streams | Failures → stderr; quiet or minimal OK on success (prefer quiet); no structured JSON reports |
-| Success stdout | Prefer empty stdout on success (informative OK allowed; keep quiet in M6 unless UX demands) |
+| Global `--help` / `--version` | **Preserve RFC-036 exactly** in positions RFC-036 already defines; do **not** invent plan-level precedence for `['--help','validate']`. Only after RFC-036 global-option handling has identified `validate` as the command to run, pass remaining argv to the validate handler |
+| `validate --help` / post-command options | Exit `2` (undefined post-command option) — RFC-037 §4.1 |
 | `doctor` / stdin / discovery / config | **Forbidden** |
 | Public `validateResourceDocument` | **Forbidden** |
 | `run(argv, { fs })` | **Forbidden** |
@@ -130,7 +132,7 @@ Handler maps `input_decode` → exit `2`, `semantic` → exit `1`, `ok` → exit
 Derived only from Accepted RFC-037 (and preserved RFC-036 shell rules):
 
 1. SHALL keep `run(argv)` as the sole public package export.
-2. SHALL register `validate` in the internal registry and dispatch it (MUST NOT fall through to root help merely because a command token is present).
+2. SHALL register `validate` in the internal registry and dispatch it when RFC-036 global-option handling has identified `validate` as the command to run (RFC-037 §3.5: MUST NOT fall through to root help **merely** because a command token is present—e.g. `['validate', path]` must not become root help). SHALL NOT invent a new global `--help`/`--version` precedence rule beyond RFC-036 + RFC-037 §4.1.3.
 3. SHALL accept exactly one required positional path after `validate`; missing/extra positionals → exit `2` stderr.
 4. SHALL reject undefined options after `validate` → exit `2` stderr.
 5. SHALL read only the explicit path inside the validate handler via a command-local adapter (bin MUST NOT pre-read).
@@ -185,6 +187,7 @@ Derived only from Accepted RFC-037 (and preserved RFC-036 shell rules):
    - `run(['validate', invalidJsonFixture])` → exit `2`
    - `run(['validate', nonObjectJsonFixture])` → exit `2` (e.g. `[]` or `null`)
    - `run(['validate', path, '--help'])` or `run(['validate', '--flag'])` → exit `2` (undefined post-command option)
+   - Global `--help` / `--version` with or without a following command token: **follow RFC-036 established handling exactly** (do not invent plan-only expectations such as “`--help validate` must dispatch validate”). Add regression coverage only for behaviors RFC-036 already requires; once globals resolve to “run command `validate`,” remaining argv go to the validate handler.
    - RFC-036 regressions: bare/`--help`/`--version`/unknown command/unknown option/`foo --help` still pass
 3. Public-surface assertion: still exports only `run` among product symbols; **does** list `@resource-forge/core` as the only `@resource-forge/*` dependency (update the M5.1 “no RF deps” assertion).
 4. Optional: internal `validateResourceDocument` unit tests for decode/object-guard/semantic mapping without filesystem.
@@ -270,9 +273,10 @@ it('returns exit 2 when path is missing', () => {
 - [ ] **Step 1:** Write failing unit tests for: valid JSON object → ok; invalid identity object → semantic; malformed JSON → input_decode; `[]` / `null` / `"x"` → input_decode.
 - [ ] **Step 2:** Implement pure `validateResourceDocument(jsonText)`:
   - `JSON.parse` in try/catch → input_decode on throw
-  - reject non-null non-array objects only; arrays/`null`/primitives → input_decode
-  - call `validateResource(candidate as …)`; map `err` → semantic with a short message (exact wording non-normative; include enough to distinguish from input_decode)
-  - map `ok` → `{ ok: true }`
+  - reject values that are not plain JSON objects suitable to pass as a Resource candidate (arrays / `null` / primitives → input_decode). The object guard is **only** a JSON-shape guard for input/decode classification.
+  - Call `validateResource` using its **existing** Accepted core input type/signature (the `{ identity, schema, annotations }` candidate shape). Do **not** introduce a new core-facing type, and do **not** use an unsafe cast merely to bypass the core contract or invent a CLI-only validation assertion.
+  - Map `err` → semantic with a short message (exact wording non-normative; distinguishable from input_decode)
+  - Map `ok` → `{ ok: true }`
 - [ ] **Step 3:** Ensure the module does **not** import `node:fs` and is **not** exported from `index.ts`.
 - [ ] **Step 4:** Run document tests — PASS.
 
@@ -298,11 +302,11 @@ it('returns exit 2 when path is missing', () => {
   - `readExplicitFile(path)`; on failure → exit `2`
   - `validateResourceDocument(text)`; map outcome → exit `0` / `1` / `2` with stderr; success stdout `''`
 - [ ] **Step 2:** Change `runUnchecked` parsing:
-  - Collect global `--help` / `--version` / invalid globals as today **until** the first non-option token (command).
+  - Collect global `--help` / `--version` / invalid globals as today **until** the first non-option token (command), preserving RFC-036 grammar `rf [global-options] [command]`.
+  - **Preserve RFC-036's established handling of global `--help` / `--version` exactly.** Do not invent plan-level precedence for cases like `['--help', 'validate']`. Only once RFC-036's global-option handling has identified `validate` as the command to run should remaining argv be passed to the validate handler.
   - If command unknown → unknown-command exit `2` (RFC-036).
-  - If command is `validate` → **do not** fall through to help; pass **remaining** argv after the command token to `runValidate`.
+  - If command is `validate` **and** global-option handling has selected command dispatch (not a builtin help/version outcome) → pass **remaining** argv after the command token to `runValidate`. Preserve the Accepted RFC-037 command-dispatch rule (RFC-037 §3.5): do not fall through to root help **merely** because a registered command token is present (e.g. `['validate', path]` must invoke validate, not root help).
   - If no command: preserve RFC-036 help/version behavior (`help || !version` → help; else version).
-  - If command registered and globals included `--help` before the command (`['--help', 'validate']`): per RFC-037 §3.5.2, **dispatch** validate (missing path → exit `2`), do **not** short-circuit to root help.
 - [ ] **Step 3:** Register `validate` in the internal registry (private map/set + dispatch).
 - [ ] **Step 4:** Update root help text so it **MAY** list `validate` (informative); remove “No product commands are registered” if no longer true.
 - [ ] **Step 5:** Run `pnpm --filter @resource-forge/cli test` — all PASS.
@@ -342,11 +346,12 @@ it('returns exit 2 when path is missing', () => {
 
 ## Execution / dependency risks (operational)
 
-1. M5.1 `run.ts` currently ignores tokens after the command and falls through to help for any registered command — Task 5 **must** change dispatch before validate can work.
+1. M5.1 `run.ts` currently ignores tokens after the command and falls through to help whenever `help || !version` after the unknown-command check — Task 5 **must** dispatch registered `validate` for command invocations without inventing new global `--help`/`--version` precedence (RFC-036 + RFC-037 §4.1.3).
 2. Public-surface test currently asserts **zero** `@resource-forge/*` deps — update in the same change that adds `core`.
 3. Do not “fix” purity by moving reads into `bin.ts` — violates RFC-037 §3.4.
 4. Do not export document helper for easier testing — test via same-package imports or `run()` fixtures.
 5. Avoid unrelated lockfile churn when adding `workspace:*` core.
+6. Do not cite nonexistent RFC subsections (e.g. “§3.5.2”); cite RFC-037 §3.5 / §4.1.3 and RFC-036 for globals.
 
 ---
 
