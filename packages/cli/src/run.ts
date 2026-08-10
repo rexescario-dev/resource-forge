@@ -1,6 +1,7 @@
 import { CLI_VERSION } from './cli-version.js';
 import { COMMAND_REGISTRY } from './command-registry.js';
 import { runDoctor } from './commands/doctor.js';
+import { runGenerate } from './commands/generate.js';
 import { runValidate } from './commands/validate.js';
 
 export type RunResult = {
@@ -11,6 +12,7 @@ export type RunResult = {
 
 COMMAND_REGISTRY.set('validate', runValidate);
 COMMAND_REGISTRY.set('doctor', runDoctor);
+COMMAND_REGISTRY.set('generate', runGenerate);
 
 const HELP_TEXT = `Usage: rf [options] [command]
 
@@ -23,6 +25,8 @@ Options:
 Commands:
   validate <file>  Validate a JSON Resource document
   doctor           Check CLI package environment health
+  generate resource <namespace> <name> <path>
+                   Write a minimal valid Resource JSON document
 `;
 
 function helpResult(): RunResult {
