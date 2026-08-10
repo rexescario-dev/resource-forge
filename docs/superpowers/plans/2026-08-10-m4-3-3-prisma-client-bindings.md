@@ -333,7 +333,7 @@ Hard prerequisites: Task 1 before 2–3; Task 2 before or with 3; Task 4 after 3
 | M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
 | M9 | **Complete** (package README + roadmap M4.3.3 + specs index) |
 | Branch | `feat/m4-3-3-prisma-client-bindings` |
-| PR | Pending delivery PR for `#118` |
+| PR | [#119](https://github.com/rexescario-dev/resource-forge/pull/119) |
 | Status | **Ready for merge** |
 
 ### Shipped
