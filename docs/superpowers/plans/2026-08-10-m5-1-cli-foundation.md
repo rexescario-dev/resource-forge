@@ -285,12 +285,12 @@ Derived only from Accepted RFC-036:
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** (2026-08-10) |
 | M6 | **Complete** |
-| M7 | — (Ready for M7) |
-| M8 | — |
-| M9 | Partial (package README + roadmap M5.1 indexing in this PR) |
+| M7 | **Approved** (2026-08-10) |
+| M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
+| M9 | **Complete** (package README + root README CLI role + roadmap M5.1 + specs index) |
 | Branch | `feat/m5-1-cli-foundation` |
 | PR | [#122](https://github.com/rexescario-dev/resource-forge/pull/122) |
-| Status | **Ready for M7** |
+| Status | **Ready for merge** |
 
 ### Shipped
 
@@ -300,7 +300,7 @@ Derived only from Accepted RFC-036:
 - Exit `0` / `1` / `2` mapping; unknown-command vs unknown-option distinguishable stderr
 - Empty internal command registry; package-local `CLI_VERSION` constant (no fs/project discovery)
 - Removed `@resource-forge/core` dependency; lockfile updated for that removal only
-- Docs: package README (descriptive M5.1 surface), roadmap M5.1 indexing, RFC-036 Accepted
+- Docs: package README, root README CLI role, roadmap M5.1 ✅, RFC-036 Accepted in specs index
 
 ### Validation
 
@@ -312,25 +312,129 @@ Derived only from Accepted RFC-036:
 | Build | **Passed** (`pnpm --filter @resource-forge/cli build`; optional bin smoke `--version` / unknown command) |
 | Package validation | **Passed** (no `@resource-forge/*` deps; public export is `run` only) |
 | Exit `1` coverage | **Structural review** — top-level `try/catch` in `run` maps unexpected throwables to `{ exitCode: 1, … }` without a public/`testOptions` injector (per Accepted plan) |
+| CI on #122 | **Passed** |
 
 ### Next Gate
 
-**M7 Code Review** for this delivery branch / PR.
+**Merge** per project norms, then SCR Status → **Slice complete** closeout.
 
 ### M7 outcome (record)
 
 ```text
-(pending)
+Decision: Approved for merge
+Subject: feat/m5-1-cli-foundation / tracking #121 / PR #122
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-1-cli-foundation.md
+
+Plan tasks reviewed:
+- Task 1 Package boundary + bin + README: ✓
+- Task 2 Failing run() tests: ✓
+- Task 3 Pure run() implementation: ✓
+- Task 4 Bin adapter: ✓
+- Task 5 Docs / validation: ✓
+
+Verification evidence:
+- pnpm --filter @resource-forge/cli test|typecheck|lint (9 tests PASS)
+- pnpm --filter @resource-forge/cli build + bin smoke
+- gh pr checks 122 → ci pass
+
+Review summary: Implements RFC-036 shell-only CLI foundation within @resource-forge/cli; no product commands, no RF workspace deps, run()-centered verification.
+Blocking findings: None (no merge blockers)
+
+Non-blocking observations (optional):
+- Empty COMMAND_REGISTRY Set is intentionally minimal; do not expand into a public registration API in follow-ons without an Accepted design.
+- Keep CLI_VERSION in sync with package.json version manually (package-local constant).
+
+Gate: Merge per human/project norms. M8/M9 may follow when appropriate.
 ```
 
 ### M8 / M9 / M10
 
-- **M8:** — (pending review)
-- **M9:** Package README + roadmap M5.1 indexing included with delivery; SCR closeout after merge per convention
-- **M10:** — (pending)
+```text
+Decision: N/A
+Subject: packages/cli/src/{run,bin,index}.ts
+Scope:
+- packages/cli M5.1 delivery surface
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-1-cli-foundation.md
+M7 / authorization: Approved for merge (2026-08-10)
+
+Maintainability goals:
+- None identified that outweigh risk for this tiny shell
+
+Changes (Complete only):
+- n/a
+
+Verification:
+Before:
+- cli test/typecheck/lint green
+After:
+- n/a (no structural change)
+
+Externally observable behavior changes: None
+
+Gate: N/A — proceed to M9
+```
+
+```text
+Decision: Complete
+Subject: M5.1 / PR #122
+Accepted specification: docs/superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md
+Accepted implementation plan: docs/superpowers/plans/2026-08-10-m5-1-cli-foundation.md
+M7: Approved for merge
+M8: N/A
+
+Documentation scope:
+- packages/cli/README.md (already descriptive in delivery)
+- docs/roadmap.md (M5.1 ✅ indexing)
+- docs/superpowers/specs/README.md (RFC-036 Accepted)
+- README.md (package role for @resource-forge/cli)
+
+Updated artifacts:
+- README.md ← M7-approved CLI foundation surface
+- docs/roadmap.md ← M5.1 ✅ / #122 linkage
+- plan SCR ← M7–M10 outcomes
+
+Editorial changes:
+- none material beyond status consistency
+
+Content updates:
+- root README CLI role; roadmap M5.1 marked delivered-approved
+
+Verification:
+- Links checked (RFC-036, plan, #121, #122)
+- Heading hierarchy checked
+- Status consistency checked (Accepted RFC/plan; Ready for merge SCR)
+- Cross-references checked
+- Terminology checked (CLI surface vs package API vs run)
+- Duplicates / outdated refs checked (root README no longer “CLI (future)”)
+
+Gate: Documentation complete. Code/behavior/contracts unchanged by this stage.
+```
+
+```text
+Decision: Accepted (slice process path)
+Subject: M5.1 CLI Foundation workflow path
+Governing specification: docs/workflows/specs/agent-workflow-design.md
+
+Asset inventory:
+- Product slice used installed M2–M9 prompts; workflow library assets were not modified
+
+Blocking findings:
+- None
+
+Non-blocking observations:
+- Full prompt-library revalidation not required for this product slice (no workflow asset changes)
+
+Gate: Workflow path for this slice validated; library revalidation N/A
+```
+
+- **M8:** N/A — no worthwhile behavior-preserving refactor beyond M6 structure.
+- **M9:** Complete — package README + root README + roadmap M5.1 indexing; RFC-036 already Accepted in specs index.
+- **M10:** Accepted for this slice’s process path (gates reachable; SCR emitted; one PR per tracking issue). Workflow prompt library assets were not modified; no library revalidation required.
 
 ---
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M5.1 sequencing/execution. RFC-036 remains authoritative for product semantics. M6 complete; Ready for M7.
+**Status: Accepted.** Authoritative for M5.1 sequencing/execution history. RFC-036 remains authoritative for product semantics. Delivery Ready for merge via [#122](https://github.com/rexescario-dev/resource-forge/pull/122).

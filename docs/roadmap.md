@@ -9,7 +9,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M2 | Core contracts (vocabulary, not behavior) | Done |
 | M3 | Resource model | Done |
 | M4 | Integrations (Nest → GraphQL → Prisma) | In progress — M4.1 Nest ✅ · M4.2 GraphQL ✅ · M4.3.1–M4.3.3 Prisma ✅ |
-| M5 | CLI & end-to-end examples | In progress — M5.1 CLI Foundation (RFC-036 / [#121](https://github.com/rexescario-dev/resource-forge/issues/121)) |
+| M5 | CLI & end-to-end examples | In progress — M5.1 CLI Foundation ✅ · [#121](https://github.com/rexescario-dev/resource-forge/issues/121) |
 
 ## Process: RFCs before contracts
 
@@ -172,11 +172,11 @@ Integrations remain independent of each other. Do not expand RFC-028 into Prisma
 
 ## M5 — CLI & examples
 
-**Status:** In progress — [M5.1 CLI Foundation](superpowers/plans/2026-08-10-m5-1-cli-foundation.md) ([RFC-036](superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md) — [#121](https://github.com/rexescario-dev/resource-forge/issues/121)).
+**Status:** In progress — [M5.1 CLI Foundation](superpowers/plans/2026-08-10-m5-1-cli-foundation.md) ✅ ([RFC-036](superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md) — [#121](https://github.com/rexescario-dev/resource-forge/issues/121)).
 
 Developer experience after the ecosystem exists.
 
-1. **M5.1 CLI Foundation** — `rf` executable shell + pure `run(argv)` (RFC-036) — delivery in progress for [#121](https://github.com/rexescario-dev/resource-forge/issues/121)
+1. **M5.1 CLI Foundation** — `rf` executable shell + pure `run(argv)` (RFC-036) ✅ — [#121](https://github.com/rexescario-dev/resource-forge/issues/121) / [#122](https://github.com/rexescario-dev/resource-forge/pull/122)
 2. **Later slices (not committed APIs)** — validate/doctor, generators, examples, and reverse Prisma generation only after their own Accepted designs
 
 Roadmap candidates that are **not** M5.1 APIs:
