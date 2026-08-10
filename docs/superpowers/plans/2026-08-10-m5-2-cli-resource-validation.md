@@ -1,9 +1,9 @@
 # M5.2 CLI Resource Validation — Implementation Tasks
 
-> **For agentic workers:** Status is **Draft**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD. Implement **only** Accepted RFC-037 CLI Resource Validation in `@resource-forge/cli`. Do **not** register `doctor` or other product commands. Do **not** invent config, discovery, stdin, globbing, structured diagnostics, `run(argv, opts)` / FS DI, or a public `validateResourceDocument`. Do **not** amend `@resource-forge/core` validation semantics. Do **not** depend on `@resource-forge/nest|graphql|prisma`. Preserve RFC-036: sole public export `run`; bin stream/exit only (no validate pre-read); exit `0/1/2`; tests centered on `run()`.
+> **For agentic workers:** Status is **Accepted**. REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans`. Follow TDD. Implement **only** Accepted RFC-037 CLI Resource Validation in `@resource-forge/cli`. Do **not** register `doctor` or other product commands. Do **not** invent config, discovery, stdin, globbing, structured diagnostics, `run(argv, opts)` / FS DI, or a public `validateResourceDocument`. Do **not** amend `@resource-forge/core` validation semantics. Do **not** depend on `@resource-forge/nest|graphql|prisma`. Preserve RFC-036: sole public export `run`; bin stream/exit only (no validate pre-read); exit `0/1/2`; tests centered on `run()`. Preserve RFC-036 global `--help`/`--version` handling exactly; dispatch `validate` only when identified as the command.
 
-**Status:** Draft  
-**M5:** Returned for Revision (2026-08-10) — Plan Review; required corrections applied in this revision: (1) remove nonexistent RFC-037 §3.5.2 cite; (2) do not invent global `--help validate` dispatch precedence—preserve RFC-036 global-option handling, then dispatch validate only when identified as the command; (3) Task 3 must use existing `validateResource` signature without unsafe cast bypass. Re-enter Plan Review.  
+**Status:** Accepted  
+**M5:** Accepted (2026-08-10) — Plan Review re-entry; no plan blockers after prior return closures (remove phantom §3.5.2; defer global `--help`/`--version` to RFC-036; use existing `validateResource` signature without unsafe cast bypass). Public-export `run` only; command-local FS; pure document seam; core workspace dep only; TDD via `run(['validate', …])` retained. RFC-037 remains Accepted. M6 authorized; task checkboxes remain open until execution.  
 **Tracking:** [#124](https://github.com/rexescario-dev/resource-forge/issues/124)  
 **Source RFC:** [RFC-037 CLI Resource Validation](../specs/2026-08-10-rfc-037-cli-resource-validation-design.md) (**Accepted**)  
 **Depends on:** [RFC-036 CLI Foundation](../specs/2026-08-10-rfc-036-cli-foundation-design.md) (**Accepted**); Accepted `@resource-forge/core` `validateResource` (RFC-005+)  
@@ -357,28 +357,35 @@ it('returns exit 2 when path is missing', () => {
 
 ## Slice Completion Report
 
-*(Fill during M6–M10; leave Status unset until closeout.)*
-
 | Field | Result |
 | --- | --- |
 | Slice | M5.2 CLI Resource Validation |
 | Tracking | [#124](https://github.com/rexescario-dev/resource-forge/issues/124) |
-| M4 | Implementation Plan: **Draft** (this document) |
-| M5 | Review **TBD** |
-| M6 | **TBD** |
+| M4 | Implementation Plan: **Accepted** |
+| M5 | Review **Accepted** (2026-08-10) |
+| M6 | **Authorized — not started** |
 | M7 | **TBD** |
 | M8 | **TBD** |
 | M9 | **TBD** |
-| Branch | TBD |
-| PR | TBD |
-| Status | **In progress (plan Draft)** |
+| Branch | `docs/rfc-037-cli-resource-validation-accept` (fold into delivery PR for `#124`) |
+| PR | [#125](https://github.com/rexescario-dev/resource-forge/pull/125) (docs/plan; delivery PR TBD) |
+| Status | **Ready for M6** |
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Plan executability | **Passed** (M5 re-entry) |
+| Spec conflict rule | **Stated** (RFC-037 wins) |
+| Prior return closures | **Verified** (no §3.5.2; RFC-036 globals; no cast bypass) |
+| Implementation | **N/A** until M6 |
 
 ### Next Gate
 
-**Plan Review (M5)** — do not begin M6 until this plan is **Accepted**.
+**M6 Implementation** — execute task checkboxes under the Accepted plan; RFC-037 governs product semantics.
 
 ---
 
 ## Document status
 
-**Status: Draft.** Authoritative sequencing for M5.2 once Plan Review Accepts. RFC-037 remains authoritative for product semantics.
+**Status: Accepted.** Authoritative for M5.2 sequencing/execution. RFC-037 remains authoritative for product semantics. M6 authorized for [#124](https://github.com/rexescario-dev/resource-forge/issues/124).

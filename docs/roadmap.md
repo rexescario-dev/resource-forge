@@ -177,7 +177,7 @@ Integrations remain independent of each other. Do not expand RFC-028 into Prisma
 Developer experience after the ecosystem exists.
 
 1. **M5.1 CLI Foundation** — `rf` executable shell + pure `run(argv)` (RFC-036) ✅ — [#121](https://github.com/rexescario-dev/resource-forge/issues/121) / [#122](https://github.com/rexescario-dev/resource-forge/pull/122)
-2. **M5.2 CLI Resource Validation** — thin `rf validate <file>` over core `validateResource` (RFC-037) Accepted — [#124](https://github.com/rexescario-dev/resource-forge/issues/124); [implementation plan](superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md) Draft
+2. **M5.2 CLI Resource Validation** — thin `rf validate <file>` over core `validateResource` (RFC-037) Accepted — [#124](https://github.com/rexescario-dev/resource-forge/issues/124); [implementation plan](superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md) Accepted (M5) — M6 authorized
 3. **Later slices (not committed APIs)** — `doctor`, generators, examples, and reverse Prisma generation only after their own Accepted designs
 
 Roadmap candidates that are **not** committed M5.1/M5.2 APIs until Accepted:
