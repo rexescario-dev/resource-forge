@@ -1,9 +1,10 @@
 /**
  * @resource-forge/prisma
  *
- * Prisma correspondence verification + schema realization for Resource Forge
- * (RFC-033 / RFC-034). Depends on @resource-forge/core only.
- * Must not depend on Nest or GraphQL. Must not require Prisma Client/CLI for emit.
+ * Prisma correspondence verification, schema realization, and thin Client
+ * persistence bindings (RFC-033 / RFC-034 / RFC-035). Depends on
+ * @resource-forge/core only. Must not depend on Nest or GraphQL. Must not
+ * import/require Prisma Client/CLI/engine for emit, verify, or binding.
  */
 import { PACKAGE_NAME as CORE_PACKAGE_NAME } from '@resource-forge/core';
 
@@ -38,3 +39,14 @@ export type {
   RelationCorrespondence,
   ResourceCorrespondence,
 } from './report.js';
+export { createPrismaResourceBinding } from './binding.js';
+export type {
+  CreatePrismaResourceBindingInput,
+  PrismaResourceBinding,
+  ResourceRecord,
+} from './binding.js';
+export type { StructuralModelDelegate } from './binding-delegate.js';
+export type {
+  PrismaBindingError,
+  PrismaBindingErrorCategory,
+} from './binding-errors.js';
