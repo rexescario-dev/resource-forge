@@ -290,7 +290,7 @@ Derived only from Accepted RFC-036:
 | M9 | **Complete** (package README + root README CLI role + roadmap M5.1 + specs index) |
 | Branch | `feat/m5-1-cli-foundation` |
 | PR | [#122](https://github.com/rexescario-dev/resource-forge/pull/122) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -316,7 +316,7 @@ Derived only from Accepted RFC-036:
 
 ### Next Gate
 
-**Merge** per project norms, then SCR Status → **Slice complete** closeout.
+**None — slice complete.**
 
 ### M7 outcome (record)
 
@@ -437,4 +437,4 @@ Gate: Workflow path for this slice validated; library revalidation N/A
 
 ## Document status
 
-**Status: Accepted.** Authoritative for M5.1 sequencing/execution history. RFC-036 remains authoritative for product semantics. Delivery Ready for merge via [#122](https://github.com/rexescario-dev/resource-forge/pull/122).
+**Status: Accepted.** Authoritative for M5.1 sequencing/execution history. RFC-036 remains authoritative for product semantics. Delivery complete via [#122](https://github.com/rexescario-dev/resource-forge/pull/122).
