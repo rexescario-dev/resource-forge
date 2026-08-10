@@ -274,10 +274,10 @@ Keep the handler cohesive initially. Extract classify/create helpers **only if**
 - Modify: `packages/cli/src/run.test.ts`
 - Optionally create: internal create-seam test file alongside an internal helper (only once Task 2 introduces the seam)
 
-- [ ] **Step 1:** Add a `describe('run() init', …)` block with cases for creatable success (absent target; empty dir; unrelated files), conforming no-op, conflicts (marker only; resources only; bad marker; resources as file; target as file; unreadable/uninspectable marker/layout where deterministically testable), usage (extra args; option-like tokens), help precedence (`--help` before/with init via globals; `init --help` as usage, not special help).
-- [ ] **Step 2:** Plan/write assertions for create-safety: pre-existing marker never overwritten; post-classify race → exit `1`; no partial final marker under stage-then-`link`; successful `link` is last exit-affecting fallible op; no conforming leftover on failed marker after resources create.
-- [ ] **Step 3:** Run `pnpm --filter @resource-forge/cli test` — establish **red** for new init cases; existing suites still pass.
-- [ ] **Step 4:** Proceed to Task 2 to green — do **not** treat committing red tests as required.
+- [x] **Step 1:** Add a `describe('run() init', …)` block with cases for creatable success (absent target; empty dir; unrelated files), conforming no-op, conflicts (marker only; resources only; bad marker; resources as file; target as file; unreadable/uninspectable marker/layout where deterministically testable), usage (extra args; option-like tokens), help precedence (`--help` before/with init via globals; `init --help` as usage, not special help).
+- [x] **Step 2:** Plan/write assertions for create-safety: pre-existing marker never overwritten; post-classify race → exit `1`; no partial final marker under stage-then-`link`; successful `link` is last exit-affecting fallible op; no conforming leftover on failed marker after resources create.
+- [x] **Step 3:** Run `pnpm --filter @resource-forge/cli test` — establish **red** for new init cases; existing suites still pass.
+- [x] **Step 4:** Proceed to Task 2 to green — do **not** treat committing red tests as required.
 
 Example assertions (informative):
 
@@ -317,7 +317,7 @@ it('returns exit 2 for resources-only half-init', () => {
 - Modify: `packages/cli/src/run.test.ts` (green + create-safety coverage)
 - Modify: `packages/cli/src/index.ts` (comment only; still export `run`)
 
-- [ ] **Step 1:** Implement `runInit(argvAfterCommand)`:
+- [x] **Step 1:** Implement `runInit(argvAfterCommand)`:
   - Gate: ≤1 positional; reject any `-…` token → exit `2`
   - Resolve: missing → `.`; `path.resolve(process.cwd(), token)` (or equivalent); no upward walk
   - Classify using RFC-040 §5 table (reads OK)
@@ -326,13 +326,13 @@ it('returns exit 2 for resources-only half-init', () => {
   - On create failure before/during publish: exit `1`; enforce non-conforming leftover; attempt empty-`resources/` cleanup if this invocation created it; target cleanup best-effort only
   - Any FS failure after creatable classification (incl. late `EEXIST` on `resources/` or marker) → exit `1` (never remapped to conflict `2`)
   - Do **not** use final-path `wx`/incremental write, overwrite-capable rename, or copy-into-final
-- [ ] **Step 2:** Extract classify/create helpers **only if** needed for readability and deterministic seam tests; keep command-local; do not export. Treat generate’s write helper as pattern reference only.
-- [ ] **Step 3:** Register `COMMAND_REGISTRY.set('init', runInit)`; update `HELP_TEXT` to list `init [path]`. **Only existing global/general command-list help is updated; do not introduce an `init`-specific help parser or command-specific help behavior.**
-- [ ] **Step 4:** Do **not** change doctor’s registry expectations (`validate` + `doctor` only).
-- [ ] **Step 5:** Do **not** modify generate/validate/doctor handlers beyond registry/help coexistence.
-- [ ] **Step 6:** Green all Task 1 / create-safety tests; keep validate/doctor/generate/RFC-036 regressions green.
-- [ ] **Step 7:** Confirm `index.ts` still exports only `run`.
-- [ ] **Step 8:** Run `pnpm --filter @resource-forge/cli test typecheck lint` — PASS.
+- [x] **Step 2:** Extract classify/create helpers **only if** needed for readability and deterministic seam tests; keep command-local; do not export. Treat generate’s write helper as pattern reference only.
+- [x] **Step 3:** Register `COMMAND_REGISTRY.set('init', runInit)`; update `HELP_TEXT` to list `init [path]`. **Only existing global/general command-list help is updated; do not introduce an `init`-specific help parser or command-specific help behavior.**
+- [x] **Step 4:** Do **not** change doctor’s registry expectations (`validate` + `doctor` only).
+- [x] **Step 5:** Do **not** modify generate/validate/doctor handlers beyond registry/help coexistence.
+- [x] **Step 6:** Green all Task 1 / create-safety tests; keep validate/doctor/generate/RFC-036 regressions green.
+- [x] **Step 7:** Confirm `index.ts` still exports only `run`.
+- [x] **Step 8:** Run `pnpm --filter @resource-forge/cli test typecheck lint` — PASS.
 
 ### Task 3: Docs + SCR scaffolding (conditional)
 
@@ -342,10 +342,10 @@ it('returns exit 2 for resources-only half-init', () => {
 - Modify: `docs/roadmap.md` **only if** M5 later-slice / M5.5 lifecycle wording should reference `#135` / RFC-040 (do not invent Done status beyond shipped truth)
 - Modify: this plan’s SCR during M7–M10
 
-- [ ] **Step 1:** Inspect current README/root/roadmap text; update only inaccurate surfaces. When documenting init: argv, default `.`, marker+`resources/`, exit table, creatable/conforming/conflict notes, and out-of-scope (sibling project loading, discovery, `--force`, scaffolding). Keep `validate`/`doctor`/`generate` accurate.
-- [ ] **Step 2:** **Do not populate `examples/basic`** or otherwise modify `examples/**`.
-- [ ] **Step 3:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout.
-- [ ] **Step 4:** Final `pnpm --filter @resource-forge/cli test typecheck lint build`.
+- [x] **Step 1:** Inspect current README/root/roadmap text; update only inaccurate surfaces. When documenting init: argv, default `.`, marker+`resources/`, exit table, creatable/conforming/conflict notes, and out-of-scope (sibling project loading, discovery, `--force`, scaffolding). Keep `validate`/`doctor`/`generate` accurate.
+- [x] **Step 2:** **Do not populate `examples/basic`** or otherwise modify `examples/**`.
+- [x] **Step 3:** Fill SCR gates after M7–M10; set Status Slice complete only after delivery merge + SCR closeout.
+- [x] **Step 4:** Final `pnpm --filter @resource-forge/cli test typecheck lint build`.
 
 ---
 
@@ -389,35 +389,39 @@ it('returns exit 2 for resources-only half-init', () => {
 | Tracking | [#135](https://github.com/rexescario-dev/resource-forge/issues/135) |
 | M4 | Implementation Plan: **Accepted** |
 | M5 | Review **Accepted** (2026-08-10) |
-| M6 | — (authorized; not started) |
-| M7 | — |
-| M8 | — |
-| M9 | — |
-| M10 | — |
-| Branch | — |
-| PR | — |
-| Status | **Ready for M6** |
+| M6 | **Complete** |
+| M7 | **Approved** (2026-08-10) |
+| M8 | **N/A** (no worthwhile behavior-preserving refactor beyond slice delivery) |
+| M9 | **Complete** (package README + root README CLI role + roadmap M5.5) |
+| M10 | **Accepted** (slice process path; workflow library assets unmodified) |
+| Branch | `feat/m5-5-cli-init-project-marker` |
+| PR | _(set on open)_ |
+| Status | **Ready for merge** |
 
 ### Shipped
 
-— (fill during/after M6)
+- Registered flat `init` command (`rf init [path]` / `run(['init', …])`)
+- Canonical `resource-forge.json` + `resources/` create path (same-dir stage + `linkSync`)
+- Creatable / conforming / conflict classification before mutation
+- Post-classify FS failures → exit `1`; conflicts/usage → exit `2`
+- Internal create seams for uninspectable / race / cleanup coverage
+- Public API remains `run` only; doctor registry expectations unchanged
 
 ### Verification
 
 | Check | Result |
 | --- | --- |
-| Plan Review | **PASS** — Accepted; no plan blockers |
-| `pnpm --filter @resource-forge/cli test` | N/A (pre-M6) |
-| typecheck / lint / build | N/A (pre-M6) |
-| CI | N/A (pre-M6) |
-| Public export `run` only | N/A (pre-M6) |
-| Doctor registry still `validate` + `doctor` | N/A (pre-M6) |
-| Create-safety (stage+`linkSync`; …) | N/A (pre-M6) |
+| `pnpm --filter @resource-forge/cli test` | **PASS** (61 tests: 57 run + 4 document) |
+| typecheck / lint / build | **PASS** |
+| CI | _(pending PR)_ |
+| Public export `run` only | **PASS** |
+| Doctor registry still `validate` + `doctor` | **PASS** |
+| Create-safety (stage+`linkSync`; non-conforming on failure; no overwrite; post-classify FS fail → 1; `link` last exit-affecting op) | **PASS** |
 
 ### Next Gate
 
-**M6 Implementation** for `#135`. Prefer one delivery PR containing Accepted plan + implementation + SCR updates.
+**Merge delivery PR** for `#135`, then mark SCR **Slice complete** on closeout if required.
 
 ---
 
-**Status: Accepted.** Authoritative for M5.5 sequencing/execution. RFC-040 remains authoritative for product semantics. M6 authorized.
+**Status: Accepted.** Authoritative for M5.5 sequencing/execution. RFC-040 remains authoritative for product semantics. Delivery in progress on `feat/m5-5-cli-init-project-marker`.

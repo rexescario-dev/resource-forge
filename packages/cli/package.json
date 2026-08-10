@@ -1,7 +1,7 @@
 {
   "name": "@resource-forge/cli",
   "version": "0.0.0",
-  "description": "CLI foundation, Resource validation, package environment doctor, and generate resource for Resource Forge",
+  "description": "CLI foundation, Resource validation, package environment doctor, generate resource, and init project marker for Resource Forge",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

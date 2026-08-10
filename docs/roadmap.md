@@ -9,7 +9,7 @@ Resource Forge grows by design before implementation. After the repository found
 | M2 | Core contracts (vocabulary, not behavior) | Done |
 | M3 | Resource model | Done |
 | M4 | Integrations (Nest → GraphQL → Prisma) | In progress — M4.1 Nest ✅ · M4.2 GraphQL ✅ · M4.3.1–M4.3.3 Prisma ✅ |
-| M5 | CLI & end-to-end examples | In progress — M5.1 CLI Foundation ✅ · M5.2 validate ✅ · M5.3 doctor ✅ · M5.4 generate resource ✅ · [#121](https://github.com/rexescario-dev/resource-forge/issues/121) · [#124](https://github.com/rexescario-dev/resource-forge/issues/124) · [#128](https://github.com/rexescario-dev/resource-forge/issues/128) · [#132](https://github.com/rexescario-dev/resource-forge/issues/132) |
+| M5 | CLI & end-to-end examples | In progress — M5.1 CLI Foundation ✅ · M5.2 validate ✅ · M5.3 doctor ✅ · M5.4 generate resource ✅ · M5.5 init ✅ · [#121](https://github.com/rexescario-dev/resource-forge/issues/121) · [#124](https://github.com/rexescario-dev/resource-forge/issues/124) · [#128](https://github.com/rexescario-dev/resource-forge/issues/128) · [#132](https://github.com/rexescario-dev/resource-forge/issues/132) · [#135](https://github.com/rexescario-dev/resource-forge/issues/135) |
 
 ## Process: RFCs before contracts
 
@@ -172,7 +172,7 @@ Integrations remain independent of each other. Do not expand RFC-028 into Prisma
 
 ## M5 — CLI & examples
 
-**Status:** In progress — [M5.1 CLI Foundation](superpowers/plans/2026-08-10-m5-1-cli-foundation.md) ✅ ([RFC-036](superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md) — [#121](https://github.com/rexescario-dev/resource-forge/issues/121)); [M5.2 CLI Resource Validation](superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md) ✅ ([RFC-037](superpowers/specs/2026-08-10-rfc-037-cli-resource-validation-design.md) — [#124](https://github.com/rexescario-dev/resource-forge/issues/124) / [#126](https://github.com/rexescario-dev/resource-forge/pull/126)); [M5.3 CLI Package Environment Doctor](superpowers/plans/2026-08-10-m5-3-cli-package-environment-doctor.md) ✅ ([RFC-038](superpowers/specs/2026-08-10-rfc-038-cli-package-environment-doctor-design.md) — [#128](https://github.com/rexescario-dev/resource-forge/issues/128) / [#130](https://github.com/rexescario-dev/resource-forge/pull/130)); [M5.4 CLI Generate Resource](superpowers/plans/2026-08-10-m5-4-cli-generate-resource.md) ✅ ([RFC-039](superpowers/specs/2026-08-10-rfc-039-cli-generate-resource-design.md) — [#132](https://github.com/rexescario-dev/resource-forge/issues/132)).
+**Status:** In progress — [M5.1 CLI Foundation](superpowers/plans/2026-08-10-m5-1-cli-foundation.md) ✅ ([RFC-036](superpowers/specs/2026-08-10-rfc-036-cli-foundation-design.md) — [#121](https://github.com/rexescario-dev/resource-forge/issues/121)); [M5.2 CLI Resource Validation](superpowers/plans/2026-08-10-m5-2-cli-resource-validation.md) ✅ ([RFC-037](superpowers/specs/2026-08-10-rfc-037-cli-resource-validation-design.md) — [#124](https://github.com/rexescario-dev/resource-forge/issues/124) / [#126](https://github.com/rexescario-dev/resource-forge/pull/126)); [M5.3 CLI Package Environment Doctor](superpowers/plans/2026-08-10-m5-3-cli-package-environment-doctor.md) ✅ ([RFC-038](superpowers/specs/2026-08-10-rfc-038-cli-package-environment-doctor-design.md) — [#128](https://github.com/rexescario-dev/resource-forge/issues/128) / [#130](https://github.com/rexescario-dev/resource-forge/pull/130)); [M5.4 CLI Generate Resource](superpowers/plans/2026-08-10-m5-4-cli-generate-resource.md) ✅ ([RFC-039](superpowers/specs/2026-08-10-rfc-039-cli-generate-resource-design.md) — [#132](https://github.com/rexescario-dev/resource-forge/issues/132)); [M5.5 CLI Init Project Marker](superpowers/plans/2026-08-10-m5-5-cli-init-project-marker.md) ✅ ([RFC-040](superpowers/specs/2026-08-10-rfc-040-cli-init-project-marker-design.md) — [#135](https://github.com/rexescario-dev/resource-forge/issues/135)).
 
 Developer experience after the ecosystem exists.
 
@@ -180,15 +180,15 @@ Developer experience after the ecosystem exists.
 2. **M5.2 CLI Resource Validation** — thin `rf validate <file>` over core `validateResource` (RFC-037) ✅ — [#124](https://github.com/rexescario-dev/resource-forge/issues/124) / [#126](https://github.com/rexescario-dev/resource-forge/pull/126)
 3. **M5.3 CLI Package Environment Doctor** — `rf doctor` CLI/package health (RFC-038) ✅ — [#128](https://github.com/rexescario-dev/resource-forge/issues/128) / [#130](https://github.com/rexescario-dev/resource-forge/pull/130)
 4. **M5.4 CLI Generate Resource** — `rf generate resource <namespace> <name> <path>` (RFC-039) ✅ — [#132](https://github.com/rexescario-dev/resource-forge/issues/132)
-5. **Later slices (not committed APIs)** — `init`, other generate kinds, examples, project/workspace doctor, and reverse Prisma generation only after their own Accepted designs
+5. **M5.5 CLI Init Project Marker** — `rf init [path]` (RFC-040) ✅ — [#135](https://github.com/rexescario-dev/resource-forge/issues/135)
+6. **Later slices (not committed APIs)** — other generate kinds, examples, project/workspace doctor, and reverse Prisma generation only after their own Accepted designs
 
 Roadmap candidates that are **not** committed APIs until Accepted:
 
 ```text
-rf init
 rf generate from-prisma
 ```
 
-`rf validate` is locked by Accepted RFC-037 (`#124`). `rf doctor` is locked by Accepted RFC-038 (`#128`). `rf generate resource` is locked by Accepted RFC-039 (`#132`).
+`rf validate` is locked by Accepted RFC-037 (`#124`). `rf doctor` is locked by Accepted RFC-038 (`#128`). `rf generate resource` is locked by Accepted RFC-039 (`#132`). `rf init` is locked by Accepted RFC-040 (`#135`).
 
 Examples demonstrate the framework end to end. They are not the source of truth for architecture.

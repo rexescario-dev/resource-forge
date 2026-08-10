@@ -1,5 +1,8 @@
 import {
   existsSync,
+  linkSync,
+  lstatSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -11,6 +14,13 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
 import { COMMAND_REGISTRY } from './command-registry.js';
 import * as cli from './index.js';
+import {
+  createInitProject,
+  resetInitProjectForTests,
+  setInspectPathForTests,
+  setLinkMarkerForTests,
+  setMkdirResourcesForTests,
+} from './init-project.js';
 import {
   getResolveCoreCallCountForTests,
   resetResolveCoreCallCountForTests,
@@ -415,6 +425,250 @@ describe('writeResourceDocument seam', () => {
   });
 });
 
+describe('run() init', () => {
+  const dirs: string[] = [];
+
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) {
+      rmSync(dir, { recursive: true, force: true });
+    }
+    resetInitProjectForTests();
+  });
+
+  function tempDir(): string {
+    const dir = mkdtempSync(join(tmpdir(), 'rf-init-'));
+    dirs.push(dir);
+    return dir;
+  }
+
+  function expectCanonical(dir: string): void {
+    const marker = JSON.parse(
+      readFileSync(join(dir, 'resource-forge.json'), 'utf8'),
+    );
+    expect(marker).toEqual({ version: 1, resourcesDir: 'resources' });
+    expect(lstatSync(join(dir, 'resources')).isDirectory()).toBe(true);
+  }
+
+  it('creates marker and resources in an empty directory', () => {
+    const dir = tempDir();
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expectCanonical(dir);
+  });
+
+  it('creates marker and resources when target is absent', () => {
+    const parent = tempDir();
+    const target = join(parent, 'new-project');
+    const result = run(['init', target]);
+    expect(result.exitCode).toBe(0);
+    expectCanonical(target);
+  });
+
+  it('creates in a directory that already has unrelated files', () => {
+    const dir = tempDir();
+    writeFileSync(join(dir, 'README.md'), 'hello\n', 'utf8');
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(0);
+    expectCanonical(dir);
+    expect(readFileSync(join(dir, 'README.md'), 'utf8')).toBe('hello\n');
+  });
+
+  it('is a no-op when already conforming', () => {
+    const dir = tempDir();
+    expect(run(['init', dir]).exitCode).toBe(0);
+    const before = readFileSync(join(dir, 'resource-forge.json'), 'utf8');
+    const again = run(['init', dir]);
+    expect(again.exitCode).toBe(0);
+    expect(again.stderr).toBe('');
+    expect(readFileSync(join(dir, 'resource-forge.json'), 'utf8')).toBe(before);
+  });
+
+  it('defaults path to cwd when omitted', () => {
+    const dir = tempDir();
+    const previous = process.cwd();
+    try {
+      process.chdir(dir);
+      const result = run(['init']);
+      expect(result.exitCode).toBe(0);
+      expectCanonical(dir);
+    } finally {
+      process.chdir(previous);
+    }
+  });
+
+  it('returns exit 2 for resources-only half-init', () => {
+    const dir = tempDir();
+    mkdirSync(join(dir, 'resources'));
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+
+  it('returns exit 2 for marker-only half-init', () => {
+    const dir = tempDir();
+    writeFileSync(
+      join(dir, 'resource-forge.json'),
+      `${JSON.stringify({ version: 1, resourcesDir: 'resources' }, null, 2)}\n`,
+      'utf8',
+    );
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(2);
+    expect(existsSync(join(dir, 'resources'))).toBe(false);
+  });
+
+  it('returns exit 2 for non-canonical marker with resources', () => {
+    const dir = tempDir();
+    mkdirSync(join(dir, 'resources'));
+    writeFileSync(
+      join(dir, 'resource-forge.json'),
+      `${JSON.stringify({ version: 2, resourcesDir: 'resources' }, null, 2)}\n`,
+      'utf8',
+    );
+    const before = readFileSync(join(dir, 'resource-forge.json'), 'utf8');
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(2);
+    expect(readFileSync(join(dir, 'resource-forge.json'), 'utf8')).toBe(before);
+  });
+
+  it('returns exit 2 when resources is a file', () => {
+    const dir = tempDir();
+    writeFileSync(join(dir, 'resources'), 'not-a-dir\n', 'utf8');
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(2);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+
+  it('returns exit 2 when target is a file', () => {
+    const dir = tempDir();
+    const target = join(dir, 'not-a-dir');
+    writeFileSync(target, 'file\n', 'utf8');
+    const result = run(['init', target]);
+    expect(result.exitCode).toBe(2);
+  });
+
+  it('returns exit 2 for uninspectable marker/layout via seam', () => {
+    const dir = tempDir();
+    setInspectPathForTests((path) => {
+      if (path === dir) {
+        return { exists: true, isDirectory: true, isFile: false };
+      }
+      throw new Error('uninspectable layout');
+    });
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toMatch(/uninspectable/i);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+
+  it('returns exit 2 for extra positionals', () => {
+    const result = run(['init', tempDir(), 'extra']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for option-like tokens', () => {
+    const result = run(['init', '--flag']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr.length).toBeGreaterThan(0);
+  });
+
+  it('returns exit 2 for init --help as usage, not special help', () => {
+    const result = run(['init', '--help']);
+    expect(result.exitCode).toBe(2);
+    expect(result.stdout).toBe('');
+  });
+
+  it('honors global --help before init without creating', () => {
+    const dir = tempDir();
+    const result = run(['--help', 'init']);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toMatch(/Usage:/);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+
+  it('does not overwrite a pre-existing marker during create race', () => {
+    const dir = tempDir();
+    const markerPath = join(dir, 'resource-forge.json');
+    writeFileSync(markerPath, '{"kept":true}\n', 'utf8');
+    // Force creatable classification, then fail exclusive link like a race.
+    setInspectPathForTests((path) => {
+      if (path === dir) {
+        return { exists: true, isDirectory: true, isFile: false };
+      }
+      return { exists: false, isDirectory: false, isFile: false };
+    });
+    setLinkMarkerForTests(() => {
+      const error = new Error('file already exists') as NodeJS.ErrnoException;
+      error.code = 'EEXIST';
+      throw error;
+    });
+    const before = readFileSync(markerPath, 'utf8');
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(1);
+    expect(readFileSync(markerPath, 'utf8')).toBe(before);
+  });
+
+  it('maps post-classify resources EEXIST to exit 1 not conflict 2', () => {
+    const dir = tempDir();
+    setMkdirResourcesForTests(() => {
+      const error = new Error('file already exists') as NodeJS.ErrnoException;
+      error.code = 'EEXIST';
+      throw error;
+    });
+    const result = run(['init', dir]);
+    expect(result.exitCode).toBe(1);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+});
+
+describe('init-project create safety', () => {
+  const dirs: string[] = [];
+
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) {
+      rmSync(dir, { recursive: true, force: true });
+    }
+    resetInitProjectForTests();
+  });
+
+  function tempDir(): string {
+    const dir = mkdtempSync(join(tmpdir(), 'rf-init-seam-'));
+    dirs.push(dir);
+    return dir;
+  }
+
+  it('cleans empty resources when marker link fails after mkdir', () => {
+    const dir = tempDir();
+    setLinkMarkerForTests(() => {
+      throw new Error('publish failed');
+    });
+    const outcome = createInitProject(dir);
+    expect(outcome.ok).toBe(false);
+    expect(existsSync(join(dir, 'resources'))).toBe(false);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(false);
+  });
+
+  it('uses link publish rather than writing the final marker path directly', () => {
+    const dir = tempDir();
+    let linked = false;
+    setLinkMarkerForTests((tempPath, markerPath) => {
+      linked = true;
+      expect(existsSync(tempPath)).toBe(true);
+      expect(readFileSync(tempPath, 'utf8')).toMatch(/"version": 1/);
+      expect(existsSync(markerPath)).toBe(false);
+      linkSync(tempPath, markerPath);
+    });
+    const outcome = createInitProject(dir);
+    expect(outcome.ok).toBe(true);
+    expect(linked).toBe(true);
+    expect(existsSync(join(dir, 'resource-forge.json'))).toBe(true);
+  });
+});
+
 describe('public package surface', () => {
   it('exports run and does not export placeholder or internal symbols', () => {
     expect(typeof cli.run).toBe('function');
@@ -427,6 +681,8 @@ describe('public package surface', () => {
     expect(cli).not.toHaveProperty('setResolveCoreForTests');
     expect(cli).not.toHaveProperty('writeResourceDocument');
     expect(cli).not.toHaveProperty('setFinalizeWriteForTests');
+    expect(cli).not.toHaveProperty('createInitProject');
+    expect(cli).not.toHaveProperty('setLinkMarkerForTests');
   });
 
   it('depends only on @resource-forge/core among workspace packages', () => {
