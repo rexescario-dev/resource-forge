@@ -1,7 +1,7 @@
 {
   "name": "@resource-forge/prisma",
   "version": "0.0.0",
-  "description": "Prisma correspondence verification, schema realization, and Client persistence bindings for Resource Forge",
+  "description": "Prisma correspondence verification, schema realization, Client persistence bindings, and DMMF→Resource bootstrap for Resource Forge",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

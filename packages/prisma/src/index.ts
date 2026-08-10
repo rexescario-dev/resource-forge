@@ -1,10 +1,11 @@
 /**
  * @resource-forge/prisma
  *
- * Prisma correspondence verification, schema realization, and thin Client
- * persistence bindings (RFC-033 / RFC-034 / RFC-035). Depends on
- * @resource-forge/core only. Must not depend on Nest or GraphQL. Must not
- * import/require Prisma Client/CLI/engine for emit, verify, or binding.
+ * Prisma correspondence verification, schema realization, Client persistence
+ * bindings, and DMMF→Resource bootstrap synthesis (RFC-033 / RFC-034 / RFC-035 /
+ * RFC-041). Depends on @resource-forge/core only. Must not depend on Nest or
+ * GraphQL. Must not import/require Prisma Client/CLI/engine for emit, verify,
+ * binding, or bootstrap.
  */
 import { PACKAGE_NAME as CORE_PACKAGE_NAME } from '@resource-forge/core';
 
@@ -50,3 +51,10 @@ export type {
   PrismaBindingError,
   PrismaBindingErrorCategory,
 } from './binding-errors.js';
+export { synthesizeResourcesFromDmmf } from './bootstrap-from-dmmf.js';
+export type {
+  BootstrapEmission,
+  BootstrapError,
+  BootstrapRefusal,
+  BootstrapSuccess,
+} from './bootstrap-from-dmmf.js';
