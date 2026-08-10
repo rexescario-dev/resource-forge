@@ -377,7 +377,7 @@ Pipeline (planning aid): profile OK → index complete model set → classify re
 | M9 | **Complete** (prisma/cli/root READMEs + roadmap M5.6 + specs index) |
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-6-cli-generate-from-prisma` |
-| PR | _(pending — fill on open)_ |
+| PR | [#139](https://github.com/rexescario-dev/resource-forge/pull/139) |
 | Status | **Ready for merge** |
 
 ### Shipped
