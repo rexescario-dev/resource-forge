@@ -440,7 +440,7 @@ pnpm --filter @resource-forge/cli typecheck
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-7-basic-cli-examples` |
 | PR | [#142](https://github.com/rexescario-dev/resource-forge/pull/142) |
-| Status | **Ready for merge** |
+| Status | **Slice complete** |
 
 ### Shipped
 
@@ -460,11 +460,12 @@ pnpm --filter @resource-forge/cli typecheck
 | Public CLI export `run` only | **PASS** |
 | Golden regenerated after core rebuild (includes `constraints: []`) | **PASS** |
 | Doctor = package/CLI health only in README + harness | **PASS** |
+| CI | **Passed** on [#142](https://github.com/rexescario-dev/resource-forge/pull/142) |
 
 ### Next Gate
 
-**Merge [#142](https://github.com/rexescario-dev/resource-forge/pull/142).** After merge, optional SCR Status → **Slice complete**.
+**None — slice complete.** Delivery merged via [#142](https://github.com/rexescario-dev/resource-forge/pull/142).
 
 ---
 
-**Status: Accepted.** Authoritative for M5.7 sequencing/execution. RFC-042 remains authoritative for product semantics. Delivery PR [#142](https://github.com/rexescario-dev/resource-forge/pull/142).
+**Status: Accepted.** Authoritative for M5.7 sequencing/execution history. RFC-042 remains authoritative for product semantics. Delivery complete via [#142](https://github.com/rexescario-dev/resource-forge/pull/142).
