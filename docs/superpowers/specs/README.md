@@ -48,3 +48,4 @@ Design documents for Resource Forge. See [RFC process](../../rfc-process.md), [r
 | [RFC-039 — CLI Generate Resource](2026-08-10-rfc-039-cli-generate-resource-design.md) | Accepted — [#132](https://github.com/rexescario-dev/resource-forge/issues/132) |
 | [RFC-040 — CLI Init Project Marker](2026-08-10-rfc-040-cli-init-project-marker-design.md) | Accepted — [#135](https://github.com/rexescario-dev/resource-forge/issues/135) |
 | [RFC-041 — CLI Generate From-Prisma (Bootstrap)](2026-08-10-rfc-041-cli-generate-from-prisma-design.md) | Accepted — [#138](https://github.com/rexescario-dev/resource-forge/issues/138) |
+| [RFC-042 — Basic CLI Examples Walkthrough](2026-08-11-rfc-042-basic-cli-examples-design.md) | Accepted — [#141](https://github.com/rexescario-dev/resource-forge/issues/141) |
