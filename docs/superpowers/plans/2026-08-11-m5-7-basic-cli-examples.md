@@ -439,7 +439,7 @@ pnpm --filter @resource-forge/cli typecheck
 | M9 | **Complete** (`examples/basic/README.md` + roadmap M5.7 / M5.6 summary cosmetic + specs index) |
 | M10 | **Accepted** (slice process path; workflow library assets unmodified) |
 | Branch | `feat/m5-7-basic-cli-examples` |
-| PR | Pending push |
+| PR | [#142](https://github.com/rexescario-dev/resource-forge/pull/142) |
 | Status | **Ready for merge** |
 
 ### Shipped
@@ -463,8 +463,8 @@ pnpm --filter @resource-forge/cli typecheck
 
 ### Next Gate
 
-**Merge delivery PR for #141**, then optional SCR closeout commit if Status needs **Slice complete**.
+**Merge [#142](https://github.com/rexescario-dev/resource-forge/pull/142).** After merge, optional SCR Status → **Slice complete**.
 
 ---
 
-**Status: Accepted.** Authoritative for M5.7 sequencing/execution. RFC-042 remains authoritative for product semantics. Delivery on `feat/m5-7-basic-cli-examples`.
+**Status: Accepted.** Authoritative for M5.7 sequencing/execution. RFC-042 remains authoritative for product semantics. Delivery PR [#142](https://github.com/rexescario-dev/resource-forge/pull/142).
