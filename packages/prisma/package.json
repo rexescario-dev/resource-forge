@@ -1,6 +1,7 @@
 {
   "name": "@resource-forge/prisma",
   "version": "0.0.0",
+  "private": true,
   "description": "Prisma correspondence verification, schema realization, Client persistence bindings, and DMMF→Resource bootstrap for Resource Forge",
   "license": "MIT",
   "type": "module",

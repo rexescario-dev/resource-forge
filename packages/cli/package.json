@@ -1,6 +1,7 @@
 {
   "name": "@resource-forge/cli",
   "version": "0.0.0",
+  "private": true,
   "description": "CLI foundation, Resource validation, package environment doctor, generate resource, init project marker, and generate from-prisma for Resource Forge",
   "license": "MIT",
   "type": "module",
