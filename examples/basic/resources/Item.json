@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "namespace": "demo",
+    "name": "Item"
+  },
+  "schema": {
+    "fields": [],
+    "relations": [],
+    "operations": [],
+    "constraints": []
+  },
+  "annotations": []
+}
