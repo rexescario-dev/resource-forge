@@ -4,7 +4,7 @@
 **Status:** Draft
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)
 **Tracking:** Pending — a paired GitHub issue is opened after this Draft is reviewed (see §Document status)
-**Depends on:** RFC-001 (Resource Identity — `ResourceIdentity` reused as the composite result reference), RFC-005 (Resource Model — Resource as structural authority), RFC-010 / RFC-011 (Relation Association Semantics / Multiplicity — precedent for referencing a target Resource by identity without requiring co-resolution at single-Resource validation time), RFC-012 (Resource Operations — Operation identity / packaging), RFC-021 (Operation Kind, Signature, and Execution — **amended by this RFC**)
+**Depends on:** RFC-001 (Resource Identity — `ResourceIdentity` reused as the composite result reference), RFC-005 (Resource Model — Resource as structural authority), RFC-010 / RFC-011 (Relation Association Semantics / Multiplicity — precedent for referencing a target Resource by identity without requiring that target to resolve at single-Resource validation time), RFC-012 (Resource Operations — Operation identity / packaging), RFC-021 (Operation Kind, Signature, and Execution — **amended by this RFC**)
 **Followed by:** A future GraphQL-layer RFC translating composite Operation results into selectable GraphQL object types (unblocks the RFC-032 §13 deferral "Richer Operation IO (nested/composite) — Blocked on future core Operation IO RFCs"); a future RFC for `many`/list composite results, if evidence justifies it; a future RFC for nullable/optional Operation results, if evidence justifies it
 **Unblocks:** Consumers whose Operations need to return an existing Resource's shape instead of a single scalar or a hand-serialized string, without core inventing a Resource-instance validation framework
 **Amends / specializes:** Amends RFC-021's closed Operation member by adding one new `result` variant. Does **not** reopen RFC-021's `kind`, `params`, scalar `result` behavior, or invocation-order invariants beyond the result-validation step. Does **not** reopen RFC-012 packaging, RFC-009 scalar vocabulary, RFC-010/011 Relation floors, or RFC-032 GraphQL translation (GraphQL mapping of this new result kind is explicitly future work).
@@ -25,7 +25,7 @@ Operation.result:
 
 A composite result names a target Resource; the target Resource's own declared `fields` and `relations` are the composite result's shape. There is no second shape language. This mirrors how a Relation's `target` already references another Resource by identity (RFC-010/011) without requiring that target to be resolvable at single-Resource validation time — resolution is a concern for whichever consuming layer needs it (for Relations, translation-unit closure per RFC-032 §5.4; for Operation composite results, an analogous future consuming-layer rule, not defined here).
 
-At invocation, core's obligation for a composite result is **presence, not structure**: the invocation must produce a present, non-null value understood to represent an instance of the target Resource. Core does not walk that value's fields or relations. The host-provided Resource instance surface remains host-owned, exactly as RFC-032 §6.4 already establishes for Field/Relation resolution — RFC-043 extends that same division of labor to Operation results instead of inventing a new one.
+At invocation, core's obligation for a composite result is **presence, not structure**: invocation succeeds when the handler produces a present, non-null result value. Core does not inspect or validate that value's runtime structure; interpretation of it as an instance of the target Resource is host-owned. The host-provided Resource instance surface remains host-owned, exactly as RFC-032 §6.4 already establishes for Field/Relation resolution — RFC-043 extends that same division of labor to Operation results instead of inventing a new one.
 
 ## 1. Scope
 
@@ -34,21 +34,21 @@ At invocation, core's obligation for a composite result is **presence, not struc
 1. Add exactly one new `Operation.result` variant: `{ resource: ResourceIdentity }`, denoting a single existing Resource.
 2. Define validity for the composite variant: exactly one declared property, `resource`, whose value is a well-formed `ResourceIdentity` (RFC-001 grammar). No additional properties.
 3. State that `kind` rules from RFC-021 (`query` MUST NOT be `void`) are unaffected: a composite result is permitted for both `query` and `command`; only `void` remains kind-restricted.
-4. Extend the RFC-021 invocation contract's result-validation step (§5.3) to cover the composite case: success = a present, non-null value understood to represent an instance of the target Resource. No field/relation-level check is performed by core.
+4. Extend the RFC-021 invocation contract's result-validation step (§5.3) to cover the composite case: success = the handler produces a present, non-null result value. No field/relation-level check is performed by core.
 5. Extend RFC-021 Operation value equality (§3.5) to cover the composite case: two composite results are equal iff their target `ResourceIdentity`s are equal; a scalar/void result is never equal to a composite result.
 6. Preserve every other RFC-021 invariant unchanged: non-nullable result floor, invoke ordering, argument rules, handler resolution, missing-handler classification, handler-application-failure non-reclassification.
-7. Explicitly state that whether the referenced `ResourceIdentity` resolves to a co-present, registered, or otherwise reachable Resource is **not** checked by this RFC's declaration validation — the same deferral already used for Relation targets (RFC-010/011; resolved at a consuming-layer level such as RFC-032 §5.4 for GraphQL, not at single-Resource validation).
+7. Explicitly state that whether the referenced `ResourceIdentity` resolves to a Resource in the relevant translation/registry context is **not** checked by this RFC's declaration validation — the same deferral already used for Relation targets (RFC-010/011; resolved at a consuming-layer level such as RFC-032 §5.4 for GraphQL, not at single-Resource validation).
 
 ### 1.2 Non-goals
 
 This RFC does not define:
 
-1. Anonymous or inline composite result shapes not tied to a registered `ResourceIdentity`
+1. Anonymous or inline composite result shapes not represented by an existing `ResourceIdentity`
 2. List / `many` composite results (a target Resource result is always exactly one instance)
 3. Nullable or optional Operation results of any kind (RFC-021's non-nullable result floor is unchanged and unextended)
 4. A field-selection or partial-selection mechanism in core — any such mechanism is future work for a consuming translation layer (e.g. GraphQL selection sets), not a core Operation concept
 5. Resource-instance structural validation: core does not verify that a composite result's runtime value actually has the target Resource's declared fields/relations, does not check field types, and does not check nullability/optionality of the target's members
-6. Whether/how a composite result's target `ResourceIdentity` must be resolvable, registered, or co-present with the invoking Resource (deferred to a future consuming-layer rule, analogous to but not defined by RFC-032 §5.4)
+6. Whether/how a composite result's target `ResourceIdentity` resolves to a Resource in any particular context (deferred to a future consuming-layer rule, analogous to but not defined by RFC-032 §5.4)
 7. Any GraphQL, Nest, or Prisma mapping of the new result variant (`@resource-forge/core` remains integration-agnostic per RFC-032 §3)
 8. Changes to RFC-021 `kind`, `params`, scalar `result` behavior, or invoke ordering beyond the result-validation step
 9. Changes to RFC-012 packaging, RFC-009 scalar vocabulary, or RFC-010/011 Relation member floors
@@ -75,8 +75,9 @@ Operation {
   name: OperationName                                    # RFC-012, unchanged
   kind: "command" | "query"                               # RFC-021, unchanged
   params: ordered sequence of OperationParam               # RFC-021, unchanged
-  result: "string" | "number" | "boolean" | "void"          # RFC-021, unchanged
-        | { resource: ResourceIdentity }                    # RFC-043, new
+  result:
+      "string" | "number" | "boolean" | "void"              # RFC-021, unchanged
+    | { resource: ResourceIdentity }                         # RFC-043, new
 }
 ```
 
@@ -104,7 +105,7 @@ A Resource's `operations` sequence remains valid under this RFC only if, in addi
    - `resource` is a well-formed `ResourceIdentity` per RFC-001 grammar.
 3. If `kind === "query"`, `result !== "void"` (RFC-021, unchanged; a composite result is never `"void"` so this rule is satisfied trivially by any composite `query` result).
 
-**Not checked by this validation:** whether the `resource` identity refers to a Resource that exists, is registered, is valid, or is co-present with the declaring Resource in any particular set. Declaration validation under this RFC is local to the Operation's own shape, exactly as RFC-021's scalar `result` validation is local (a scalar `result` type is checked for grammar, not for whether any handler will ever produce a matching value).
+**Not checked by this validation:** whether the referenced `ResourceIdentity` resolves to a Resource in the relevant translation/registry context. Declaration validation under this RFC is local to the Operation's own shape, exactly as RFC-021's scalar `result` validation is local (a scalar `result` type is checked for grammar, not for whether any handler will ever produce a matching value).
 
 ### 4.1 Declaration failure categories (conceptual, extends RFC-021 §4.1)
 
@@ -124,18 +125,17 @@ The RFC-021 invocation steps (declaration validity → Operation lookup → argu
 | --- | --- |
 | `"void"` | Unchanged (RFC-021): invocation completes without a semantic result payload. |
 | `"string"` \| `"number"` \| `"boolean"` | Unchanged (RFC-021): invocation completes with a present, non-null value matching the declared scalar type. |
-| `{ resource: ResourceIdentity }` | Invocation completes with a **present, non-null value** understood to represent an instance of the target Resource. |
+| `{ resource: ResourceIdentity }` | Invocation succeeds when the handler produces a present, non-null result value. |
 
-**Presence-only obligation.** For a composite result, core's result-validation step ends at presence and non-nullness. Core MUST NOT walk the returned value's fields or relations against the target Resource's declared schema, MUST NOT require the value to expose any particular runtime shape beyond "present and non-null," and MUST NOT reject a composite result value on the grounds that a field is missing, mistyped, or that a related Resource cannot be resolved. Field/relation-level correctness, if and when it needs to be established, is the responsibility of whichever consuming/integration layer later reads those fields (for example, a future GraphQL resolver contract analogous to RFC-032 §6.1–§6.2) — not this invocation contract.
+**Presence-only obligation.** For a composite result, invocation succeeds when the handler produces a present, non-null result value. Core does not inspect or validate the value's runtime structure; interpretation of that value as an instance of the declared target Resource is host-owned. Core MUST NOT walk the returned value's fields or relations against the target Resource's declared schema, MUST NOT require the value to expose any particular runtime shape beyond "present and non-null," and MUST NOT reject a composite result value on the grounds that a field is missing, mistyped, or that a related Resource cannot be resolved. Field/relation-level correctness, if and when it needs to be established, is the responsibility of whichever consuming/integration layer later reads those fields (for example, a future GraphQL resolver contract analogous to RFC-032 §6.1–§6.2) — not this invocation contract.
 
 A present semantic result payload that is `null`/`undefined`, or an absent result, when `result` is a composite type → **result contract failure**, using the same failure classification RFC-021 §5.5 already defines for scalar result mismatches.
 
-### 5.1 What "understood to represent an instance" does not mean
+### 5.1 What "presence-only" does not mean
 
 To avoid the presence-only rule being read back into an implicit validation obligation:
 
-- Core does not define what runtime shape a "Resource instance" must have. That remains host-owned (RFC-032 §6.4), unchanged by this RFC.
-- Core does not attempt to distinguish "a value that structurally matches the target Resource" from "a value that does not" — any object, record, or opaque reference the host considers to be an instance of the target Resource satisfies this contract at the core layer.
+- Core does not define a runtime representation for Resource instances. That remains host-owned (RFC-032 §6.4), unchanged by this RFC. Any present, non-null value produced by the host satisfies the core-level result-presence contract; interpretation of that value as an instance of the target Resource belongs to the host/consuming layer.
 - This RFC does not introduce a `validateResourceInstance` function, type guard, or equivalent. None is required by this contract, and none is authorized by this RFC.
 
 ## 6. Equality (extension of RFC-021 §3.5)
@@ -217,7 +217,7 @@ invoke(SomeResource, "byId", { id: "abc" }, handlers)
 | RFC-001 Resource Identity | Consumed — `ResourceIdentity` is reused unchanged as the composite result reference; no new identity concept |
 | RFC-005 Resource Model | Relied upon — Resource remains structural authority; unchanged |
 | RFC-009 Field Types | Unrelated to this amendment beyond continuing to govern the unchanged scalar `result` variants |
-| RFC-010 / RFC-011 Relation Association / Multiplicity | Relied upon as precedent only — target-by-identity without required co-resolution; Relation floors themselves are unchanged and not reopened |
+| RFC-010 / RFC-011 Relation Association / Multiplicity | Relied upon as precedent only — target-by-identity without requiring resolution at declaration time; Relation floors themselves are unchanged and not reopened |
 | RFC-012 Resource Operations | Relied upon — Operation identity, packaging, `operations` sequence semantics unchanged |
 | RFC-021 Operation Kind, Signature, Execution | **Amended** — `result` union widened by one variant; result-validation step (§5.3) and equality (§3.5) extended; all other RFC-021 invariants unchanged |
 | RFC-023 Projection Composition | Unrelated — Operations still contribute no projection entries; unchanged |
@@ -232,7 +232,7 @@ invoke(SomeResource, "byId", { id: "abc" }, handlers)
 1. `Operation.result` is `"string" | "number" | "boolean" | "void" | { resource: ResourceIdentity }` — exactly one new variant added to RFC-021's closed union.
 2. A composite `result` value has exactly the declared property `resource`, a well-formed `ResourceIdentity`; additional properties are invalid.
 3. `kind` rules are unchanged: only `"void"` is kind-restricted (`query` MUST NOT use it); composite results are permitted for both `query` and `command`.
-4. Declaration validation of a composite `result` is local to the Operation's own shape; it does not require the referenced Resource to exist, be registered, or be co-present with the declaring Resource.
+4. Declaration validation of a composite `result` is local to the Operation's own shape; it does not require the referenced `ResourceIdentity` to resolve to a Resource in any particular context.
 5. Invocation-time result validation for a composite result checks presence and non-nullness only; it does not inspect the value's fields or relations.
 6. Two composite results are equal iff their target `ResourceIdentity`s are equal; a scalar/void result is never equal to a composite result.
 7. No `many`/list composite results, no nullable/optional results, no anonymous/inline result shapes, and no field-selection mechanism are introduced by this RFC.
