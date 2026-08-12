@@ -3,7 +3,7 @@
 **Date:** 2026-08-12
 **Status:** Draft
 **Package:** `@resource-forge/core` (contracts; no implementation in this RFC)
-**Tracking:** Pending — a paired GitHub issue is opened after this Draft is reviewed (see §Document status)
+**Tracking:** [#144](https://github.com/rexescario-dev/resource-forge/issues/144)
 **Depends on:** RFC-001 (Resource Identity — `ResourceIdentity` reused as the composite result reference), RFC-005 (Resource Model — Resource as structural authority), RFC-010 / RFC-011 (Relation Association Semantics / Multiplicity — precedent for referencing a target Resource by identity without requiring that target to resolve at single-Resource validation time), RFC-012 (Resource Operations — Operation identity / packaging), RFC-021 (Operation Kind, Signature, and Execution — **amended by this RFC**)
 **Followed by:** A future GraphQL-layer RFC translating composite Operation results into selectable GraphQL object types (unblocks the RFC-032 §13 deferral "Richer Operation IO (nested/composite) — Blocked on future core Operation IO RFCs"); a future RFC for `many`/list composite results, if evidence justifies it; a future RFC for nullable/optional Operation results, if evidence justifies it
 **Unblocks:** Consumers whose Operations need to return an existing Resource's shape instead of a single scalar or a hand-serialized string, without core inventing a Resource-instance validation framework
@@ -260,4 +260,4 @@ Deferred concerns are listed in §1.2. This ledger records that anonymous/inline
 
 Per this repository's M2 Specification gate (`docs/workflows/prompts/specification.md`), this document stops at Draft and is handed to Design Review (M3); it does not self-Accept.
 
-A paired GitHub tracking issue (`RFC-043: <title>`) is opened after this Draft has been reviewed, per the Resource Forge RFC process (`docs/rfc-process.md`): Draft → Review → Accept → Implement. This document will be updated with the issue link once that issue exists.
+Paired GitHub tracking issue: [#144](https://github.com/rexescario-dev/resource-forge/issues/144), per the Resource Forge RFC process (`docs/rfc-process.md`): Draft → Review → Accept → Implement.
